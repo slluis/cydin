@@ -67,8 +67,9 @@ namespace Cydin.Models
 
 		public static Settings GetSettings ()
 		{
-			var db = DataConnection.GetConnection ();
-			return db.ReadSettings<Settings> ();
+			using (var db = DataConnection.GetConnection ()) {
+				return db.ReadSettings<Settings> ();
+			}
 		}
 		
 		public static string GetCurrentAppName ()

@@ -158,72 +158,73 @@ namespace Cydin.Builder
 		
 		static void UpdateRepos (int appId, bool updateAll)
 		{
-			UserModel m = UserModel.GetAdmin (appId);
-			string basePath = AddinsPath;
-
-			SetupService setupService = new SetupService ();
-			LocalStatusMonitor monitor = new LocalStatusMonitor ();
-
-			HashSet<string> fileList = new HashSet<string> ();
-			FindFiles (fileList, basePath);
-			HashSet<string> reposToBuild = new HashSet<string> ();
-
-			List<Release> releases = new List<Release> ();
-
-			foreach (Release rel in m.GetReleases ()) {
-				foreach (string plat in rel.PlatformsList) {
-					string repoPath = Path.Combine (basePath, rel.DevStatus.ToString ());
-					repoPath = Path.Combine (repoPath, plat);
-					repoPath = Path.Combine (repoPath, rel.TargetAppVersion);
-					string path = Path.GetFullPath (Path.Combine (repoPath, rel.AddinId + "-" + rel.Version + ".mpack"));
-					fileList.Remove (path);
-					if (rel.Status == ReleaseStatus.PendingPublish || updateAll) {
-						if (!Directory.Exists (repoPath))
-							Directory.CreateDirectory (repoPath);
-						if (!File.Exists (rel.GetFilePath (plat))) {
-							Log (LogSeverity.Error, "Could not publish release " + rel.Version + " of add-in " + rel.AddinId + ". File " + rel.GetFilePath (plat) + " not found");
-							continue;
+			using (UserModel m = UserModel.GetAdmin (appId)) {
+				string basePath = AddinsPath;
+	
+				SetupService setupService = new SetupService ();
+				LocalStatusMonitor monitor = new LocalStatusMonitor ();
+	
+				HashSet<string> fileList = new HashSet<string> ();
+				FindFiles (fileList, basePath);
+				HashSet<string> reposToBuild = new HashSet<string> ();
+	
+				List<Release> releases = new List<Release> ();
+	
+				foreach (Release rel in m.GetReleases ()) {
+					foreach (string plat in rel.PlatformsList) {
+						string repoPath = Path.Combine (basePath, rel.DevStatus.ToString ());
+						repoPath = Path.Combine (repoPath, plat);
+						repoPath = Path.Combine (repoPath, rel.TargetAppVersion);
+						string path = Path.GetFullPath (Path.Combine (repoPath, rel.AddinId + "-" + rel.Version + ".mpack"));
+						fileList.Remove (path);
+						if (rel.Status == ReleaseStatus.PendingPublish || updateAll) {
+							if (!Directory.Exists (repoPath))
+								Directory.CreateDirectory (repoPath);
+							if (!File.Exists (rel.GetFilePath (plat))) {
+								Log (LogSeverity.Error, "Could not publish release " + rel.Version + " of add-in " + rel.AddinId + ". File " + rel.GetFilePath (plat) + " not found");
+								continue;
+							}
+							File.Copy (rel.GetFilePath (plat), path, true);
+							GenerateInstallerFile (m, path, rel, plat);
+							reposToBuild.Add (repoPath);
+							if (!releases.Contains (rel))
+								releases.Add (rel);
 						}
-						File.Copy (rel.GetFilePath (plat), path, true);
-						GenerateInstallerFile (m, path, rel, plat);
-						reposToBuild.Add (repoPath);
-						if (!releases.Contains (rel))
-							releases.Add (rel);
 					}
 				}
-			}
-
-			// Remove old add-ins
-
-			foreach (string f in fileList) {
-				try {
-					reposToBuild.Add (Path.GetFullPath (Path.GetDirectoryName (f)));
-					File.Delete (f);
-					string f2 = Path.ChangeExtension (f, m.CurrentApplication.AddinPackageExtension);
-					if (File.Exists (f2))
-						File.Delete (f2);
+	
+				// Remove old add-ins
+	
+				foreach (string f in fileList) {
+					try {
+						reposToBuild.Add (Path.GetFullPath (Path.GetDirectoryName (f)));
+						File.Delete (f);
+						string f2 = Path.ChangeExtension (f, m.CurrentApplication.AddinPackageExtension);
+						if (File.Exists (f2))
+							File.Delete (f2);
+					}
+					catch (Exception ex) {
+						Log (ex);
+					}
 				}
-				catch (Exception ex) {
-					Log (ex);
+	
+				// Update the repos
+	
+				foreach (string r in reposToBuild) {
+					setupService.BuildRepository (monitor, r);
+					string ds = r.Substring (basePath.Length + 1);
+					int i = ds.IndexOf (Path.DirectorySeparatorChar);
+					ds = ds.Substring (0, i);
+					string title = "MonoDevelop Add-in Repository";
+					if (ds != DevStatus.Stable.ToString())
+						title += " (" + ds + " channel)";
+					AppendName (Path.Combine (r, "main.mrep"), title);
+					AppendName (Path.Combine (r, "root.mrep"), title);
 				}
+	
+				foreach (Release rel in releases)
+					m.SetPublished (rel);
 			}
-
-			// Update the repos
-
-			foreach (string r in reposToBuild) {
-				setupService.BuildRepository (monitor, r);
-				string ds = r.Substring (basePath.Length + 1);
-				int i = ds.IndexOf (Path.DirectorySeparatorChar);
-				ds = ds.Substring (0, i);
-				string title = "MonoDevelop Add-in Repository";
-				if (ds != DevStatus.Stable.ToString())
-					title += " (" + ds + " channel)";
-				AppendName (Path.Combine (r, "main.mrep"), title);
-				AppendName (Path.Combine (r, "root.mrep"), title);
-			}
-
-			foreach (Release rel in releases)
-				m.SetPublished (rel);
 		}
 		
 		static void AppendName (string file, string name)

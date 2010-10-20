@@ -58,85 +58,91 @@ namespace Cydin
 		{
 			BuildService.CheckClient ();
 			List<SourceInfo> list = new List<SourceInfo> ();
-			UserModel m = UserModel.GetAdmin (appId);
-			foreach (Project p in m.GetProjects ()) {
-				foreach (VcsSource s in m.GetSources (p.Id)) {
-					List<SourceTagInfo> tags = new List<SourceTagInfo> ();
-					foreach (SourceTag st in m.GetVcsSourceTags (s.Id))
-						tags.Add (new SourceTagInfo (st));
-					list.Add (new SourceInfo (p, s, tags.ToArray ()));
+			using (UserModel m = UserModel.GetAdmin (appId)) {
+				foreach (Project p in m.GetProjects ()) {
+					foreach (VcsSource s in m.GetSources (p.Id)) {
+						List<SourceTagInfo> tags = new List<SourceTagInfo> ();
+						foreach (SourceTag st in m.GetVcsSourceTags (s.Id))
+							tags.Add (new SourceTagInfo (st));
+						list.Add (new SourceInfo (p, s, tags.ToArray ()));
+					}
 				}
+				return list.ToArray ();
 			}
-			return list.ToArray ();
 		}
 		
 		public SourceTagInfo[] GetSourceTags (int appId)
 		{
 			BuildService.CheckClient ();
-			UserModel m = UserModel.GetAdmin (appId);
-			List<SourceTagInfo> list = new List<SourceTagInfo> ();
-			foreach (SourceTag st in m.GetSourceTags ())
-				list.Add (new SourceTagInfo (st));
-			return list.ToArray ();
+			using (UserModel m = UserModel.GetAdmin (appId)) {
+				List<SourceTagInfo> list = new List<SourceTagInfo> ();
+				foreach (SourceTag st in m.GetSourceTags ())
+					list.Add (new SourceTagInfo (st));
+				return list.ToArray ();
+			}
 		}
 		
 		[WebMethod]
 		public ReleaseInfo[] GetReleases (int appId)
 		{
 			BuildService.CheckClient ();
-			UserModel m = UserModel.GetAdmin (appId);
-			List<ReleaseInfo> list = new List<ReleaseInfo> ();
-			
-			foreach (Project p in m.GetProjects ()) {
-				foreach (Release rel in m.GetProjectReleases (p.Id))
-					list.Add (new ReleaseInfo (rel));
+			using (UserModel m = UserModel.GetAdmin (appId)) {
+				List<ReleaseInfo> list = new List<ReleaseInfo> ();
+				
+				foreach (Project p in m.GetProjects ()) {
+					foreach (Release rel in m.GetProjectReleases (p.Id))
+						list.Add (new ReleaseInfo (rel));
+				}
+				return list.ToArray ();
 			}
-			return list.ToArray ();
 		}
 		
 		[WebMethod]
 		public void SetSourceStatus (int appId, int sourceId, string status, string errorMessage)
 		{
 			BuildService.CheckClient ();
-			UserModel m = UserModel.GetAdmin (appId);
-			m.SetSourceStatus (sourceId, status, errorMessage);
+			using (UserModel m = UserModel.GetAdmin (appId)) {
+				m.SetSourceStatus (sourceId, status, errorMessage);
+			}
 		}
 		
 		[WebMethod]
 		public void SetSourceTagStatus (int appId, int sourceId, string status)
 		{
 			BuildService.CheckClient ();
-			UserModel m = UserModel.GetAdmin (appId);
-			SourceTag stag = m.GetSourceTag (sourceId);
-			m.SetSourceTagStatus (stag, status);
+			using (UserModel m = UserModel.GetAdmin (appId)) {
+				SourceTag stag = m.GetSourceTag (sourceId);
+				m.SetSourceTagStatus (stag, status);
+			}
 		}
 		
 		[WebMethod]
 		public void UpdateSourceTags (int appId, int sourceId, DateTime fetchTime, SourceTagInfo[] sourceTags)
 		{
 			BuildService.CheckClient ();
-			UserModel m = UserModel.GetAdmin (appId);
-			VcsSource s = m.GetSource (sourceId);
-			s.LastFetchTime = fetchTime;
-			m.UpdateSource (s);
-			IEnumerable<SourceTag> currentTags = m.GetVcsSourceTags (sourceId);
-			foreach (SourceTagInfo stInfo in sourceTags) {
-				SourceTag st = currentTags.FirstOrDefault (t => t.Url == stInfo.Url);
-				if (st != null) {
-					stInfo.MergeTo (st);
-					m.UpdateSourceTag (st);
+			using (UserModel m = UserModel.GetAdmin (appId)) {
+				VcsSource s = m.GetSource (sourceId);
+				s.LastFetchTime = fetchTime;
+				m.UpdateSource (s);
+				IEnumerable<SourceTag> currentTags = m.GetVcsSourceTags (sourceId);
+				foreach (SourceTagInfo stInfo in sourceTags) {
+					SourceTag st = currentTags.FirstOrDefault (t => t.Url == stInfo.Url);
+					if (st != null) {
+						stInfo.MergeTo (st);
+						m.UpdateSourceTag (st);
+					}
+					else {
+						st = new SourceTag ();
+						st.SourceId = s.Id;
+						st.ProjectId = s.ProjectId;
+						stInfo.MergeTo (st);
+						m.CreateSourceTag (st);
+					}
 				}
-				else {
-					st = new SourceTag ();
-					st.SourceId = s.Id;
-					st.ProjectId = s.ProjectId;
-					stInfo.MergeTo (st);
-					m.CreateSourceTag (st);
+				foreach (SourceTag st in currentTags) {
+					if (!sourceTags.Any (t => t.Url == st.Url))
+						m.DeleteSourceTag (st);
 				}
-			}
-			foreach (SourceTag st in currentTags) {
-				if (!sourceTags.Any (t => t.Url == st.Url))
-					m.DeleteSourceTag (st);
 			}
 		}
 		
@@ -144,20 +150,22 @@ namespace Cydin
 		public void SetPublished (int appId, int releaseId)
 		{
 			BuildService.CheckClient ();
-			UserModel m = UserModel.GetAdmin (appId);
-			m.SetPublished (m.GetRelease (releaseId));
+			using (UserModel m = UserModel.GetAdmin (appId)) {
+				m.SetPublished (m.GetRelease (releaseId));
+			}
 		}
 		
 		[WebMethod]
 		public void SetSourceTagBuilt (int appId, int sourceTagId)
 		{
 			BuildService.CheckClient ();
-			UserModel m = UserModel.GetAdmin (appId);
-			SourceTag st = m.GetSourceTag (sourceTagId);
-			m.SetSourceTagStatus (st, SourceTagStatus.Ready);
-			VcsSource vcs = m.GetVcsSource (st.SourceId);
-			if (vcs.AutoPublish)
-				Builder.BuildService.PublishRelease (m, st, false);
+			using (UserModel m = UserModel.GetAdmin (appId)) {
+				SourceTag st = m.GetSourceTag (sourceTagId);
+				m.SetSourceTagStatus (st, SourceTagStatus.Ready);
+				VcsSource vcs = m.GetVcsSource (st.SourceId);
+				if (vcs.AutoPublish)
+					Builder.BuildService.PublishRelease (m, st, false);
+			}
 		}
 		
 		[WebMethod]
@@ -165,26 +173,28 @@ namespace Cydin
 		{
 			BuildService.CheckClient ();
 			List<AppReleaseInfo> list = new List<AppReleaseInfo> ();
-			UserModel m = UserModel.GetAdmin (appId);
-			foreach (AppRelease r in m.GetAppReleases ()) {
-				list.Add (new AppReleaseInfo (r));
+			using (UserModel m = UserModel.GetAdmin (appId)) {
+				foreach (AppRelease r in m.GetAppReleases ()) {
+					list.Add (new AppReleaseInfo (r));
+				}
+				return list.ToArray ();
 			}
-			return list.ToArray ();
 		}
 		
 		[WebMethod]
 		public void SetSourceTagBuildData (int appId, int stagId, string addinVersion, string addinId, string appVersion, string[] platforms)
 		{
 			BuildService.CheckClient ();
-			UserModel m = UserModel.GetAdmin (appId);
-			SourceTag st = m.GetSourceTag (stagId);
-			st.AddinVersion = addinVersion;
-			st.AddinId = addinId;
-			st.TargetAppVersion = appVersion;
-			st.Platforms = string.Join (" ", platforms);
-			st.Status = SourceTagStatus.Built;
-			st.BuildDate = DateTime.Now;
-			m.UpdateSourceTag (st);
+			using (UserModel m = UserModel.GetAdmin (appId)) {
+				SourceTag st = m.GetSourceTag (stagId);
+				st.AddinVersion = addinVersion;
+				st.AddinId = addinId;
+				st.TargetAppVersion = appVersion;
+				st.Platforms = string.Join (" ", platforms);
+				st.Status = SourceTagStatus.Built;
+				st.BuildDate = DateTime.Now;
+				m.UpdateSourceTag (st);
+			}
 		}
 	}
 	

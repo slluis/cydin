@@ -30,8 +30,10 @@ namespace Cydin.Controllers
 			string sourceTagId = context.Request.Headers ["sourceTagId"];
 			string fileName = context.Request.Headers ["fileName"];
 			
-			UserModel m = UserModel.GetAdmin (int.Parse (appId));
-			SourceTag stag = m.GetSourceTag (int.Parse (sourceTagId));
+			SourceTag stag;
+			using (UserModel m = UserModel.GetAdmin (int.Parse (appId))) {
+				stag = m.GetSourceTag (int.Parse (sourceTagId));
+			}
 			string path = Path.Combine (stag.PackagesPath, fileName);
 			
 			string dir = Path.GetDirectoryName (path);
