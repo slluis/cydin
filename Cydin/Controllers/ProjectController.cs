@@ -10,15 +10,14 @@ using Cydin.Builder;
 
 namespace Cydin.Controllers
 {
-    public class ProjectController : Controller
+    public class ProjectController : CydinController
     {
         //
         // GET: /Project/
 
         public ActionResult Index (int id)
         {
-			UserModel m = UserModel.GetCurrent ();
-			Project p = m.GetProject (id);
+			Project p = CurrentUserModel.GetProject (id);
 			if (p == null)
 				throw new Exception ("Project not found");
 			return View (p);
@@ -34,10 +33,9 @@ namespace Cydin.Controllers
 		
 		public ActionResult Edit (int id)
 		{
-			UserModel m = UserModel.GetCurrent ();
-			m.ValidateProject (id);
+			CurrentUserModel.ValidateProject (id);
 			ViewData["Creating"] = false;
-			return View ("Create", m.GetProject (id));
+			return View ("Create", CurrentUserModel.GetProject (id));
 		}
 
         public ActionResult Create()
@@ -51,8 +49,7 @@ namespace Cydin.Controllers
         {
             try
             {
-				UserModel m = UserModel.GetCurrent ();
-				m.CreateProject (project);
+				CurrentUserModel.CreateProject (project);
 				return RedirectToAction ("CreateInitial", "Source", new { projectId = project.Id });
             }
             catch (Exception ex)
@@ -66,11 +63,10 @@ namespace Cydin.Controllers
         {
             try
             {
-				UserModel m = UserModel.GetCurrent ();
-				Project p = m.GetProject (project.Id);
+				Project p = CurrentUserModel.GetProject (project.Id);
 				p.Name = project.Name;
 				p.Description = project.Description;
-				m.UpdateProject (p);
+				CurrentUserModel.UpdateProject (p);
 				return RedirectToAction ("Index", new { id = project.Id });
             }
             catch (Exception ex)
@@ -84,127 +80,112 @@ namespace Cydin.Controllers
  
         public ActionResult Delete(int id)
         {
-			UserModel.GetCurrent ().DeleteProject (id);
+			CurrentUserModel.DeleteProject (id);
 			return RedirectToAction ("Index", "Home");
         }
 
 		public ActionResult DeleteRelease (int releaseId)
 		{
-			UserModel m = UserModel.GetCurrent ();
-			Release r = m.GetRelease (releaseId);
-			m.DeleteRelease (r);
+			Release r = CurrentUserModel.GetRelease (releaseId);
+			CurrentUserModel.DeleteRelease (r);
 			return RedirectToAction ("Index", new { id = r.ProjectId });
 		}
 
 		public ActionResult PublishRelease (int sourceId)
 		{
-			UserModel m = UserModel.GetCurrent ();
-			Release rel = m.PublishRelease (sourceId);
+			Release rel = CurrentUserModel.PublishRelease (sourceId);
 			return RedirectToAction ("Index", new { id = rel.ProjectId});
 		}
 
 		public ActionResult UploadRelease (int projectId)
 		{
-			UserModel m = UserModel.GetCurrent ();
-			Project p = m.GetProject (projectId);
+			Project p = CurrentUserModel.GetProject (projectId);
 			return View (p);
 		}
 
 		[HttpPost]
 		public ActionResult UploadReleaseFile (int projectId)
 		{
-			UserModel m = UserModel.GetCurrent ();
-			m.UploadRelease (projectId, Request.Files[0]);
+			CurrentUserModel.UploadRelease (projectId, Request.Files[0]);
 			return RedirectToAction ("Index", new { id = projectId });
 		}
 
 		public ActionResult UpdateSource (int sourceTagId)
 		{
-			UserModel m = UserModel.GetCurrent ();
-			m.CleanSources (sourceTagId);
+			CurrentUserModel.CleanSources (sourceTagId);
 			BuildService.TriggerBuild ();
-			SourceTag st = m.GetSourceTag (sourceTagId);
+			SourceTag st = CurrentUserModel.GetSourceTag (sourceTagId);
 			return RedirectToAction ("Index", new { id = st.ProjectId });
 		}
 
 		public ActionResult BuildLog (int id)
 		{
-			UserModel m = UserModel.GetCurrent ();
-			SourceTag stag = m.GetSourceTag (id);
+			SourceTag stag = CurrentUserModel.GetSourceTag (id);
 			return File (stag.LogFile, "text/html");
 		}
 
 		public ActionResult ReleasePackage (int id, string platform)
 		{
-			UserModel m = UserModel.GetCurrent ();
-			Release rel = m.GetRelease (id);
+			Release rel = CurrentUserModel.GetRelease (id);
 			return File (rel.GetFilePath (platform), "application/x-mpack", rel.AddinId + "-" + rel.Version + ".mpack");
 		}
 
 		public ActionResult SourceTagPackage (int id, string platform)
 		{
-			UserModel m = UserModel.GetCurrent ();
-			SourceTag stag = m.GetSourceTag (id);
+			SourceTag stag = CurrentUserModel.GetSourceTag (id);
 			return File (stag.GetFilePath (platform), "application/x-mpack", stag.AddinId + "-" + stag.AddinVersion + ".mpack");
 		}
 
 		public ActionResult AppReleasePackage (int id)
 		{
-			ServiceModel m = ServiceModel.GetCurrent ();
-			AppRelease release = m.GetAppRelease (id);
+			AppRelease release = CurrentServiceModel.GetAppRelease (id);
 			return File (release.ZipPath, "application/zip");
 		}
 
 		public ActionResult ReleasePackageInstaller (int id)
 		{
-			UserModel m = UserModel.GetCurrent ();
-			Release rel = m.GetRelease (id);
+			Release rel = CurrentUserModel.GetRelease (id);
 			StringWriter sw = new StringWriter ();
-			BuildService.GenerateInstallerXml (sw, m, rel, rel.PlatformsList);
-			return File (Encoding.UTF8.GetBytes (sw.ToString()), "application/x-" + m.CurrentApplication.AddinPackageSubextension + "-mpack", rel.AddinId + "-" + rel.Version + m.CurrentApplication.AddinPackageExtension);
+			BuildService.GenerateInstallerXml (sw, CurrentUserModel, rel, rel.PlatformsList);
+			return File (Encoding.UTF8.GetBytes (sw.ToString()), "application/x-" + CurrentUserModel.CurrentApplication.AddinPackageSubextension + "-mpack", rel.AddinId + "-" + rel.Version + CurrentUserModel.CurrentApplication.AddinPackageExtension);
 		}
 
 		public ActionResult ConfirmDelete (int id)
 		{
-			UserModel m = UserModel.GetCurrent ();
-			Project p = m.GetProject (id);
+			Project p = CurrentUserModel.GetProject (id);
 			return View (p);
 		}
 
 		public ActionResult ToggleTrusted (int id)
 		{
-			UserModel m = UserModel.GetCurrent ();
-			if (!m.IsAdmin)
+			if (!CurrentUserModel.IsAdmin)
 				throw new Exception ("Unauthorised");
-			Project p = m.GetProject (id);
-			m.SetProjectTrusted (id, !p.Trusted);
+			Project p = CurrentUserModel.GetProject (id);
+			CurrentUserModel.SetProjectTrusted (id, !p.Trusted);
 			return View ("Index", p);
 		}
 		
         [HttpPost]
 		public ActionResult SetNotification (int id, string notif, string value)
 		{
-			UserModel m = UserModel.GetCurrent ();
-			
 			if (!notif.StartsWith ("notify-"))
 				return Content ("Unknown notification");
 			ProjectNotification pnot = (ProjectNotification) Enum.Parse (typeof(ProjectNotification), notif.Substring (7));
-			m.SetProjectNotification (pnot, id, value == "true");
+			CurrentUserModel.SetProjectNotification (pnot, id, value == "true");
 			return Content ("OK");
 		}
 		
         [HttpPost]
 		public ActionResult SetDevStatus (int id, int stagId, int value)
 		{
-			UserModel m = UserModel.GetCurrent ();
-			m.ValidateProject (id);
+			CurrentUserModel.ValidateProject (id);
 			
-			SourceTag stag = m.GetSourceTag (stagId);
+			SourceTag stag = CurrentUserModel.GetSourceTag (stagId);
 			if (stag.ProjectId != id)
 				throw new InvalidOperationException ("Invalid source tag");
 			
 			stag.DevStatus = (DevStatus) value;
-			m.UpdateSourceTag (stag);
+			CurrentUserModel.UpdateSourceTag (stag);
 			return Content ("OK");
 		}
 	}

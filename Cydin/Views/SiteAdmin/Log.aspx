@@ -1,4 +1,4 @@
-<%@ Page Title="" Language="C#" Inherits="System.Web.Mvc.ViewPage<Cydin.Models.ServiceModel>" %>
+<%@ Page Title="" Language="C#" Inherits="Cydin.Views.UserViewPage" %>
 <%@ Import Namespace="Cydin.Builder" %>
 <%@ Import Namespace="Cydin.Properties" %>
 <%@ Import Namespace="Cydin.Models" %>

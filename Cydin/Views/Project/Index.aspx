@@ -1,4 +1,4 @@
-<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage<Cydin.Models.Project>" %>
+<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="Cydin.Views.UserViewPage<Cydin.Models.Project>" %>
 <%@ Import Namespace="Cydin.Properties" %>
 <%@ Import Namespace="Cydin.Models" %>
 <%@ Import Namespace="System.Linq" %>
@@ -37,7 +37,7 @@
     Response.Write (md.Transform (Model.Description));
     %>
 
-    <%  UserModel m = UserModel.GetCurrent ();
+    <%  UserModel m = CurrentUserModel;
         var isProjectAdmin = m.CanManageProject (Model);
         var sources = m.GetProjectSources (Model.Id);
         var sourceTags = m.GetProjectSourceTags (Model.Id);

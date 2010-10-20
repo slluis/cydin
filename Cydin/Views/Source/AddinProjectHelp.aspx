@@ -1,4 +1,4 @@
-<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage" %>
+<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="Cydin.Views.UserViewPage" %>
 <%@ Import Namespace="Cydin.Properties" %>
 <%@ Import Namespace="Cydin.Models" %>
 
@@ -29,7 +29,7 @@
 
 Comments:
 <ul>
-<li><b>AddinProject</b> is the root element. It must have an attribute named <b>appVersion</b> which specifies the <%=UserModel.GetCurrent().CurrentApplication.Name %> version that the add-in is targetting.</li>
+<li><b>AddinProject</b> is the root element. It must have an attribute named <b>appVersion</b> which specifies the <%=CurrentUserModel.CurrentApplication.Name %> version that the add-in is targetting.</li>
 <li>There must be at least one <b>Project</b> element with the following child elements and attributes:
 <ul><li><b>platforms</b> attribute (optional): names of the platforms that this add-in configuration is targetting. It can be Linux, Mac or Win32.
   It is possible to specify several values separated by a space. If no value is specified, the configuration applies to all platforms.</li>

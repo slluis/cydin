@@ -1,4 +1,4 @@
-<%@ Page Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage" %>
+<%@ Page Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="Cydin.Views.UserViewPage" %>
 <%@ Import Namespace="Cydin.Properties" %>
 <%@ Import Namespace="Cydin.Models" %>
 <%@ Import Namespace="Cydin.Controllers" %>
@@ -8,7 +8,7 @@
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
-    <%  UserModel m = UserModel.GetCurrent (); %>
+    <%  UserModel m = CurrentUserModel; %>
     
     <table width="100%" border="0" cellspacing="0" cellpadding="0">
     <tr valign="top"><td width="75%">

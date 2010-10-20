@@ -35,56 +35,51 @@ using Cydin.Properties;
 
 namespace Cydin.Controllers
 {
-	public class SiteAdminController: Controller
+	public class SiteAdminController: CydinController
 	{
         public ActionResult Index()
         {
-			UserModel m = UserModel.GetCurrent ();
-			m.CheckIsSiteAdmin ();
-			return View (m.ServiceModel);
+			CurrentUserModel.CheckIsSiteAdmin ();
+			return View ();
         }
 		
         public ActionResult Setup()
         {
 			if (Settings.Default.OperationMode != OperationMode.NotSet) {
-				if (!ServiceModel.GetCurrent ().ThereIsAdministrator ())
+				if (!CurrentServiceModel.ThereIsAdministrator ())
 					return Redirect (ControllerHelper.GetActionUrl ("home", "User", "Login"));
 				else
 					RedirectToAction ("Index", "Home");
 			}
-			return View (ServiceModel.GetCurrent ());
+			return View ();
         }
 		
 		public ActionResult EnableServiceChange ()
 		{
-			UserModel m = UserModel.GetCurrent ();
-			m.CheckIsSiteAdmin ();
+			CurrentUserModel.CheckIsSiteAdmin ();
 			BuildService.AllowChangingService = true;
-			return View ("Index", m.ServiceModel);
+			return View ("Index");
 		}
 		
 		public ActionResult DisableServiceChange ()
 		{
-			UserModel m = UserModel.GetCurrent ();
-			m.CheckIsSiteAdmin ();
+			CurrentUserModel.CheckIsSiteAdmin ();
 			BuildService.AllowChangingService = false;
-			return View ("Index", m.ServiceModel);
+			return View ("Index");
 		}
 		
 		public ActionResult AuthorizeServiceChange ()
 		{
-			UserModel m = UserModel.GetCurrent ();
-			m.CheckIsSiteAdmin ();
+			CurrentUserModel.CheckIsSiteAdmin ();
 			BuildService.AuthorizeServiceConnection (BuildService.BuildBotConnectionRequest);
-			return View ("Index", m.ServiceModel);
+			return View ("Index");
 		}
 		
 		public ActionResult EditSettings ()
 		{
 			Settings s = UserModel.GetSettings ();
 			if (!Settings.Default.InitialConfiguration) {
-				UserModel m = UserModel.GetCurrent ();
-				m.CheckIsSiteAdmin ();
+				CurrentUserModel.CheckIsSiteAdmin ();
 				return View ("Settings", s);
 			} else {
 				s.WebSiteHost = HttpContext.Request.Url.Host;
@@ -97,9 +92,8 @@ namespace Cydin.Controllers
 		[HttpPost]
         public ActionResult SaveSettings (Settings s)
         {
-			UserModel m = UserModel.GetCurrent ();
 			if (!Settings.Default.InitialConfiguration)
-				m.CheckIsSiteAdmin ();
+				CurrentUserModel.CheckIsSiteAdmin ();
 			
 			Settings.Default.DataPath = s.DataPath;
 			Settings.Default.OperationMode = s.OperationMode;
@@ -110,21 +104,20 @@ namespace Cydin.Controllers
 			Settings.Default.SmtpUser = s.SmtpUser;
 			Settings.Default.SmtpUseSSL = s.SmtpUseSSL;
 			
-			m.UpdateSettings (Settings.Default);
+			CurrentUserModel.UpdateSettings (Settings.Default);
 			
 			Cydin.MvcApplication.UpdateRoutes ();
-			if (!ServiceModel.GetCurrent ().ThereIsAdministrator ())
+			if (!CurrentServiceModel.ThereIsAdministrator ())
 				return Redirect (ControllerHelper.GetActionUrl ("home", "Login", "User"));
 			else {
-				ServiceModel.GetCurrent ().EndInitialConfiguration ();
+				CurrentServiceModel.EndInitialConfiguration ();
 				return Redirect (ControllerHelper.GetActionUrl ("home", null, null));
 			}
         }
 		
 		public ActionResult NewApplication ()
 		{
-			UserModel m = UserModel.GetCurrent ();
-			m.CheckIsSiteAdmin ();
+			CurrentUserModel.CheckIsSiteAdmin ();
 			Application app = new Application ();
 			app.Id = -1;
 			return View ("EditApplication", app);
@@ -132,43 +125,40 @@ namespace Cydin.Controllers
 		
 		public ActionResult EditApplication (int id)
 		{
-			UserModel m = UserModel.GetCurrent ();
-			m.CheckIsSiteAdmin ();
-			Application app = m.ServiceModel.GetApplication (id);
+			CurrentUserModel.CheckIsSiteAdmin ();
+			Application app = CurrentServiceModel.GetApplication (id);
 			return View ("EditApplication", app);
 		}
 		
 		[HttpPost]
         public ActionResult UpdateApplication (Application app)
         {
-			UserModel m = UserModel.GetCurrent ();
+			UserModel m = CurrentUserModel;
 			m.CheckIsSiteAdmin ();
 			if (app.Id != -1) {
-				Application capp = m.ServiceModel.GetApplication (app.Id);
+				Application capp = CurrentServiceModel.GetApplication (app.Id);
 				capp.Name = app.Name;
 				capp.Subdomain = app.Subdomain;
 				capp.Platforms = app.Platforms;
-				m.ServiceModel.UpdateApplication (capp);
+				CurrentServiceModel.UpdateApplication (capp);
 			}
 			else {
 				app.Description = "<p>This is the home page of the add-in repository for " + app.Name + "</p><p>Click on the 'Edit Page' link to change the content of this welcome page</p>";
-				m.ServiceModel.CreateApplication (app);
+				CurrentServiceModel.CreateApplication (app);
 			}
 			return RedirectToAction ("Index");
         }
 		
 		public ActionResult UsersList ()
 		{
-			UserModel m = UserModel.GetCurrent ();
-			m.CheckIsSiteAdmin ();
-			return View (m.ServiceModel);
+			CurrentUserModel.CheckIsSiteAdmin ();
+			return View ();
 		}
 		
 		public ActionResult Log ()
 		{
-			UserModel m = UserModel.GetCurrent ();
-			m.CheckIsSiteAdmin ();
-			return View (m.ServiceModel);
+			CurrentUserModel.CheckIsSiteAdmin ();
+			return View ();
 		}
 	}
 }

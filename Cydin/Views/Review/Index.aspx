@@ -1,4 +1,4 @@
-<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage<Cydin.Models.UserModel>" %>
+<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="Cydin.Views.UserViewPage" %>
 <%@ Import Namespace="Cydin.Properties" %>
 <%@ Import Namespace="Cydin.Models" %>
 
@@ -12,12 +12,12 @@
 
     <table>
     <tr>
-    <th>Date</th><th>Project</th><th>Addin Version</th><th><%=Model.CurrentApplication.Name %> Version</th><th></th>
+    <th>Date</th><th>Project</th><th>Addin Version</th><th><%=CurrentUserModel.CurrentApplication.Name %> Version</th><th></th>
     </tr>
-    <% foreach (Release rel in Model.GetPendingReleases (ReleaseStatus.PendingReview)) { %>
+    <% foreach (Release rel in CurrentUserModel.GetPendingReleases (ReleaseStatus.PendingReview)) { %>
     <tr>
     <td><%=rel.LastChangeTime %></td>
-    <td><%=Html.ActionLink (Model.GetProject (rel.ProjectId).Name, "Index", "Project", new {id=rel.ProjectId}, null) %></td>
+    <td><%=Html.ActionLink (CurrentUserModel.GetProject (rel.ProjectId).Name, "Index", "Project", new {id=rel.ProjectId}, null) %></td>
     <td><%=rel.Version %></td>
     <td><%=rel.TargetAppVersion %></td>
     <td>

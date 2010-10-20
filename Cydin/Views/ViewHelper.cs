@@ -45,6 +45,7 @@ namespace Cydin.Views
 			
 			ServiceModel sm = ServiceModel.GetCurrent ();
 			Application app = sm.GetApplication (appId);
+			sm.Dispose ();
 			
 			MarkdownSharp.Markdown md = new MarkdownSharp.Markdown ();
 			md.AutoHyperlink = true;

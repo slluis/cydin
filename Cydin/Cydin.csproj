@@ -138,6 +138,8 @@
     <Compile Include="Models\DevStatus.cs" />
     <Compile Include="Models\VersionControlUtil.cs" />
     <Compile Include="Controllers\ControllerHelper.cs" />
+    <Compile Include="Views\UserViewPage.cs" />
+    <Compile Include="Controllers\CydinController.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />

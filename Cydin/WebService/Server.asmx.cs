@@ -23,11 +23,12 @@ namespace Cydin
 		{
 			BuildService.CheckClient ();
 			SettingsInfo settings = new SettingsInfo ();
-			ServiceModel sm = ServiceModel.GetCurrent ();
-			List<ApplicationInfo> apps = new List<ApplicationInfo> ();
-			foreach (Application app in sm.GetApplications ())
-				apps.Add (new ApplicationInfo () { Id = app.Id, Name = app.Name, Platforms = app.Platforms });
-			settings.Applications = apps.ToArray ();
+			using (ServiceModel sm = ServiceModel.GetCurrent ()) {
+				List<ApplicationInfo> apps = new List<ApplicationInfo> ();
+				foreach (Application app in sm.GetApplications ())
+					apps.Add (new ApplicationInfo () { Id = app.Id, Name = app.Name, Platforms = app.Platforms });
+				settings.Applications = apps.ToArray ();
+			}
 			return settings;
 		}
 		

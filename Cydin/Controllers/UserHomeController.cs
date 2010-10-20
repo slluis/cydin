@@ -11,7 +11,7 @@ namespace Cydin.Controllers
     {
         public ActionResult Index()
         {
-            return View(UserModel.GetCurrent ());
+            return View();
         }
 
 		public ActionResult NewProject ()

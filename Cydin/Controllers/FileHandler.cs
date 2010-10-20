@@ -76,7 +76,9 @@ namespace Cydin.Controllers
 				string fileId = subPath;
 				fileId = fileId.Replace (Path.DirectorySeparatorChar, '/');
 				fileId = fileId.Substring (0, fileId.Length - 6).Trim ('/');
-				UserModel.GetCurrent ().IncDownloadCount (fileId);
+				using (UserModel m = UserModel.GetCurrent ()) {
+					m.IncDownloadCount (fileId);
+				}
 			}
 		}
 

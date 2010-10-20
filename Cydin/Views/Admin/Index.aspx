@@ -1,4 +1,4 @@
-<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage<Cydin.Models.UserModel>" %>
+<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="Cydin.Views.UserViewPage" %>
 <%@ Import Namespace="Cydin.Builder" %>
 <%@ Import Namespace="Cydin.Properties" %>
 <%@ Import Namespace="Cydin.Models" %>
@@ -34,9 +34,11 @@
 	<div id="tabs-3">
     <table>
     <tr><th>Release</th><th></th></tr>
-    <% foreach (AppRelease r in Model.GetAppReleases ()) { %>
+    <% 
+    UserModel m = CurrentUserModel;
+    foreach (AppRelease r in m.GetAppReleases ()) { %>
     <tr>
-    <td> <%= Model.CurrentApplication.Name + " " + r.AppVersion%> </td>
+    <td> <%= m.CurrentApplication.Name + " " + r.AppVersion%> </td>
     <td> <%=Html.ActionLink ("Delete", "Delete", "AppRelease", new { id = r.Id }, null) %> <%=Html.ActionLink ("Edit", "Edit", "AppRelease", new { id = r.Id }, null) %> </td>
     </tr>
     <% } %>

@@ -8,34 +8,31 @@ using Cydin.Builder;
 
 namespace Cydin.Controllers
 {
-    public class ReviewController : Controller
+    public class ReviewController : CydinController
     {
         //
         // GET: /Review/
 
         public ActionResult Index()
         {
-			UserModel m = UserModel.GetCurrent ();
-			m.CheckIsAdmin ();
-            return View(UserModel.GetCurrent ());
+			CurrentUserModel.CheckIsAdmin ();
+            return View();
         }
 
 		public ActionResult ApproveRelease (int id)
 		{
-			UserModel m = UserModel.GetCurrent ();
-			m.CheckIsAdmin ();
-			m.ApproveRelease (id);
+			CurrentUserModel.CheckIsAdmin ();
+			CurrentUserModel.ApproveRelease (id);
 			BuildService.UpdateRepositories (false);
-			return View ("Index", m);
+			return View ("Index");
 		}
 
 		public ActionResult RejectRelease (int id)
 		{
-			UserModel m = UserModel.GetCurrent ();
-			m.CheckIsAdmin ();
-			m.RejectRelease (id);
+			CurrentUserModel.CheckIsAdmin ();
+			CurrentUserModel.RejectRelease (id);
 			BuildService.UpdateRepositories (false);
-			return View ("Index", m);
+			return View ("Index");
 		}
 	}
 }

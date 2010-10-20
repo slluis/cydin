@@ -1,4 +1,4 @@
-<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage<Cydin.Models.ServiceModel>" %>
+<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="Cydin.Views.UserViewPage" %>
 <%@ Import Namespace="Cydin.Builder" %>
 <%@ Import Namespace="Cydin.Properties" %>
 <%@ Import Namespace="Cydin.Models" %>
@@ -26,7 +26,7 @@
 	</ul>
 	
 	<div id="tabs-1">
-	<b>Cydin version:</b> <%=Model.Version%><br>
+	<b>Cydin version:</b> <%=CurrentServiceModel.Version%><br>
     <b>Service Address:</b> <%=BuildService.AuthorisedBuildBotConnection %><br>
     <b>Status:</b> <%=BuildService.Status %><br><br>
     
@@ -43,14 +43,14 @@
     </div>
     <div id="tabs-2">
     <%
-			var apps = Model.GetApplications ();
+			var apps = CurrentServiceModel.GetApplications ();
 			if (!apps.Any ())
 				Response.Write ("There are no applications defined.");
 			else { %>
     <table>
     <tr><th>Name</th><th>Subdomain</th><th>Platforms</th><th></th></tr>
 	<%
-		foreach (Application app in Model.GetApplications ()) { %>
+		foreach (Application app in CurrentServiceModel.GetApplications ()) { %>
     <tr>
     <td> <%=Html.ActionLink (app.Name, "EditApplication", "SiteAdmin", new { id = app.Id }, null) %> </td>
 	<td> <%=app.Subdomain%> </td>

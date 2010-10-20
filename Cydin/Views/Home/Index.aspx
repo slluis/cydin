@@ -1,17 +1,17 @@
-<%@ Page Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage" %>
+<%@ Page Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="Cydin.Views.UserViewPage" %>
 <%@ Import Namespace="System.Linq" %>
 <%@ Import Namespace="Cydin.Properties" %>
 <%@ Import Namespace="Cydin.Models" %>
 <%@ Import Namespace="Cydin.Views" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="TitleContent" runat="server">
-    <%=UserModel.GetCurrent ().CurrentApplication.Name + " Community Add-in Repository"%>
+    <%=CurrentUserModel.CurrentApplication.Name + " Community Add-in Repository"%>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
 <script type="text/javascript" src="/Scripts/notifications.js"></script> 
 
-    <%  UserModel m = UserModel.GetCurrent (); %>
+    <%  UserModel m = CurrentUserModel; %>
     
     <table width="100%" border="0" cellspacing="0" cellpadding="0" id="content-table">
     <tr valign="top"><td width="75%">

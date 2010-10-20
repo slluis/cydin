@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage" %>
+﻿<%@ Page Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="Cydin.Views.UserViewPage" %>
 <%@ Import Namespace="Cydin.Properties" %>
 <%@ Import Namespace="Cydin.Models" %>
 
@@ -8,7 +8,7 @@
 
 <asp:Content ID="aboutContent" ContentPlaceHolderID="MainContent" runat="server">
     <h2>About</h2>
-    <% var m = UserModel.GetCurrent ();
+    <% var m = CurrentUserModel;
     if (m.CurrentApplication != null) { %>
     <p>This web site is a Community Add-in Repository for <%=m.CurrentApplication.Name %>.</p>
 

@@ -1,4 +1,5 @@
 using Cydin.Properties;
+
 namespace Cydin.Controllers
 {
 	using System;
@@ -12,7 +13,7 @@ namespace Cydin.Controllers
 	using DotNetOpenAuth.OpenId.RelyingParty;
 	using Cydin.Models;
 
-	public class UserController : Controller
+	public class UserController : CydinController
 	{
 		private static OpenIdRelyingParty openid = new OpenIdRelyingParty ();
 
@@ -52,7 +53,7 @@ namespace Cydin.Controllers
 		public ActionResult Profile (User u)
 		{
 			if (u.Login == null)
-				u = UserModel.GetCurrent ().User;
+				u = CurrentUserModel.User;
 			return View ("Profile", u);
 		}
 
@@ -65,11 +66,10 @@ namespace Cydin.Controllers
 			if (!ModelState.IsValid)
 				return View ("Profile", user);
 			
-			UserModel m = UserModel.GetCurrent ();
-			User cuser = m.GetUser (user.Id);
+			User cuser = CurrentUserModel.GetUser (user.Id);
 			cuser.Name = user.Name;
 			cuser.Email = user.Email;
-			m.UpdateUser (cuser);
+			CurrentUserModel.UpdateUser (cuser);
 	
 			return RedirectToAction ("Index", "Home");
 		}
@@ -113,15 +113,14 @@ namespace Cydin.Controllers
 				switch (response.Status) {
 				case AuthenticationStatus.Authenticated:
 					
-					User user = ServiceModel.GetCurrent ().GetUserFromOpenId (response.ClaimedIdentifier);
+					User user = CurrentServiceModel.GetUserFromOpenId (response.ClaimedIdentifier);
 					if (updating) {
 						if (user == null) {
 							ViewData["Message"] = "User not registered";
 							return View (loginView);
 						}
-						ServiceModel sm = ServiceModel.GetCurrent ();
 						string newId = GetTicketId (ticket);
-						sm.UpdateOpenId (response.ClaimedIdentifier, newId);
+						CurrentServiceModel.UpdateOpenId (response.ClaimedIdentifier, newId);
 						FormsAuthentication.SignOut ();
 					}
 					
@@ -175,9 +174,8 @@ namespace Cydin.Controllers
 				return View ("Registration", user);
 			}
 
-			ServiceModel m = ServiceModel.GetCurrent ();
-			if (m.IsUserNameAvailable (user.Login)) {
-				m.CreateUser (user);
+			if (CurrentServiceModel.IsUserNameAvailable (user.Login)) {
+				CurrentServiceModel.CreateUser (user);
 
 				FormsAuthentication.SetAuthCookie (user.Login, true);
 

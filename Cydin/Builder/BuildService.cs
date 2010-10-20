@@ -142,7 +142,11 @@ namespace Cydin.Builder
 		
 		static void UpdateAllRepos (bool updateAll)
 		{
-			foreach (Cydin.Models.Application app in ServiceModel.GetCurrent ().GetApplications ()) {
+			ServiceModel sm = ServiceModel.GetCurrent ();
+			var apps = sm.GetApplications ();
+			sm.Dispose ();
+			
+			foreach (Cydin.Models.Application app in apps) {
 				try {
 					UpdateRepos (app.Id, updateAll);
 				} catch (Exception ex) {

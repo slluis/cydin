@@ -9,28 +9,25 @@ using Cydin.Properties;
 
 namespace Cydin.Controllers
 {
-    public class AdminController : Controller
+    public class AdminController : CydinController
     {
         public ActionResult Index()
         {
-			UserModel m = UserModel.GetCurrent ();
-			m.CheckIsAdmin ();
-			return View (m);
+			CurrentUserModel.CheckIsAdmin ();
+			return View ();
         }
 
 		public ActionResult UpdateRepositories ()
 		{
-			UserModel m = UserModel.GetCurrent ();
-			m.CheckIsAdmin ();
+			CurrentUserModel.CheckIsAdmin ();
 			BuildService.UpdateRepositories (true);
-			return View ("Index", m);
+			return View ("Index");
 		}
 		
 		public ActionResult ProjectsList ()
 		{
-			UserModel m = UserModel.GetCurrent ();
-			m.CheckIsAdmin ();
-			return View (m);
+			CurrentUserModel.CheckIsAdmin ();
+			return View ();
 		}
 		
     }

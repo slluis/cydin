@@ -8,16 +8,15 @@ using Cydin.Builder;
 
 namespace Cydin.Controllers
 {
-    public class SourceController : Controller
+    public class SourceController : CydinController
     {
         //
         // GET: /Source/
 
         public ActionResult Index(int projectId)
         {
-			UserModel m = UserModel.GetCurrent ();
 			ViewData["ProjectId"] = projectId;
-			return View (m.GetSources (projectId));
+			return View (CurrentUserModel.GetSources (projectId));
         }
 
         //
@@ -47,8 +46,7 @@ namespace Cydin.Controllers
         [HttpPost]
         public ActionResult Create(VcsSource source, bool? initialCreation)
         {
-			UserModel m = UserModel.GetCurrent ();
-			m.CreateSource (source);
+			CurrentUserModel.CreateSource (source);
 			if (initialCreation.HasValue && initialCreation.Value)
 				return RedirectToAction ("Index", "Project", new { id = source.ProjectId });
 			else
@@ -62,8 +60,7 @@ namespace Cydin.Controllers
         {
 			ViewData["Creating"] = false;
 			ViewData["CreatingProject"] = false;
-			UserModel m = UserModel.GetCurrent ();
-			return View (m.GetSource (id));
+			return View (CurrentUserModel.GetSource (id));
         }
 
         //
@@ -74,8 +71,7 @@ namespace Cydin.Controllers
         {
             try
             {
-				UserModel m = UserModel.GetCurrent ();
-				m.UpdateSource (source);
+				CurrentUserModel.UpdateSource (source);
 				return RedirectToAction ("Index", new { projectId = source.ProjectId });
             }
             catch
@@ -89,8 +85,7 @@ namespace Cydin.Controllers
  
         public ActionResult Delete(int id, int projectId)
         {
-			UserModel m = UserModel.GetCurrent ();
-			m.DeleteSource (id);
+			CurrentUserModel.DeleteSource (id);
 			return RedirectToAction ("Index", new { projectId = projectId });
         }
 		

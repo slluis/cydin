@@ -35,7 +35,7 @@ using System.IO;
 
 namespace Cydin.Models
 {
-	public class ServiceModel
+	public class ServiceModel: IDisposable
 	{
 		protected MySqlConnection db;
 		string version;
@@ -51,6 +51,11 @@ namespace Cydin.Models
 		{
 		}
 		
+		public void Dispose ()
+		{
+			db.Close ();
+		}
+		
 		internal User GetUserFromOpenId (string identifier)
 		{
 			return db.SelectObjectWhere<User> ("OpenId = {0}", identifier);
@@ -58,7 +63,9 @@ namespace Cydin.Models
 		
 		void CheckIsAdmin ()
 		{
-			UserModel.GetCurrent ().CheckIsAdmin ();
+			using (var m = UserModel.GetCurrent ()) {
+				m.CheckIsAdmin ();
+			}
 		}
 		
 		public string Version {

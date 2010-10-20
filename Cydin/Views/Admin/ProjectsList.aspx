@@ -1,4 +1,4 @@
-<%@ Page Title="" Language="C#" Inherits="System.Web.Mvc.ViewPage<Cydin.Models.UserModel>" %>
+<%@ Page Title="" Language="C#" Inherits="Cydin.Views.UserViewPage" %>
 <%@ Import Namespace="Cydin.Builder" %>
 <%@ Import Namespace="Cydin.Properties" %>
 <%@ Import Namespace="Cydin.Models" %>
@@ -8,23 +8,23 @@
 
 <table>
 <tr><th>Project</th><th>Owner</th><th>Sources</th><th>Releases</th><th>Downloads</th></tr>
-<% foreach (Project p in Model.GetProjects ()) { %>
+<% foreach (Project p in CurrentUserModel.GetProjects ()) { %>
 <tr>
 <td><%=Html.ActionLink (p.Name, "Index", "Project", new { id = p.Id }, null)%></td>
 <td>
-	<% foreach (User u in Model.GetProjectOwners (p)) { %>
+	<% foreach (User u in CurrentUserModel.GetProjectOwners (p)) { %>
 		<%=Html.ActionLink (u.Login, "Profile", "User", u, null)%> 
 	<% } %>
 </td>
 <td>
-<% var tags = Model.GetProjectSourceTags (p.Id); 
+<% var tags = CurrentUserModel.GetProjectSourceTags (p.Id); 
    var errs = tags.Where (t => t.Status == SourceTagStatus.BuildError).Count ();
 %>
 <%=tags.Count ()%>
 <%=errs > 0 ? "(" + errs + " errors)" : ""%>
 </td>
 <td>
-<% var rels = Model.GetProjectReleases (p.Id); 
+<% var rels = CurrentUserModel.GetProjectReleases (p.Id); 
 	var count = rels.Count ();
 %>
 <%= count %>
@@ -42,7 +42,7 @@ foreach (var g in grp) {
 <% } %>
 </td>
 <td>
-<%=Model.GetDownloadSummary (p)%>
+<%=CurrentUserModel.GetDownloadSummary (p)%>
 </td>
 </tr>
 <% } %>

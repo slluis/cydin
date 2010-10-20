@@ -9,7 +9,7 @@ using Cydin.Models;
 namespace Cydin.Controllers
 {
 	[HandleError]
-	public class HomeController : Controller
+	public class HomeController : CydinController
 	{
 		public ActionResult Index ()
 		{
@@ -28,7 +28,7 @@ namespace Cydin.Controllers
 				if (string.IsNullOrEmpty (app) || app == "home")
 					return Redirect (ControllerHelper.GetActionUrl ("home", "Index", "SiteHome"));
 			}
-			else if (UserModel.GetCurrent ().CurrentApplication == null)
+			else if (CurrentUserModel.CurrentApplication == null)
 				return RedirectToAction ("Index", "SiteAdmin");
 				
 			return View ();
@@ -42,7 +42,7 @@ namespace Cydin.Controllers
         [HttpPost]
 		public ActionResult SetApplicationNotification (string notif, string value)
 		{
-			UserModel m = UserModel.GetCurrent ();
+			UserModel m = CurrentUserModel;
 			NotificationInfo ni = m.GetApplicationNotifications ().FirstOrDefault (n => n.Id == notif);
 			if (ni != null) {
 				bool enable = value == "true";
@@ -61,8 +61,7 @@ namespace Cydin.Controllers
 		
 		public ActionResult Edit ()
 		{
-			UserModel m = UserModel.GetCurrent ();
-			m.CheckIsAdmin ();
+			CurrentUserModel.CheckIsAdmin ();
 			return View ("Edit");
 		}
  
@@ -72,12 +71,11 @@ namespace Cydin.Controllers
         {
             try
             {
-				UserModel m = UserModel.GetCurrent ();
+				UserModel m = CurrentUserModel;
 				m.CheckIsAdmin ();
-				ServiceModel sm = ServiceModel.GetCurrent ();
-				Application app = sm.GetApplication (m.CurrentApplication.Id);
+				Application app = CurrentServiceModel.GetApplication (m.CurrentApplication.Id);
 				app.Description = content;
-				sm.UpdateApplication (app);
+				CurrentServiceModel.UpdateApplication (app);
 				Cydin.Views.ViewHelper.ClearCache ();
 				
 				return RedirectToAction ("Index");

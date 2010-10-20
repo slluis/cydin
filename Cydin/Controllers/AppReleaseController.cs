@@ -7,7 +7,7 @@ using Cydin.Models;
 
 namespace Cydin.Controllers
 {
-    public class AppReleaseController : Controller
+    public class AppReleaseController : CydinController
     {
         //
         // GET: /AppRelease/
@@ -40,9 +40,8 @@ namespace Cydin.Controllers
  
         public ActionResult Edit(int id)
         {
-			UserModel m = UserModel.GetCurrent ();
 			ViewData["Creating"] = false;
-			return View (m.GetAppRelease (id));
+			return View (CurrentUserModel.GetAppRelease (id));
         }
 
 
@@ -58,11 +57,10 @@ namespace Cydin.Controllers
 		[HttpPost]
 		public ActionResult UploadAssemblies (AppRelease release)
 		{
-			UserModel m = UserModel.GetCurrent ();
-			AppRelease rp = m.GetAppRelease (release.Id);
+			AppRelease rp = CurrentUserModel.GetAppRelease (release.Id);
 			rp.AppVersion = release.AppVersion;
 			rp.AddinRootVersion = release.AddinRootVersion;
-			m.UpdateAppRelease (rp, Request.Files.Count > 0 ? Request.Files[0] : null);
+			CurrentUserModel.UpdateAppRelease (rp, Request.Files.Count > 0 ? Request.Files[0] : null);
 			return RedirectToAction ("Index", "Admin");
 		}
 	}

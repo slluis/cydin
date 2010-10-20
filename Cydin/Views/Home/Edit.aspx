@@ -1,4 +1,4 @@
-<%@ Page Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage" ValidateRequest="false" %>
+<%@ Page Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="Cydin.Views.UserViewPage" ValidateRequest="false" %>
 <%@ Import Namespace="Cydin.Properties" %>
 <%@ Import Namespace="Cydin.Models" %>
 
@@ -9,7 +9,7 @@
 <asp:Content ID="aboutContent" ContentPlaceHolderID="MainContent" runat="server">
     <p>Home page content:</p>
 	
-	<% Application app = UserModel.GetCurrent ().CurrentApplication; %>
+	<% Application app = CurrentUserModel.CurrentApplication; %>
 
 
     <% using (Html.BeginForm ("Update", "Home")) {%>

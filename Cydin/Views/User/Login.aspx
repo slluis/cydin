@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage" %>
+﻿<%@ Page Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="Cydin.Views.UserViewPage" %>
 <%@ Import Namespace="Cydin.Properties" %>
 <%@ Import Namespace="Cydin.Models" %>
 
@@ -12,7 +12,7 @@
         <%= Html.Encode(ViewData["Message"].ToString())%>
     </div>
     <% } %>
-	<% if (Settings.Default.InitialConfiguration && !ServiceModel.GetCurrent ().ThereIsAdministrator ()) {%>
+	<% if (Settings.Default.InitialConfiguration && !CurrentServiceModel.ThereIsAdministrator ()) {%>
 	<h2>Site Administrator Account</h2>
 	<p>An administrator account needs to be created. To create the account, click on your OpenID provider:</p>
 	<% } else {%>

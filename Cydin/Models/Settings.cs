@@ -72,7 +72,9 @@ namespace Cydin.Properties
 		
 		public void Save ()
 		{
-			UserModel.GetCurrent ().UpdateSettings (this);
+			using (UserModel m = UserModel.GetCurrent ()) {
+				m.UpdateSettings (this);
+			}
 		}
 	}
 	

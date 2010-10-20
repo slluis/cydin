@@ -44,6 +44,7 @@ namespace Cydin.Models
 			ServiceModel sm = ServiceModel.GetCurrent ();
 			if (!string.IsNullOrEmpty (login))
 				m.user = sm.GetUser (login);
+			sm.Dispose ();
 			
 			if (m.application != null && m.user != null) {
 				UserApplication uap = m.db.SelectObjectWhere<UserApplication> ("UserId={0} AND ApplicationId={1}", m.user.Id, m.application.Id);
@@ -130,14 +131,6 @@ namespace Cydin.Models
 			}
 		}
 		
-		public ServiceModel ServiceModel {
-			get {
-				if (!Settings.Default.InitialConfiguration)
-					CheckIsSiteAdmin ();
-				return ServiceModel.GetCurrent ();
-			}
-		}
-
 		HashSet<int> OwnedProjects
 		{
 			get
