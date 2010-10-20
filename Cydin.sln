@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cydin", "Cydin\Cydin.csproj", "{86F68BD3-3372-465C-864C-CFE35EAB5263}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CydinBuildService", "CydinBuildService\CydinBuildService.csproj", "{4AFC8138-D54D-45B8-8890-CB666BDB7580}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CydinService", "CydinService\CydinService.csproj", "{E938D655-F3B8-4A72-877F-2A4140420A9F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4AFC8138-D54D-45B8-8890-CB666BDB7580}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AFC8138-D54D-45B8-8890-CB666BDB7580}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AFC8138-D54D-45B8-8890-CB666BDB7580}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AFC8138-D54D-45B8-8890-CB666BDB7580}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86F68BD3-3372-465C-864C-CFE35EAB5263}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86F68BD3-3372-465C-864C-CFE35EAB5263}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86F68BD3-3372-465C-864C-CFE35EAB5263}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86F68BD3-3372-465C-864C-CFE35EAB5263}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E938D655-F3B8-4A72-877F-2A4140420A9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E938D655-F3B8-4A72-877F-2A4140420A9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E938D655-F3B8-4A72-877F-2A4140420A9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E938D655-F3B8-4A72-877F-2A4140420A9F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Cydin\Cydin.csproj
+		Policies = $0
+		$0.VersionControlPolicy = $1
+		$1.inheritsSet = Mono
+		$0.ChangeLogPolicy = $2
+		$2.UpdateMode = None
+		$2.inheritsSet = Mono
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

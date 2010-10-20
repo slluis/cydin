@@ -1,0 +1,66 @@
+ABOUT CYDIN
+===========
+
+Cydin is an ASP.NET add-in repository web site for Mono.Addins based
+applications.
+
+Add-in developers can publish their add-ins in a Cydin web site and make them
+available to all users. The site works like a build bot: it pulls the source
+code of add-ins from version control repositories, builds and packages them,
+and then publishes them in an add-in repository, to which MonoDevelop will be
+subscribed.
+
+Cydin is composed by two services:
+
+* The Cydin web site is the frontend to the repository. It allows users to
+  create new add-in projects and register add-in sources, and to download
+  existing add-ins.
+
+* The Cydin build service is in charge of pulling the add-in source code,
+  build the add-ins and publish them. This service can be installed in a
+  different machine
+
+DEPENDENCIES
+============
+
+The basic dependencies are:
+
+* Mono 2.6
+* Mysql (tested with 5.1.46)
+
+Cydin also depends on some open source libraries which are included as
+binaries in the repository to make it easier to build the project.
+Those libraries are:
+
+* Contracts.dll (http://code.google.com/p/mono-soc-2010)
+* DotNetOpenAuth (http://github.com/slluis/dotnetopenid)
+* ICSharpCode.SharpZipLib (get it from Mono)
+* log4net (http://logging.apache.org/log4net)
+* Mono.Addins (http://monoaddins.codeplex.com)
+* mysql.data (http://www.mysql.com/downloads/connector/net)
+* ASP.NET MVC 2.0 (get it from Mono)
+
+BUILDING
+========
+
+Open Cydin.sln in MonoDevelop and run the build command, or run xbuild in
+the root project directory.
+
+DATABASE SETUP
+==============
+
+The database script creation (create.sql) is available in the 'db' directory.
+To setup the database you have to:
+
+1) Create a new database in mysql
+2) run the create.sql script on that database
+3) In Cydin/Web.config, look for 'CommunityAddinRepoConnectionString'. In the
+   connectionString attribute, set the address of the mysql server, the name
+   of the database, and the database user and password for the connection.
+
+RUNNING
+=======
+
+To test the web site, start xsp2 in the Cydin directory, and then open
+localhost:8080 in your browser, or just click on Run in MonoDevelop.
+

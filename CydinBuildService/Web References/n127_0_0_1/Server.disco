@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<discovery xmlns:scl="http://schemas.xmlsoap.org/disco/scl/" xmlns="http://schemas.xmlsoap.org/disco/">
+  <scl:contractRef docRef="http://127.0.0.1:8080/WebService/Server.asmx" ref="http://127.0.0.1:8080/WebService/Server.asmx?wsdl" />
+  <soap xmlns:q1="http://tempuri.org/" binding="q1:ServerSoap" address="http://127.0.0.1:8080/WebService/Server.asmx" xmlns="http://schemas/xmlsoap.org/disco/schema/soap/" />
+  <soap xmlns:q2="http://tempuri.org/" binding="q2:ServerSoap12" address="http://127.0.0.1:8080/WebService/Server.asmx" xmlns="http://schemas/xmlsoap.org/disco/schema/soap/" />
+</discovery>

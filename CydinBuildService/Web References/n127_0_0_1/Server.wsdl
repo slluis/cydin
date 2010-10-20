@@ -1,0 +1,1210 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:s0="http://tempuri.org/" name="Server" targetNamespace="http://tempuri.org/" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <xs:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:element name="ConnectBuildService">
+        <xs:complexType />
+      </xs:element>
+      <xs:element name="ConnectBuildServiceResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="ConnectBuildServiceResult" type="xs:boolean" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="GetSettings">
+        <xs:complexType />
+      </xs:element>
+      <xs:complexType name="SettingsInfo">
+        <xs:sequence>
+          <xs:element minOccurs="0" maxOccurs="1" name="Applications" type="s0:ArrayOfApplicationInfo" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ArrayOfApplicationInfo">
+        <xs:sequence>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="ApplicationInfo" nillable="true" type="s0:ApplicationInfo" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ApplicationInfo">
+        <xs:sequence>
+          <xs:element minOccurs="0" maxOccurs="1" name="Name" type="xs:string" />
+          <xs:element minOccurs="1" maxOccurs="1" name="Id" type="xs:int" />
+          <xs:element minOccurs="0" maxOccurs="1" name="Platforms" type="xs:string" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="GetSettingsResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="1" name="GetSettingsResult" type="s0:SettingsInfo" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="DisconnectBuildService">
+        <xs:complexType />
+      </xs:element>
+      <xs:element name="DisconnectBuildServiceResponse">
+        <xs:complexType />
+      </xs:element>
+      <xs:element name="SetBuildServiceStatus">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="1" name="status" type="xs:string" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SetBuildServiceStatusResponse">
+        <xs:complexType />
+      </xs:element>
+      <xs:simpleType name="LogSeverity">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Info" />
+          <xs:enumeration value="Warning" />
+          <xs:enumeration value="Error" />
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:element name="Log">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="severity" type="s0:LogSeverity" />
+            <xs:element minOccurs="0" maxOccurs="1" name="message" type="xs:string" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="LogResponse">
+        <xs:complexType />
+      </xs:element>
+      <xs:element name="GetSources">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="appId" type="xs:int" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:complexType name="ArrayOfSourceInfo">
+        <xs:sequence>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="SourceInfo" nillable="true" type="s0:SourceInfo" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="SourceInfo">
+        <xs:sequence>
+          <xs:element minOccurs="1" maxOccurs="1" name="Id" type="xs:int" />
+          <xs:element minOccurs="0" maxOccurs="1" name="ProjectName" type="xs:string" />
+          <xs:element minOccurs="0" maxOccurs="1" name="Type" type="xs:string" />
+          <xs:element minOccurs="0" maxOccurs="1" name="Url" type="xs:string" />
+          <xs:element minOccurs="0" maxOccurs="1" name="Tags" type="xs:string" />
+          <xs:element minOccurs="0" maxOccurs="1" name="Branches" type="xs:string" />
+          <xs:element minOccurs="0" maxOccurs="1" name="SourceTags" type="s0:ArrayOfSourceTagInfo" />
+          <xs:element minOccurs="1" maxOccurs="1" name="LastFetchTime" type="xs:dateTime" />
+          <xs:element minOccurs="1" maxOccurs="1" name="AutoPublish" type="xs:boolean" />
+          <xs:element minOccurs="0" maxOccurs="1" name="Directory" type="xs:string" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ArrayOfSourceTagInfo">
+        <xs:sequence>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="SourceTagInfo" nillable="true" type="s0:SourceTagInfo" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="SourceTagInfo">
+        <xs:sequence>
+          <xs:element minOccurs="1" maxOccurs="1" name="Id" type="xs:int" />
+          <xs:element minOccurs="0" maxOccurs="1" name="Name" type="xs:string" />
+          <xs:element minOccurs="0" maxOccurs="1" name="LastRevision" type="xs:string" />
+          <xs:element minOccurs="0" maxOccurs="1" name="Url" type="xs:string" />
+          <xs:element minOccurs="0" maxOccurs="1" name="Status" type="xs:string" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="GetSourcesResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="1" name="GetSourcesResult" type="s0:ArrayOfSourceInfo" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="GetReleases">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="appId" type="xs:int" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:complexType name="ArrayOfReleaseInfo">
+        <xs:sequence>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="ReleaseInfo" nillable="true" type="s0:ReleaseInfo" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ReleaseInfo">
+        <xs:sequence>
+          <xs:element minOccurs="1" maxOccurs="1" name="Id" type="xs:int" />
+          <xs:element minOccurs="0" maxOccurs="1" name="AddinId" type="xs:string" />
+          <xs:element minOccurs="0" maxOccurs="1" name="Version" type="xs:string" />
+          <xs:element minOccurs="0" maxOccurs="1" name="TargetAppVersion" type="xs:string" />
+          <xs:element minOccurs="0" maxOccurs="1" name="Platforms" type="s0:ArrayOfString" />
+          <xs:element minOccurs="0" maxOccurs="1" name="Status" type="xs:string" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ArrayOfString">
+        <xs:sequence>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="xs:string" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="GetReleasesResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="1" name="GetReleasesResult" type="s0:ArrayOfReleaseInfo" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SetSourceStatus">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="appId" type="xs:int" />
+            <xs:element minOccurs="1" maxOccurs="1" name="sourceId" type="xs:int" />
+            <xs:element minOccurs="0" maxOccurs="1" name="status" type="xs:string" />
+            <xs:element minOccurs="0" maxOccurs="1" name="errorMessage" type="xs:string" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SetSourceStatusResponse">
+        <xs:complexType />
+      </xs:element>
+      <xs:element name="SetSourceTagStatus">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="appId" type="xs:int" />
+            <xs:element minOccurs="1" maxOccurs="1" name="sourceId" type="xs:int" />
+            <xs:element minOccurs="0" maxOccurs="1" name="status" type="xs:string" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SetSourceTagStatusResponse">
+        <xs:complexType />
+      </xs:element>
+      <xs:element name="UpdateSourceTags">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="appId" type="xs:int" />
+            <xs:element minOccurs="1" maxOccurs="1" name="sourceId" type="xs:int" />
+            <xs:element minOccurs="1" maxOccurs="1" name="fetchTime" type="xs:dateTime" />
+            <xs:element minOccurs="0" maxOccurs="1" name="sourceTags" type="s0:ArrayOfSourceTagInfo" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="UpdateSourceTagsResponse">
+        <xs:complexType />
+      </xs:element>
+      <xs:element name="SetPublished">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="appId" type="xs:int" />
+            <xs:element minOccurs="1" maxOccurs="1" name="releaseId" type="xs:int" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SetPublishedResponse">
+        <xs:complexType />
+      </xs:element>
+      <xs:element name="SetSourceTagBuilt">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="appId" type="xs:int" />
+            <xs:element minOccurs="1" maxOccurs="1" name="sourceTagId" type="xs:int" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SetSourceTagBuiltResponse">
+        <xs:complexType />
+      </xs:element>
+      <xs:element name="GetAppReleases">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="appId" type="xs:int" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:complexType name="ArrayOfAppReleaseInfo">
+        <xs:sequence>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="AppReleaseInfo" nillable="true" type="s0:AppReleaseInfo" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="AppReleaseInfo">
+        <xs:sequence>
+          <xs:element minOccurs="1" maxOccurs="1" name="Id" type="xs:int" />
+          <xs:element minOccurs="0" maxOccurs="1" name="AppVersion" type="xs:string" />
+          <xs:element minOccurs="0" maxOccurs="1" name="ZipUrl" type="xs:string" />
+          <xs:element minOccurs="1" maxOccurs="1" name="LastUpdateTime" type="xs:dateTime" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="GetAppReleasesResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="1" name="GetAppReleasesResult" type="s0:ArrayOfAppReleaseInfo" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SetSourceTagBuildData">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="appId" type="xs:int" />
+            <xs:element minOccurs="1" maxOccurs="1" name="stagId" type="xs:int" />
+            <xs:element minOccurs="0" maxOccurs="1" name="addinVersion" type="xs:string" />
+            <xs:element minOccurs="0" maxOccurs="1" name="addinId" type="xs:string" />
+            <xs:element minOccurs="0" maxOccurs="1" name="appVersion" type="xs:string" />
+            <xs:element minOccurs="0" maxOccurs="1" name="platforms" type="s0:ArrayOfString" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SetSourceTagBuildDataResponse">
+        <xs:complexType />
+      </xs:element>
+      <xs:element name="boolean" type="xs:boolean" />
+      <xs:element name="SettingsInfo" nillable="true" type="s0:SettingsInfo" />
+      <xs:element name="ArrayOfSourceInfo" nillable="true" type="s0:ArrayOfSourceInfo" />
+      <xs:element name="ArrayOfReleaseInfo" nillable="true" type="s0:ArrayOfReleaseInfo" />
+      <xs:element name="ArrayOfAppReleaseInfo" nillable="true" type="s0:ArrayOfAppReleaseInfo" />
+    </xs:schema>
+    <xs:schema xmlns:tns="http://tempuri.org/AbstractTypes" targetNamespace="http://tempuri.org/AbstractTypes" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:import namespace="http://schemas.xmlsoap.org/soap/encoding/" />
+      <xs:import namespace="http://schemas.xmlsoap.org/wsdl/" />
+      <xs:simpleType name="LogSeverity">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Info" />
+          <xs:enumeration value="Warning" />
+          <xs:enumeration value="Error" />
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:complexType name="ArrayOfString">
+        <xs:complexContent mixed="false">
+          <xs:restriction base="soapenc:Array">
+            <xs:attribute xmlns:d7p1="http://schemas.xmlsoap.org/wsdl/" d7p2:arrayType="xs:string[]" ref="soapenc:arrayType" xmlns:d7p2="http://schemas.xmlsoap.org/wsdl/" />
+          </xs:restriction>
+        </xs:complexContent>
+      </xs:complexType>
+    </xs:schema>
+  </types>
+  <message name="ConnectBuildServiceSoapIn">
+    <part name="parameters" element="s0:ConnectBuildService" />
+  </message>
+  <message name="ConnectBuildServiceSoapOut">
+    <part name="parameters" element="s0:ConnectBuildServiceResponse" />
+  </message>
+  <message name="GetSettingsSoapIn">
+    <part name="parameters" element="s0:GetSettings" />
+  </message>
+  <message name="GetSettingsSoapOut">
+    <part name="parameters" element="s0:GetSettingsResponse" />
+  </message>
+  <message name="DisconnectBuildServiceSoapIn">
+    <part name="parameters" element="s0:DisconnectBuildService" />
+  </message>
+  <message name="DisconnectBuildServiceSoapOut">
+    <part name="parameters" element="s0:DisconnectBuildServiceResponse" />
+  </message>
+  <message name="SetBuildServiceStatusSoapIn">
+    <part name="parameters" element="s0:SetBuildServiceStatus" />
+  </message>
+  <message name="SetBuildServiceStatusSoapOut">
+    <part name="parameters" element="s0:SetBuildServiceStatusResponse" />
+  </message>
+  <message name="LogSoapIn">
+    <part name="parameters" element="s0:Log" />
+  </message>
+  <message name="LogSoapOut">
+    <part name="parameters" element="s0:LogResponse" />
+  </message>
+  <message name="GetSourcesSoapIn">
+    <part name="parameters" element="s0:GetSources" />
+  </message>
+  <message name="GetSourcesSoapOut">
+    <part name="parameters" element="s0:GetSourcesResponse" />
+  </message>
+  <message name="GetReleasesSoapIn">
+    <part name="parameters" element="s0:GetReleases" />
+  </message>
+  <message name="GetReleasesSoapOut">
+    <part name="parameters" element="s0:GetReleasesResponse" />
+  </message>
+  <message name="SetSourceStatusSoapIn">
+    <part name="parameters" element="s0:SetSourceStatus" />
+  </message>
+  <message name="SetSourceStatusSoapOut">
+    <part name="parameters" element="s0:SetSourceStatusResponse" />
+  </message>
+  <message name="SetSourceTagStatusSoapIn">
+    <part name="parameters" element="s0:SetSourceTagStatus" />
+  </message>
+  <message name="SetSourceTagStatusSoapOut">
+    <part name="parameters" element="s0:SetSourceTagStatusResponse" />
+  </message>
+  <message name="UpdateSourceTagsSoapIn">
+    <part name="parameters" element="s0:UpdateSourceTags" />
+  </message>
+  <message name="UpdateSourceTagsSoapOut">
+    <part name="parameters" element="s0:UpdateSourceTagsResponse" />
+  </message>
+  <message name="SetPublishedSoapIn">
+    <part name="parameters" element="s0:SetPublished" />
+  </message>
+  <message name="SetPublishedSoapOut">
+    <part name="parameters" element="s0:SetPublishedResponse" />
+  </message>
+  <message name="SetSourceTagBuiltSoapIn">
+    <part name="parameters" element="s0:SetSourceTagBuilt" />
+  </message>
+  <message name="SetSourceTagBuiltSoapOut">
+    <part name="parameters" element="s0:SetSourceTagBuiltResponse" />
+  </message>
+  <message name="GetAppReleasesSoapIn">
+    <part name="parameters" element="s0:GetAppReleases" />
+  </message>
+  <message name="GetAppReleasesSoapOut">
+    <part name="parameters" element="s0:GetAppReleasesResponse" />
+  </message>
+  <message name="SetSourceTagBuildDataSoapIn">
+    <part name="parameters" element="s0:SetSourceTagBuildData" />
+  </message>
+  <message name="SetSourceTagBuildDataSoapOut">
+    <part name="parameters" element="s0:SetSourceTagBuildDataResponse" />
+  </message>
+  <message name="ConnectBuildServiceHttpGetIn" />
+  <message name="ConnectBuildServiceHttpGetOut">
+    <part name="Body" element="s0:boolean" />
+  </message>
+  <message name="GetSettingsHttpGetIn" />
+  <message name="GetSettingsHttpGetOut">
+    <part name="Body" element="s0:SettingsInfo" />
+  </message>
+  <message name="DisconnectBuildServiceHttpGetIn" />
+  <message name="DisconnectBuildServiceHttpGetOut" />
+  <message name="SetBuildServiceStatusHttpGetIn">
+    <part name="status" type="s:string" />
+  </message>
+  <message name="SetBuildServiceStatusHttpGetOut" />
+  <message name="LogHttpGetIn">
+    <part xmlns:q1="http://tempuri.org/AbstractTypes" name="severity" type="q1:LogSeverity" />
+    <part name="message" type="s:string" />
+  </message>
+  <message name="LogHttpGetOut" />
+  <message name="GetSourcesHttpGetIn">
+    <part name="appId" type="s:int" />
+  </message>
+  <message name="GetSourcesHttpGetOut">
+    <part name="Body" element="s0:ArrayOfSourceInfo" />
+  </message>
+  <message name="GetReleasesHttpGetIn">
+    <part name="appId" type="s:int" />
+  </message>
+  <message name="GetReleasesHttpGetOut">
+    <part name="Body" element="s0:ArrayOfReleaseInfo" />
+  </message>
+  <message name="SetSourceStatusHttpGetIn">
+    <part name="appId" type="s:int" />
+    <part name="sourceId" type="s:int" />
+    <part name="status" type="s:string" />
+    <part name="errorMessage" type="s:string" />
+  </message>
+  <message name="SetSourceStatusHttpGetOut" />
+  <message name="SetSourceTagStatusHttpGetIn">
+    <part name="appId" type="s:int" />
+    <part name="sourceId" type="s:int" />
+    <part name="status" type="s:string" />
+  </message>
+  <message name="SetSourceTagStatusHttpGetOut" />
+  <message name="SetPublishedHttpGetIn">
+    <part name="appId" type="s:int" />
+    <part name="releaseId" type="s:int" />
+  </message>
+  <message name="SetPublishedHttpGetOut" />
+  <message name="SetSourceTagBuiltHttpGetIn">
+    <part name="appId" type="s:int" />
+    <part name="sourceTagId" type="s:int" />
+  </message>
+  <message name="SetSourceTagBuiltHttpGetOut" />
+  <message name="GetAppReleasesHttpGetIn">
+    <part name="appId" type="s:int" />
+  </message>
+  <message name="GetAppReleasesHttpGetOut">
+    <part name="Body" element="s0:ArrayOfAppReleaseInfo" />
+  </message>
+  <message name="SetSourceTagBuildDataHttpGetIn">
+    <part name="appId" type="s:int" />
+    <part name="stagId" type="s:int" />
+    <part name="addinVersion" type="s:string" />
+    <part name="addinId" type="s:string" />
+    <part name="appVersion" type="s:string" />
+    <part xmlns:q2="http://tempuri.org/AbstractTypes" name="platforms" type="q2:ArrayOfString" />
+  </message>
+  <message name="SetSourceTagBuildDataHttpGetOut" />
+  <message name="ConnectBuildServiceHttpPostIn" />
+  <message name="ConnectBuildServiceHttpPostOut">
+    <part name="Body" element="s0:boolean" />
+  </message>
+  <message name="GetSettingsHttpPostIn" />
+  <message name="GetSettingsHttpPostOut">
+    <part name="Body" element="s0:SettingsInfo" />
+  </message>
+  <message name="DisconnectBuildServiceHttpPostIn" />
+  <message name="DisconnectBuildServiceHttpPostOut" />
+  <message name="SetBuildServiceStatusHttpPostIn">
+    <part name="status" type="s:string" />
+  </message>
+  <message name="SetBuildServiceStatusHttpPostOut" />
+  <message name="LogHttpPostIn">
+    <part xmlns:q3="http://tempuri.org/AbstractTypes" name="severity" type="q3:LogSeverity" />
+    <part name="message" type="s:string" />
+  </message>
+  <message name="LogHttpPostOut" />
+  <message name="GetSourcesHttpPostIn">
+    <part name="appId" type="s:int" />
+  </message>
+  <message name="GetSourcesHttpPostOut">
+    <part name="Body" element="s0:ArrayOfSourceInfo" />
+  </message>
+  <message name="GetReleasesHttpPostIn">
+    <part name="appId" type="s:int" />
+  </message>
+  <message name="GetReleasesHttpPostOut">
+    <part name="Body" element="s0:ArrayOfReleaseInfo" />
+  </message>
+  <message name="SetSourceStatusHttpPostIn">
+    <part name="appId" type="s:int" />
+    <part name="sourceId" type="s:int" />
+    <part name="status" type="s:string" />
+    <part name="errorMessage" type="s:string" />
+  </message>
+  <message name="SetSourceStatusHttpPostOut" />
+  <message name="SetSourceTagStatusHttpPostIn">
+    <part name="appId" type="s:int" />
+    <part name="sourceId" type="s:int" />
+    <part name="status" type="s:string" />
+  </message>
+  <message name="SetSourceTagStatusHttpPostOut" />
+  <message name="SetPublishedHttpPostIn">
+    <part name="appId" type="s:int" />
+    <part name="releaseId" type="s:int" />
+  </message>
+  <message name="SetPublishedHttpPostOut" />
+  <message name="SetSourceTagBuiltHttpPostIn">
+    <part name="appId" type="s:int" />
+    <part name="sourceTagId" type="s:int" />
+  </message>
+  <message name="SetSourceTagBuiltHttpPostOut" />
+  <message name="GetAppReleasesHttpPostIn">
+    <part name="appId" type="s:int" />
+  </message>
+  <message name="GetAppReleasesHttpPostOut">
+    <part name="Body" element="s0:ArrayOfAppReleaseInfo" />
+  </message>
+  <message name="SetSourceTagBuildDataHttpPostIn">
+    <part name="appId" type="s:int" />
+    <part name="stagId" type="s:int" />
+    <part name="addinVersion" type="s:string" />
+    <part name="addinId" type="s:string" />
+    <part name="appVersion" type="s:string" />
+    <part xmlns:q4="http://tempuri.org/AbstractTypes" name="platforms" type="q4:ArrayOfString" />
+  </message>
+  <message name="SetSourceTagBuildDataHttpPostOut" />
+  <portType name="ServerSoap">
+    <operation name="ConnectBuildService">
+      <input message="s0:ConnectBuildServiceSoapIn" />
+      <output message="s0:ConnectBuildServiceSoapOut" />
+    </operation>
+    <operation name="GetSettings">
+      <input message="s0:GetSettingsSoapIn" />
+      <output message="s0:GetSettingsSoapOut" />
+    </operation>
+    <operation name="DisconnectBuildService">
+      <input message="s0:DisconnectBuildServiceSoapIn" />
+      <output message="s0:DisconnectBuildServiceSoapOut" />
+    </operation>
+    <operation name="SetBuildServiceStatus">
+      <input message="s0:SetBuildServiceStatusSoapIn" />
+      <output message="s0:SetBuildServiceStatusSoapOut" />
+    </operation>
+    <operation name="Log">
+      <input message="s0:LogSoapIn" />
+      <output message="s0:LogSoapOut" />
+    </operation>
+    <operation name="GetSources">
+      <input message="s0:GetSourcesSoapIn" />
+      <output message="s0:GetSourcesSoapOut" />
+    </operation>
+    <operation name="GetReleases">
+      <input message="s0:GetReleasesSoapIn" />
+      <output message="s0:GetReleasesSoapOut" />
+    </operation>
+    <operation name="SetSourceStatus">
+      <input message="s0:SetSourceStatusSoapIn" />
+      <output message="s0:SetSourceStatusSoapOut" />
+    </operation>
+    <operation name="SetSourceTagStatus">
+      <input message="s0:SetSourceTagStatusSoapIn" />
+      <output message="s0:SetSourceTagStatusSoapOut" />
+    </operation>
+    <operation name="UpdateSourceTags">
+      <input message="s0:UpdateSourceTagsSoapIn" />
+      <output message="s0:UpdateSourceTagsSoapOut" />
+    </operation>
+    <operation name="SetPublished">
+      <input message="s0:SetPublishedSoapIn" />
+      <output message="s0:SetPublishedSoapOut" />
+    </operation>
+    <operation name="SetSourceTagBuilt">
+      <input message="s0:SetSourceTagBuiltSoapIn" />
+      <output message="s0:SetSourceTagBuiltSoapOut" />
+    </operation>
+    <operation name="GetAppReleases">
+      <input message="s0:GetAppReleasesSoapIn" />
+      <output message="s0:GetAppReleasesSoapOut" />
+    </operation>
+    <operation name="SetSourceTagBuildData">
+      <input message="s0:SetSourceTagBuildDataSoapIn" />
+      <output message="s0:SetSourceTagBuildDataSoapOut" />
+    </operation>
+  </portType>
+  <portType name="ServerSoap12">
+    <operation name="ConnectBuildService">
+      <input message="s0:ConnectBuildServiceSoapIn" />
+      <output message="s0:ConnectBuildServiceSoapOut" />
+    </operation>
+    <operation name="GetSettings">
+      <input message="s0:GetSettingsSoapIn" />
+      <output message="s0:GetSettingsSoapOut" />
+    </operation>
+    <operation name="DisconnectBuildService">
+      <input message="s0:DisconnectBuildServiceSoapIn" />
+      <output message="s0:DisconnectBuildServiceSoapOut" />
+    </operation>
+    <operation name="SetBuildServiceStatus">
+      <input message="s0:SetBuildServiceStatusSoapIn" />
+      <output message="s0:SetBuildServiceStatusSoapOut" />
+    </operation>
+    <operation name="Log">
+      <input message="s0:LogSoapIn" />
+      <output message="s0:LogSoapOut" />
+    </operation>
+    <operation name="GetSources">
+      <input message="s0:GetSourcesSoapIn" />
+      <output message="s0:GetSourcesSoapOut" />
+    </operation>
+    <operation name="GetReleases">
+      <input message="s0:GetReleasesSoapIn" />
+      <output message="s0:GetReleasesSoapOut" />
+    </operation>
+    <operation name="SetSourceStatus">
+      <input message="s0:SetSourceStatusSoapIn" />
+      <output message="s0:SetSourceStatusSoapOut" />
+    </operation>
+    <operation name="SetSourceTagStatus">
+      <input message="s0:SetSourceTagStatusSoapIn" />
+      <output message="s0:SetSourceTagStatusSoapOut" />
+    </operation>
+    <operation name="UpdateSourceTags">
+      <input message="s0:UpdateSourceTagsSoapIn" />
+      <output message="s0:UpdateSourceTagsSoapOut" />
+    </operation>
+    <operation name="SetPublished">
+      <input message="s0:SetPublishedSoapIn" />
+      <output message="s0:SetPublishedSoapOut" />
+    </operation>
+    <operation name="SetSourceTagBuilt">
+      <input message="s0:SetSourceTagBuiltSoapIn" />
+      <output message="s0:SetSourceTagBuiltSoapOut" />
+    </operation>
+    <operation name="GetAppReleases">
+      <input message="s0:GetAppReleasesSoapIn" />
+      <output message="s0:GetAppReleasesSoapOut" />
+    </operation>
+    <operation name="SetSourceTagBuildData">
+      <input message="s0:SetSourceTagBuildDataSoapIn" />
+      <output message="s0:SetSourceTagBuildDataSoapOut" />
+    </operation>
+  </portType>
+  <portType name="ServerHttpGet">
+    <operation name="ConnectBuildService">
+      <input message="s0:ConnectBuildServiceHttpGetIn" />
+      <output message="s0:ConnectBuildServiceHttpGetOut" />
+    </operation>
+    <operation name="GetSettings">
+      <input message="s0:GetSettingsHttpGetIn" />
+      <output message="s0:GetSettingsHttpGetOut" />
+    </operation>
+    <operation name="DisconnectBuildService">
+      <input message="s0:DisconnectBuildServiceHttpGetIn" />
+      <output message="s0:DisconnectBuildServiceHttpGetOut" />
+    </operation>
+    <operation name="SetBuildServiceStatus">
+      <input message="s0:SetBuildServiceStatusHttpGetIn" />
+      <output message="s0:SetBuildServiceStatusHttpGetOut" />
+    </operation>
+    <operation name="Log">
+      <input message="s0:LogHttpGetIn" />
+      <output message="s0:LogHttpGetOut" />
+    </operation>
+    <operation name="GetSources">
+      <input message="s0:GetSourcesHttpGetIn" />
+      <output message="s0:GetSourcesHttpGetOut" />
+    </operation>
+    <operation name="GetReleases">
+      <input message="s0:GetReleasesHttpGetIn" />
+      <output message="s0:GetReleasesHttpGetOut" />
+    </operation>
+    <operation name="SetSourceStatus">
+      <input message="s0:SetSourceStatusHttpGetIn" />
+      <output message="s0:SetSourceStatusHttpGetOut" />
+    </operation>
+    <operation name="SetSourceTagStatus">
+      <input message="s0:SetSourceTagStatusHttpGetIn" />
+      <output message="s0:SetSourceTagStatusHttpGetOut" />
+    </operation>
+    <operation name="SetPublished">
+      <input message="s0:SetPublishedHttpGetIn" />
+      <output message="s0:SetPublishedHttpGetOut" />
+    </operation>
+    <operation name="SetSourceTagBuilt">
+      <input message="s0:SetSourceTagBuiltHttpGetIn" />
+      <output message="s0:SetSourceTagBuiltHttpGetOut" />
+    </operation>
+    <operation name="GetAppReleases">
+      <input message="s0:GetAppReleasesHttpGetIn" />
+      <output message="s0:GetAppReleasesHttpGetOut" />
+    </operation>
+    <operation name="SetSourceTagBuildData">
+      <input message="s0:SetSourceTagBuildDataHttpGetIn" />
+      <output message="s0:SetSourceTagBuildDataHttpGetOut" />
+    </operation>
+  </portType>
+  <portType name="ServerHttpPost">
+    <operation name="ConnectBuildService">
+      <input message="s0:ConnectBuildServiceHttpPostIn" />
+      <output message="s0:ConnectBuildServiceHttpPostOut" />
+    </operation>
+    <operation name="GetSettings">
+      <input message="s0:GetSettingsHttpPostIn" />
+      <output message="s0:GetSettingsHttpPostOut" />
+    </operation>
+    <operation name="DisconnectBuildService">
+      <input message="s0:DisconnectBuildServiceHttpPostIn" />
+      <output message="s0:DisconnectBuildServiceHttpPostOut" />
+    </operation>
+    <operation name="SetBuildServiceStatus">
+      <input message="s0:SetBuildServiceStatusHttpPostIn" />
+      <output message="s0:SetBuildServiceStatusHttpPostOut" />
+    </operation>
+    <operation name="Log">
+      <input message="s0:LogHttpPostIn" />
+      <output message="s0:LogHttpPostOut" />
+    </operation>
+    <operation name="GetSources">
+      <input message="s0:GetSourcesHttpPostIn" />
+      <output message="s0:GetSourcesHttpPostOut" />
+    </operation>
+    <operation name="GetReleases">
+      <input message="s0:GetReleasesHttpPostIn" />
+      <output message="s0:GetReleasesHttpPostOut" />
+    </operation>
+    <operation name="SetSourceStatus">
+      <input message="s0:SetSourceStatusHttpPostIn" />
+      <output message="s0:SetSourceStatusHttpPostOut" />
+    </operation>
+    <operation name="SetSourceTagStatus">
+      <input message="s0:SetSourceTagStatusHttpPostIn" />
+      <output message="s0:SetSourceTagStatusHttpPostOut" />
+    </operation>
+    <operation name="SetPublished">
+      <input message="s0:SetPublishedHttpPostIn" />
+      <output message="s0:SetPublishedHttpPostOut" />
+    </operation>
+    <operation name="SetSourceTagBuilt">
+      <input message="s0:SetSourceTagBuiltHttpPostIn" />
+      <output message="s0:SetSourceTagBuiltHttpPostOut" />
+    </operation>
+    <operation name="GetAppReleases">
+      <input message="s0:GetAppReleasesHttpPostIn" />
+      <output message="s0:GetAppReleasesHttpPostOut" />
+    </operation>
+    <operation name="SetSourceTagBuildData">
+      <input message="s0:SetSourceTagBuildDataHttpPostIn" />
+      <output message="s0:SetSourceTagBuildDataHttpPostOut" />
+    </operation>
+  </portType>
+  <binding name="ServerSoap" type="s0:ServerSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="ConnectBuildService">
+      <soap:operation soapAction="http://tempuri.org/ConnectBuildService" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="GetSettings">
+      <soap:operation soapAction="http://tempuri.org/GetSettings" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="DisconnectBuildService">
+      <soap:operation soapAction="http://tempuri.org/DisconnectBuildService" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="SetBuildServiceStatus">
+      <soap:operation soapAction="http://tempuri.org/SetBuildServiceStatus" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="Log">
+      <soap:operation soapAction="http://tempuri.org/Log" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="GetSources">
+      <soap:operation soapAction="http://tempuri.org/GetSources" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="GetReleases">
+      <soap:operation soapAction="http://tempuri.org/GetReleases" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="SetSourceStatus">
+      <soap:operation soapAction="http://tempuri.org/SetSourceStatus" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="SetSourceTagStatus">
+      <soap:operation soapAction="http://tempuri.org/SetSourceTagStatus" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="UpdateSourceTags">
+      <soap:operation soapAction="http://tempuri.org/UpdateSourceTags" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="SetPublished">
+      <soap:operation soapAction="http://tempuri.org/SetPublished" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="SetSourceTagBuilt">
+      <soap:operation soapAction="http://tempuri.org/SetSourceTagBuilt" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="GetAppReleases">
+      <soap:operation soapAction="http://tempuri.org/GetAppReleases" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="SetSourceTagBuildData">
+      <soap:operation soapAction="http://tempuri.org/SetSourceTagBuildData" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <binding name="ServerSoap12" type="s0:ServerSoap12">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="ConnectBuildService">
+      <soap12:operation soapAction="http://tempuri.org/ConnectBuildService" style="document" />
+      <input>
+        <soap12:body use="literal" />
+      </input>
+      <output>
+        <soap12:body use="literal" />
+      </output>
+    </operation>
+    <operation name="GetSettings">
+      <soap12:operation soapAction="http://tempuri.org/GetSettings" style="document" />
+      <input>
+        <soap12:body use="literal" />
+      </input>
+      <output>
+        <soap12:body use="literal" />
+      </output>
+    </operation>
+    <operation name="DisconnectBuildService">
+      <soap12:operation soapAction="http://tempuri.org/DisconnectBuildService" style="document" />
+      <input>
+        <soap12:body use="literal" />
+      </input>
+      <output>
+        <soap12:body use="literal" />
+      </output>
+    </operation>
+    <operation name="SetBuildServiceStatus">
+      <soap12:operation soapAction="http://tempuri.org/SetBuildServiceStatus" style="document" />
+      <input>
+        <soap12:body use="literal" />
+      </input>
+      <output>
+        <soap12:body use="literal" />
+      </output>
+    </operation>
+    <operation name="Log">
+      <soap12:operation soapAction="http://tempuri.org/Log" style="document" />
+      <input>
+        <soap12:body use="literal" />
+      </input>
+      <output>
+        <soap12:body use="literal" />
+      </output>
+    </operation>
+    <operation name="GetSources">
+      <soap12:operation soapAction="http://tempuri.org/GetSources" style="document" />
+      <input>
+        <soap12:body use="literal" />
+      </input>
+      <output>
+        <soap12:body use="literal" />
+      </output>
+    </operation>
+    <operation name="GetReleases">
+      <soap12:operation soapAction="http://tempuri.org/GetReleases" style="document" />
+      <input>
+        <soap12:body use="literal" />
+      </input>
+      <output>
+        <soap12:body use="literal" />
+      </output>
+    </operation>
+    <operation name="SetSourceStatus">
+      <soap12:operation soapAction="http://tempuri.org/SetSourceStatus" style="document" />
+      <input>
+        <soap12:body use="literal" />
+      </input>
+      <output>
+        <soap12:body use="literal" />
+      </output>
+    </operation>
+    <operation name="SetSourceTagStatus">
+      <soap12:operation soapAction="http://tempuri.org/SetSourceTagStatus" style="document" />
+      <input>
+        <soap12:body use="literal" />
+      </input>
+      <output>
+        <soap12:body use="literal" />
+      </output>
+    </operation>
+    <operation name="UpdateSourceTags">
+      <soap12:operation soapAction="http://tempuri.org/UpdateSourceTags" style="document" />
+      <input>
+        <soap12:body use="literal" />
+      </input>
+      <output>
+        <soap12:body use="literal" />
+      </output>
+    </operation>
+    <operation name="SetPublished">
+      <soap12:operation soapAction="http://tempuri.org/SetPublished" style="document" />
+      <input>
+        <soap12:body use="literal" />
+      </input>
+      <output>
+        <soap12:body use="literal" />
+      </output>
+    </operation>
+    <operation name="SetSourceTagBuilt">
+      <soap12:operation soapAction="http://tempuri.org/SetSourceTagBuilt" style="document" />
+      <input>
+        <soap12:body use="literal" />
+      </input>
+      <output>
+        <soap12:body use="literal" />
+      </output>
+    </operation>
+    <operation name="GetAppReleases">
+      <soap12:operation soapAction="http://tempuri.org/GetAppReleases" style="document" />
+      <input>
+        <soap12:body use="literal" />
+      </input>
+      <output>
+        <soap12:body use="literal" />
+      </output>
+    </operation>
+    <operation name="SetSourceTagBuildData">
+      <soap12:operation soapAction="http://tempuri.org/SetSourceTagBuildData" style="document" />
+      <input>
+        <soap12:body use="literal" />
+      </input>
+      <output>
+        <soap12:body use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <binding name="ServerHttpGet" type="s0:ServerHttpGet">
+    <http:binding verb="GET" />
+    <operation name="ConnectBuildService">
+      <http:operation location="/ConnectBuildService" />
+      <input>
+        <http:urlEncoded />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+    <operation name="GetSettings">
+      <http:operation location="/GetSettings" />
+      <input>
+        <http:urlEncoded />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+    <operation name="DisconnectBuildService">
+      <http:operation location="/DisconnectBuildService" />
+      <input>
+        <http:urlEncoded />
+      </input>
+      <output />
+    </operation>
+    <operation name="SetBuildServiceStatus">
+      <http:operation location="/SetBuildServiceStatus" />
+      <input>
+        <http:urlEncoded />
+      </input>
+      <output />
+    </operation>
+    <operation name="Log">
+      <http:operation location="/Log" />
+      <input>
+        <http:urlEncoded />
+      </input>
+      <output />
+    </operation>
+    <operation name="GetSources">
+      <http:operation location="/GetSources" />
+      <input>
+        <http:urlEncoded />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+    <operation name="GetReleases">
+      <http:operation location="/GetReleases" />
+      <input>
+        <http:urlEncoded />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+    <operation name="SetSourceStatus">
+      <http:operation location="/SetSourceStatus" />
+      <input>
+        <http:urlEncoded />
+      </input>
+      <output />
+    </operation>
+    <operation name="SetSourceTagStatus">
+      <http:operation location="/SetSourceTagStatus" />
+      <input>
+        <http:urlEncoded />
+      </input>
+      <output />
+    </operation>
+    <operation name="SetPublished">
+      <http:operation location="/SetPublished" />
+      <input>
+        <http:urlEncoded />
+      </input>
+      <output />
+    </operation>
+    <operation name="SetSourceTagBuilt">
+      <http:operation location="/SetSourceTagBuilt" />
+      <input>
+        <http:urlEncoded />
+      </input>
+      <output />
+    </operation>
+    <operation name="GetAppReleases">
+      <http:operation location="/GetAppReleases" />
+      <input>
+        <http:urlEncoded />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+    <operation name="SetSourceTagBuildData">
+      <http:operation location="/SetSourceTagBuildData" />
+      <input>
+        <http:urlEncoded />
+      </input>
+      <output />
+    </operation>
+  </binding>
+  <binding name="ServerHttpPost" type="s0:ServerHttpPost">
+    <http:binding verb="POST" />
+    <operation name="ConnectBuildService">
+      <http:operation location="/ConnectBuildService" />
+      <input>
+        <mime:content part="" type="application/x-www-form-urlencoded" />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+    <operation name="GetSettings">
+      <http:operation location="/GetSettings" />
+      <input>
+        <mime:content part="" type="application/x-www-form-urlencoded" />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+    <operation name="DisconnectBuildService">
+      <http:operation location="/DisconnectBuildService" />
+      <input>
+        <mime:content part="" type="application/x-www-form-urlencoded" />
+      </input>
+      <output />
+    </operation>
+    <operation name="SetBuildServiceStatus">
+      <http:operation location="/SetBuildServiceStatus" />
+      <input>
+        <mime:content part="" type="application/x-www-form-urlencoded" />
+      </input>
+      <output />
+    </operation>
+    <operation name="Log">
+      <http:operation location="/Log" />
+      <input>
+        <mime:content part="" type="application/x-www-form-urlencoded" />
+      </input>
+      <output />
+    </operation>
+    <operation name="GetSources">
+      <http:operation location="/GetSources" />
+      <input>
+        <mime:content part="" type="application/x-www-form-urlencoded" />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+    <operation name="GetReleases">
+      <http:operation location="/GetReleases" />
+      <input>
+        <mime:content part="" type="application/x-www-form-urlencoded" />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+    <operation name="SetSourceStatus">
+      <http:operation location="/SetSourceStatus" />
+      <input>
+        <mime:content part="" type="application/x-www-form-urlencoded" />
+      </input>
+      <output />
+    </operation>
+    <operation name="SetSourceTagStatus">
+      <http:operation location="/SetSourceTagStatus" />
+      <input>
+        <mime:content part="" type="application/x-www-form-urlencoded" />
+      </input>
+      <output />
+    </operation>
+    <operation name="SetPublished">
+      <http:operation location="/SetPublished" />
+      <input>
+        <mime:content part="" type="application/x-www-form-urlencoded" />
+      </input>
+      <output />
+    </operation>
+    <operation name="SetSourceTagBuilt">
+      <http:operation location="/SetSourceTagBuilt" />
+      <input>
+        <mime:content part="" type="application/x-www-form-urlencoded" />
+      </input>
+      <output />
+    </operation>
+    <operation name="GetAppReleases">
+      <http:operation location="/GetAppReleases" />
+      <input>
+        <mime:content part="" type="application/x-www-form-urlencoded" />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+    <operation name="SetSourceTagBuildData">
+      <http:operation location="/SetSourceTagBuildData" />
+      <input>
+        <mime:content part="" type="application/x-www-form-urlencoded" />
+      </input>
+      <output />
+    </operation>
+  </binding>
+  <service name="Server">
+    <port name="ServerSoap" binding="s0:ServerSoap">
+      <soap:address location="http://127.0.0.1:8080/WebService/Server.asmx" />
+    </port>
+    <port name="ServerSoap12" binding="s0:ServerSoap12">
+      <soap12:address location="http://127.0.0.1:8080/WebService/Server.asmx" />
+    </port>
+    <port name="ServerHttpGet" binding="s0:ServerHttpGet">
+      <http:address location="http://127.0.0.1:8080/WebService/Server.asmx" />
+    </port>
+    <port name="ServerHttpPost" binding="s0:ServerHttpPost">
+      <http:address location="http://127.0.0.1:8080/WebService/Server.asmx" />
+    </port>
+  </service>
+</definitions>
