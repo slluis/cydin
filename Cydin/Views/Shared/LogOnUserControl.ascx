@@ -1,7 +1,9 @@
 <%@ Control Language="C#" Inherits="System.Web.Mvc.ViewUserControl" %>
 <%
-    if (Request.IsAuthenticated) {
-        Cydin.Models.User CurrentUser = Cydin.Models.UserModel.GetCurrent ().User;
+	Cydin.Models.User CurrentUser = null;
+    if (Request.IsAuthenticated)
+        CurrentUser = Cydin.Models.UserModel.GetCurrent ().User;
+    if (CurrentUser != null) {
 %>
 <div class="usertext">
     

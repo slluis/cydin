@@ -45,12 +45,12 @@ namespace Cydin.Models
 		[DataMember]
 		public string Subdomain { get; set; }
 		
-		public string AddingPackageSubextension {
+		public string AddinPackageSubextension {
 			get { return "monodevelop"; }
 		}
 		
-		public string AddingPackageExtension {
-			get { return "." + AddingPackageSubextension + "-mpack"; }
+		public string AddinPackageExtension {
+			get { return "." + AddinPackageSubextension + "-mpack"; }
 		}
 	}
 }

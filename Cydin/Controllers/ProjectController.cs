@@ -161,7 +161,7 @@ namespace Cydin.Controllers
 			Release rel = m.GetRelease (id);
 			StringWriter sw = new StringWriter ();
 			BuildService.GenerateInstallerXml (sw, m, rel, rel.PlatformsList);
-			return File (Encoding.UTF8.GetBytes (sw.ToString()), "application/x-" + m.CurrentApplication.AddingPackageSubextension + "-mpack", rel.AddinId + "-" + rel.Version + m.CurrentApplication.AddingPackageExtension);
+			return File (Encoding.UTF8.GetBytes (sw.ToString()), "application/x-" + m.CurrentApplication.AddinPackageSubextension + "-mpack", rel.AddinId + "-" + rel.Version + m.CurrentApplication.AddinPackageExtension);
 		}
 
 		public ActionResult ConfirmDelete (int id)

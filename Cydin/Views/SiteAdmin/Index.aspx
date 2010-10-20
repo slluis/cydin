@@ -42,15 +42,27 @@
     <% } %>
     </div>
     <div id="tabs-2">
+    <%
+			var apps = Model.GetApplications ();
+			if (!apps.Any ())
+				Response.Write ("There are no applications defined.");
+			else { %>
     <table>
-    <tr><th>Application</th><th></th></tr>
-    <% foreach (Application app in Model.GetApplications ()) { %>
+    <tr><th>Name</th><th>Subdomain</th><th>Platforms</th><th></th></tr>
+	<%
+		foreach (Application app in Model.GetApplications ()) { %>
     <tr>
-    <td> <%=app.Name%> </td>
+    <td> <%=Html.ActionLink (app.Name, "EditApplication", "SiteAdmin", new { id = app.Id }, null) %> </td>
+	<td> <%=app.Subdomain%> </td>
+	<td> <%=app.Platforms%> </td>
     <td> <%=Html.ActionLink ("Delete", "DeleteApplication", "SiteAdmin", new { id = app.Id }, null) %> </td>
     </tr>
-    <% } %>
+    <% } } %>
     </table>
+
+	<% if (Settings.Default.SupportsMultiApps || apps.Count() == 0) { %>
+  	<p><%=Html.ActionLink ("Add new application", "NewApplication") %></p>
+	<% } %>
 	</div>
 
 	</div>

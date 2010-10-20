@@ -26,8 +26,10 @@ namespace Cydin.Controllers
 			if (Settings.Default.SupportsMultiApps) {
 				string app = UserModel.GetCurrentAppName ();
 				if (string.IsNullOrEmpty (app) || app == "home")
-					return Redirect (ControllerHelper.GetActionUrl ("home", "SiteHome", "Index"));
+					return Redirect (ControllerHelper.GetActionUrl ("home", "Index", "SiteHome"));
 			}
+			else if (UserModel.GetCurrent ().CurrentApplication == null)
+				return RedirectToAction ("Index", "SiteAdmin");
 				
 			return View ();
 		}

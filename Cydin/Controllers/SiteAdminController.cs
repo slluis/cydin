@@ -101,16 +101,60 @@ namespace Cydin.Controllers
 			if (!Settings.Default.InitialConfiguration)
 				m.CheckIsSiteAdmin ();
 			
-			m.UpdateSettings (s);
+			Settings.Default.DataPath = s.DataPath;
+			Settings.Default.OperationMode = s.OperationMode;
+			Settings.Default.WebSiteHost = s.WebSiteHost;
+			Settings.Default.SmtpHost = s.SmtpHost;
+			Settings.Default.SmtpPassword = s.SmtpPassword;
+			Settings.Default.SmtpPort = s.SmtpPort;
+			Settings.Default.SmtpUser = s.SmtpUser;
+			Settings.Default.SmtpUseSSL = s.SmtpUseSSL;
 			
-			Settings.Default = s;
+			m.UpdateSettings (Settings.Default);
+			
 			Cydin.MvcApplication.UpdateRoutes ();
 			if (!ServiceModel.GetCurrent ().ThereIsAdministrator ())
-				return Redirect (ControllerHelper.GetActionUrl ("home", "User", "Login"));
+				return Redirect (ControllerHelper.GetActionUrl ("home", "Login", "User"));
 			else {
 				ServiceModel.GetCurrent ().EndInitialConfiguration ();
 				return Redirect (ControllerHelper.GetActionUrl ("home", null, null));
 			}
+        }
+		
+		public ActionResult NewApplication ()
+		{
+			UserModel m = UserModel.GetCurrent ();
+			m.CheckIsSiteAdmin ();
+			Application app = new Application ();
+			app.Id = -1;
+			return View ("EditApplication", app);
+		}
+		
+		public ActionResult EditApplication (int id)
+		{
+			UserModel m = UserModel.GetCurrent ();
+			m.CheckIsSiteAdmin ();
+			Application app = m.ServiceModel.GetApplication (id);
+			return View ("EditApplication", app);
+		}
+		
+		[HttpPost]
+        public ActionResult UpdateApplication (Application app)
+        {
+			UserModel m = UserModel.GetCurrent ();
+			m.CheckIsSiteAdmin ();
+			if (app.Id != -1) {
+				Application capp = m.ServiceModel.GetApplication (app.Id);
+				capp.Name = app.Name;
+				capp.Subdomain = app.Subdomain;
+				capp.Platforms = app.Platforms;
+				m.ServiceModel.UpdateApplication (capp);
+			}
+			else {
+				app.Description = "<p>This is the home page of the add-in repository for " + app.Name + "</p><p>Click on the 'Edit Page' link to change the content of this welcome page</p>";
+				m.ServiceModel.CreateApplication (app);
+			}
+			return RedirectToAction ("Index");
         }
 		
 		public ActionResult UsersList ()

@@ -93,8 +93,8 @@ namespace Cydin.Controllers
 						else
 							realm = new Realm ("http://*." + host);
 						
-						IAuthenticationRequest req = openid.CreateRequest (Request.Form["openid_identifier"]);
-//						IAuthenticationRequest req = openid.CreateRequest (Request.Form["openid_identifier"], realm);
+//						IAuthenticationRequest req = openid.CreateRequest (Request.Form["openid_identifier"]);
+						IAuthenticationRequest req = openid.CreateRequest (Request.Form["openid_identifier"], realm);
 						OutgoingWebResponse res = req.RedirectingResponse;
 						return new InternalOutgoingWebResponseActionResult (res);
 					}
@@ -128,7 +128,10 @@ namespace Cydin.Controllers
 					// This is a new user, send them to a registration page
 					if (user == null) {
 						ViewData["openid"] = response.ClaimedIdentifier;
-						return Redirect (string.Format ("~/User/register?openid={0}", Url.Encode (response.ClaimedIdentifier)));
+						if (Settings.Default.SupportsMultiApps)
+							return Redirect (string.Format ("~/home/User/register?openid={0}", Url.Encode (response.ClaimedIdentifier)));
+						else
+							return Redirect (string.Format ("~/User/register?openid={0}", Url.Encode (response.ClaimedIdentifier)));
 					}
 					
 					Session["FriendlyIdentifier"] = response.FriendlyIdentifierForDisplay;

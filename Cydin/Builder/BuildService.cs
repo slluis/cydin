@@ -195,7 +195,7 @@ namespace Cydin.Builder
 				try {
 					reposToBuild.Add (Path.GetFullPath (Path.GetDirectoryName (f)));
 					File.Delete (f);
-					string f2 = Path.ChangeExtension (f, m.CurrentApplication.AddingPackageExtension);
+					string f2 = Path.ChangeExtension (f, m.CurrentApplication.AddinPackageExtension);
 					if (File.Exists (f2))
 						File.Delete (f2);
 				}
@@ -246,7 +246,7 @@ namespace Cydin.Builder
 		
 		internal static void GenerateInstallerFile (UserModel m, string packagesPath, Release rel, params string[] platforms)
 		{
-			string file = Path.ChangeExtension (packagesPath, m.CurrentApplication.AddingPackageExtension);
+			string file = Path.ChangeExtension (packagesPath, m.CurrentApplication.AddinPackageExtension);
 			using (StreamWriter sw = new StreamWriter (file)) {
 				GenerateInstallerXml (sw, m, rel, platforms);
 			}

@@ -166,6 +166,11 @@ namespace Cydin.Models
 		{
 			db.UpdateObject (app);
 		}
+		
+		public void CreateApplication (Application app)
+		{
+			db.InsertObject (app);
+		}
 	}
 }
 

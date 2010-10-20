@@ -15,11 +15,11 @@
 		{
 			var sel = $("#operation-selector").attr("value");
 			if (sel == "1")
-				$("#operation-selector-desc").text ("The site provides add-ins for a single application.");
+				$("#operation-selector-desc").text ("In Single Operation Mode, the site provides add-ins for a single application.");
 			else if (sel == "2")
-				$("#operation-selector-desc").html ("Multiple applications are supported. Each application is identified by a subdomain in the url, for example: <b>monodevelop</b>.cydin.net");
+				$("#operation-selector-desc").html ("Using this mode, multiple applications are supported. Each application is identified by a subdomain in the url, for example: <b>monodevelop</b>.cydin.net");
 			else if (sel == "3")
-				$("#operation-selector-desc").html ("Multiple applications are supported. Each application is identified by a path in the url, for example: cydin.net/<b>monodevelop</b>");
+				$("#operation-selector-desc").html ("Using this mode, multiple applications are supported. Each application is identified by a path in the url, for example: cydin.net/<b>monodevelop</b>");
 		}
 	</script>
 	<% 
