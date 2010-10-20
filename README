@@ -58,9 +58,59 @@ To setup the database you have to:
    connectionString attribute, set the address of the mysql server, the name
    of the database, and the database user and password for the connection.
 
-RUNNING
-=======
+RUNNING THE WEB SITE
+====================
 
 To test the web site, start xsp2 in the Cydin directory, and then open
 localhost:8080 in your browser, or just click on Run in MonoDevelop.
+You'll have to follow some setup instructions the first time you access
+the web site.
 
+BUILD SERVICE SETUP
+===================
+
+The build service can run in the same server running the web site or in a
+different server. To set up the service:
+
+1) Build the CydinService project.
+
+2) Copy the following assemblies to the server:
+     CydinService.exe
+     CydinBuildService.dll
+     ICSharpCode.SharpZipLib.dll
+     Mono.Addins.dll
+     Mono.Addins.Setup.dll
+     
+3) Create a configuration file for the service
+
+You need to create a configuration file "cyding.config" with the following
+content:
+
+<Settings>
+	<WebSiteUrl>web-site-url</WebSiteUrl>
+	<DataPath>path-to-data-files</DataPath>
+</Settings>
+
+Where 'web-site-url' is the url of the Cydin web site, and
+'path-to-data-files' is an absolute or relative path to a directory
+where the service has to store the source code it downloads and builds.
+The DataPath element is optional and defaults to "Files".
+
+Here is an example of configuration file:
+
+<Settings>
+	<WebSiteUrl>http://localhost:8080</WebSiteUrl>
+	<DataPath>Files</DataPath>
+</Settings>
+
+The configuration file must be named cydin.config, and can be placed:
+* in the working directory from where the service is started
+* in /etc
+* in ~/.config
+
+4) Start the service by running 'mono CydinService.exe'
+
+5) Validate the build service connection. In the Cydin web site, go to
+   the site administration page and click on the Build Service tab.
+   Click on 'Change Service' and authorize the service connection
+   when it shows up.
