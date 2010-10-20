@@ -38,7 +38,7 @@ namespace Cydin.Models
 					m.application = m.db.SelectObjectWhere<Application> ("Subdomain={0}", app);
 			}
 			else {
-				m.application = m.db.SelectObjects<Application> ().First ();
+				m.application = m.db.SelectObjects<Application> ().FirstOrDefault ();
 			}
 			
 			ServiceModel sm = ServiceModel.GetCurrent ();

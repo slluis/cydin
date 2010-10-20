@@ -60,7 +60,7 @@ namespace Cydin.Properties
 			get { return "http://" + WebSiteHost; }
 		}
 		
-        [DataMember (DefaultValue = OperationMode.SingleApp)]
+        [DataMember (DefaultValue = OperationMode.NotSet)]
 		public OperationMode OperationMode { get; set; }
 		
 		public bool SupportsMultiApps {

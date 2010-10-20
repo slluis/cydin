@@ -52,8 +52,7 @@ namespace Cydin.Controllers
 				else
 					RedirectToAction ("Index", "Home");
 			}
-			UserModel m = UserModel.GetCurrent ();
-			return View (m.ServiceModel);
+			return View (ServiceModel.GetCurrent ());
         }
 		
 		public ActionResult EnableServiceChange ()
