@@ -66,6 +66,7 @@
     <Compile Include="SourcePullers\GitPuller.cs" />
     <Compile Include="SourcePullers\SubversionPuller.cs" />
     <Compile Include="SourcePullers\BazaarPuller.cs" />
+    <Compile Include="AddinProject.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

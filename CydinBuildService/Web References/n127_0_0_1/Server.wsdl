@@ -241,15 +241,25 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
+      <xs:complexType name="ArrayOfAddinData">
+        <xs:sequence>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="AddinData" nillable="true" type="s0:AddinData" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="AddinData">
+        <xs:sequence>
+          <xs:element minOccurs="0" maxOccurs="1" name="AddinVersion" type="xs:string" />
+          <xs:element minOccurs="0" maxOccurs="1" name="AddinId" type="xs:string" />
+          <xs:element minOccurs="0" maxOccurs="1" name="AppVersion" type="xs:string" />
+          <xs:element minOccurs="0" maxOccurs="1" name="Platforms" type="xs:string" />
+        </xs:sequence>
+      </xs:complexType>
       <xs:element name="SetSourceTagBuildData">
         <xs:complexType>
           <xs:sequence>
             <xs:element minOccurs="1" maxOccurs="1" name="appId" type="xs:int" />
             <xs:element minOccurs="1" maxOccurs="1" name="stagId" type="xs:int" />
-            <xs:element minOccurs="0" maxOccurs="1" name="addinVersion" type="xs:string" />
-            <xs:element minOccurs="0" maxOccurs="1" name="addinId" type="xs:string" />
-            <xs:element minOccurs="0" maxOccurs="1" name="appVersion" type="xs:string" />
-            <xs:element minOccurs="0" maxOccurs="1" name="platforms" type="s0:ArrayOfString" />
+            <xs:element minOccurs="0" maxOccurs="1" name="addins" type="s0:ArrayOfAddinData" />
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -264,7 +274,6 @@
     </xs:schema>
     <xs:schema xmlns:tns="http://tempuri.org/AbstractTypes" targetNamespace="http://tempuri.org/AbstractTypes" xmlns:xs="http://www.w3.org/2001/XMLSchema">
       <xs:import namespace="http://schemas.xmlsoap.org/soap/encoding/" />
-      <xs:import namespace="http://schemas.xmlsoap.org/wsdl/" />
       <xs:simpleType name="LogSeverity">
         <xs:restriction base="xs:string">
           <xs:enumeration value="Info" />
@@ -272,13 +281,6 @@
           <xs:enumeration value="Error" />
         </xs:restriction>
       </xs:simpleType>
-      <xs:complexType name="ArrayOfString">
-        <xs:complexContent mixed="false">
-          <xs:restriction base="soapenc:Array">
-            <xs:attribute xmlns:d7p1="http://schemas.xmlsoap.org/wsdl/" d7p2:arrayType="xs:string[]" ref="soapenc:arrayType" xmlns:d7p2="http://schemas.xmlsoap.org/wsdl/" />
-          </xs:restriction>
-        </xs:complexContent>
-      </xs:complexType>
     </xs:schema>
   </types>
   <message name="ConnectBuildServiceSoapIn">
@@ -425,15 +427,6 @@
   <message name="GetAppReleasesHttpGetOut">
     <part name="Body" element="s0:ArrayOfAppReleaseInfo" />
   </message>
-  <message name="SetSourceTagBuildDataHttpGetIn">
-    <part name="appId" type="s:int" />
-    <part name="stagId" type="s:int" />
-    <part name="addinVersion" type="s:string" />
-    <part name="addinId" type="s:string" />
-    <part name="appVersion" type="s:string" />
-    <part xmlns:q2="http://tempuri.org/AbstractTypes" name="platforms" type="q2:ArrayOfString" />
-  </message>
-  <message name="SetSourceTagBuildDataHttpGetOut" />
   <message name="ConnectBuildServiceHttpPostIn" />
   <message name="ConnectBuildServiceHttpPostOut">
     <part name="Body" element="s0:boolean" />
@@ -449,7 +442,7 @@
   </message>
   <message name="SetBuildServiceStatusHttpPostOut" />
   <message name="LogHttpPostIn">
-    <part xmlns:q3="http://tempuri.org/AbstractTypes" name="severity" type="q3:LogSeverity" />
+    <part xmlns:q2="http://tempuri.org/AbstractTypes" name="severity" type="q2:LogSeverity" />
     <part name="message" type="s:string" />
   </message>
   <message name="LogHttpPostOut" />
@@ -494,15 +487,6 @@
   <message name="GetAppReleasesHttpPostOut">
     <part name="Body" element="s0:ArrayOfAppReleaseInfo" />
   </message>
-  <message name="SetSourceTagBuildDataHttpPostIn">
-    <part name="appId" type="s:int" />
-    <part name="stagId" type="s:int" />
-    <part name="addinVersion" type="s:string" />
-    <part name="addinId" type="s:string" />
-    <part name="appVersion" type="s:string" />
-    <part xmlns:q4="http://tempuri.org/AbstractTypes" name="platforms" type="q4:ArrayOfString" />
-  </message>
-  <message name="SetSourceTagBuildDataHttpPostOut" />
   <portType name="ServerSoap">
     <operation name="ConnectBuildService">
       <input message="s0:ConnectBuildServiceSoapIn" />
@@ -668,10 +652,6 @@
       <input message="s0:GetAppReleasesHttpGetIn" />
       <output message="s0:GetAppReleasesHttpGetOut" />
     </operation>
-    <operation name="SetSourceTagBuildData">
-      <input message="s0:SetSourceTagBuildDataHttpGetIn" />
-      <output message="s0:SetSourceTagBuildDataHttpGetOut" />
-    </operation>
   </portType>
   <portType name="ServerHttpPost">
     <operation name="ConnectBuildService">
@@ -721,10 +701,6 @@
     <operation name="GetAppReleases">
       <input message="s0:GetAppReleasesHttpPostIn" />
       <output message="s0:GetAppReleasesHttpPostOut" />
-    </operation>
-    <operation name="SetSourceTagBuildData">
-      <input message="s0:SetSourceTagBuildDataHttpPostIn" />
-      <output message="s0:SetSourceTagBuildDataHttpPostOut" />
     </operation>
   </portType>
   <binding name="ServerSoap" type="s0:ServerSoap">
@@ -1081,13 +1057,6 @@
         <mime:mimeXml part="Body" />
       </output>
     </operation>
-    <operation name="SetSourceTagBuildData">
-      <http:operation location="/SetSourceTagBuildData" />
-      <input>
-        <http:urlEncoded />
-      </input>
-      <output />
-    </operation>
   </binding>
   <binding name="ServerHttpPost" type="s0:ServerHttpPost">
     <http:binding verb="POST" />
@@ -1184,13 +1153,6 @@
       <output>
         <mime:mimeXml part="Body" />
       </output>
-    </operation>
-    <operation name="SetSourceTagBuildData">
-      <http:operation location="/SetSourceTagBuildData" />
-      <input>
-        <mime:content part="" type="application/x-www-form-urlencoded" />
-      </input>
-      <output />
     </operation>
   </binding>
   <service name="Server">

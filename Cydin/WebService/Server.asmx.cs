@@ -7,6 +7,7 @@ using Cydin.Models;
 using Cydin.Builder;
 using System.Collections.Generic;
 using Cydin.Properties;
+using System.Xml.Serialization;
 
 namespace Cydin
 {
@@ -182,15 +183,16 @@ namespace Cydin
 		}
 		
 		[WebMethod]
-		public void SetSourceTagBuildData (int appId, int stagId, string addinVersion, string addinId, string appVersion, string[] platforms)
+		public void SetSourceTagBuildData (int appId, int stagId, SourceTagAddinInfo[] addins)
 		{
 			BuildService.CheckClient ();
+			SourceTagAddinInfo addin = addins [0];
 			using (UserModel m = UserModel.GetAdmin (appId)) {
 				SourceTag st = m.GetSourceTag (stagId);
-				st.AddinVersion = addinVersion;
-				st.AddinId = addinId;
-				st.TargetAppVersion = appVersion;
-				st.Platforms = string.Join (" ", platforms);
+				st.AddinVersion = addin.AddinVersion;
+				st.AddinId = addin.AddinId;
+				st.TargetAppVersion = addin.AppVersion;
+				st.Platforms =addin.Platforms;// string.Join (" ", addin.Platforms);
 				st.Status = SourceTagStatus.Built;
 				st.BuildDate = DateTime.Now;
 				m.UpdateSourceTag (st);
@@ -258,6 +260,15 @@ namespace Cydin
 		public string LastRevision { get; set; }
 		public string Url { get; set; }
 		public string Status { get; set; }
+	}
+	
+	[XmlType ("AddinData")]
+	public class SourceTagAddinInfo
+	{
+		public string AddinVersion { get; set; }
+		public string AddinId { get; set; }
+		public string AppVersion { get; set; }
+		public string Platforms { get; set; }
 	}
 	
 	public class ReleaseInfo

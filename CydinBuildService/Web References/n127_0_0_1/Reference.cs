@@ -558,45 +558,36 @@ namespace CydinBuildService.n127_0_0_1 {
         }
         
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://tempuri.org/SetSourceTagBuildData", RequestNamespace="http://tempuri.org/", ResponseNamespace="http://tempuri.org/", ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped, Use=System.Web.Services.Description.SoapBindingUse.Literal)]
-        public void SetSourceTagBuildData(int appId, int stagId, string addinVersion, string addinId, string appVersion, string[] platforms) {
+        public void SetSourceTagBuildData(int appId, int stagId, AddinData[] addins) {
             this.Invoke("SetSourceTagBuildData", new object[] {
                         appId,
                         stagId,
-                        addinVersion,
-                        addinId,
-                        appVersion,
-                        platforms});
+                        addins});
         }
         
-        public System.IAsyncResult BeginSetSourceTagBuildData(int appId, int stagId, string addinVersion, string addinId, string appVersion, string[] platforms, System.AsyncCallback callback, object asyncState) {
+        public System.IAsyncResult BeginSetSourceTagBuildData(int appId, int stagId, AddinData[] addins, System.AsyncCallback callback, object asyncState) {
             return this.BeginInvoke("SetSourceTagBuildData", new object[] {
                         appId,
                         stagId,
-                        addinVersion,
-                        addinId,
-                        appVersion,
-                        platforms}, callback, asyncState);
+                        addins}, callback, asyncState);
         }
         
         public void EndSetSourceTagBuildData(System.IAsyncResult asyncResult) {
             this.EndInvoke(asyncResult);
         }
         
-        public void SetSourceTagBuildDataAsync(int appId, int stagId, string addinVersion, string addinId, string appVersion, string[] platforms) {
-            this.SetSourceTagBuildDataAsync(appId, stagId, addinVersion, addinId, appVersion, platforms, null);
+        public void SetSourceTagBuildDataAsync(int appId, int stagId, AddinData[] addins) {
+            this.SetSourceTagBuildDataAsync(appId, stagId, addins, null);
         }
         
-        public void SetSourceTagBuildDataAsync(int appId, int stagId, string addinVersion, string addinId, string appVersion, string[] platforms, object userState) {
+        public void SetSourceTagBuildDataAsync(int appId, int stagId, AddinData[] addins, object userState) {
             if ((this.SetSourceTagBuildDataOperationCompleted == null)) {
                 this.SetSourceTagBuildDataOperationCompleted = new System.Threading.SendOrPostCallback(this.OnSetSourceTagBuildDataCompleted);
             }
             this.InvokeAsync("SetSourceTagBuildData", new object[] {
                         appId,
                         stagId,
-                        addinVersion,
-                        addinId,
-                        appVersion,
-                        platforms}, this.SetSourceTagBuildDataOperationCompleted, userState);
+                        addins}, this.SetSourceTagBuildDataOperationCompleted, userState);
         }
         
         private void OnSetSourceTagBuildDataCompleted(object arg) {
@@ -762,6 +753,27 @@ namespace CydinBuildService.n127_0_0_1 {
         
         /// <remarks/>
         public System.DateTime LastUpdateTime;
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "2.0.50727.1433")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://tempuri.org/")]
+    public partial class AddinData {
+        
+        /// <remarks/>
+        public string AddinVersion;
+        
+        /// <remarks/>
+        public string AddinId;
+        
+        /// <remarks/>
+        public string AppVersion;
+        
+        /// <remarks/>
+        public string Platforms;
     }
     
     public partial class ConnectBuildServiceCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {

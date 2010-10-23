@@ -11,6 +11,7 @@ using System.Xml;
 using CydinBuildService.n127_0_0_1;
 using ICSharpCode.SharpZipLib.Zip;
 using System.Net;
+using System.Xml.Serialization;
 
 namespace CydinBuildService
 {
@@ -332,9 +333,6 @@ namespace CydinBuildService
 			SourcePuller sp = VersionControl.GetSourcePuller (source.Type);
 			sp.PrepareForBuild (ctx, source.Id, stag);
 			
-			SetupService ss = new SetupService ();
-			HashSet<string> foundPlatforms = new HashSet<string> ();
-			bool generatedXplatPackage = false;
 			string destPath = Path.GetFullPath (source.GetAddinSourcePath (ctx, stag));
 			string sourcePath = destPath;
 			if (!string.IsNullOrEmpty (source.Directory))
@@ -344,7 +342,6 @@ namespace CydinBuildService
 			if (sourcePath != destPath && !sourcePath.StartsWith (destPath))
 				throw new Exception ("Invalid source directory: " + source.Directory);
 			
-			
 			string projectFile = Path.Combine (sourcePath, "addin-project.xml");
 			if (!File.Exists (projectFile)) {
 				string msg = "addin-project.xml file not found";
@@ -353,21 +350,19 @@ namespace CydinBuildService
 				throw new Exception (msg);
 			}
 
-			string tmpPath = Path.Combine (sourcePath, "tmp");
-
-			XmlDocument doc = new XmlDocument ();
-			doc.Load (projectFile);
+			AddinProject addinProject;
+			StreamReader sr = new StreamReader (projectFile);
+			using (sr) {
+				XmlSerializer ser = new XmlSerializer (typeof(AddinProject));
+				addinProject = (AddinProject) ser.Deserialize (sr);
+			}
 			
-			string addinVersion = "";
-			string addinId = "";
-			
-			string appVersion = doc.DocumentElement.GetAttribute ("appVersion");
-			if (appVersion.Length == 0)
+			if (string.IsNullOrEmpty (addinProject.AppVersion))
 				throw new Exception ("Target application version not specified in addin-project.xml");
 			
-			AppReleaseInfo rel = ctx.Server.GetAppReleases (ctx.AppId).Where (r => r.AppVersion == appVersion).FirstOrDefault ();
+			AppReleaseInfo rel = ctx.Server.GetAppReleases (ctx.AppId).Where (r => r.AppVersion == addinProject.AppVersion).FirstOrDefault ();
 			if (rel == null)
-				throw new Exception ("Application release " + appVersion + " not found.");
+				throw new Exception ("Application release " + addinProject.AppVersion + " not found.");
 			
 			RefreshAppRelease (ctx, rel);
 
@@ -375,36 +370,50 @@ namespace CydinBuildService
 
 			foreach (string f in Directory.GetFiles (sourcePath, "*.mpack"))
 				File.Delete (f);
-
-			foreach (XmlElement elem in doc.SelectNodes ("/AddinProject/Project")) {
-
-				if (elem["AddinFile"] == null)
+			
+			List<AddinData> addins = new List<AddinData> ();
+			
+			foreach (AddinProjectAddin addin in addinProject.Addins) {
+				addins.Add (BuildProjectAddin (ctx, stag, logFile, sourcePath, rel, addin));
+			}
+			ctx.Server.SetSourceTagBuildData (ctx.AppId, stag.Id, addins.ToArray ());
+		}
+		
+		AddinData BuildProjectAddin (BuildContext ctx, SourceTagInfo stag, string logFile, string sourcePath, AppReleaseInfo rel, AddinProjectAddin addin)
+		{
+			SetupService ss = new SetupService ();
+			bool generatedXplatPackage = false;
+			HashSet<string> foundPlatforms = new HashSet<string> ();
+			AddinData ainfo = new AddinData ();
+			
+			foreach (AddinProjectSource psource in addin.Sources) {
+				if (string.IsNullOrEmpty (psource.AddinFile))
 					throw new Exception ("AddinFile element not found in addin-project.xml");
-
-				string platforms = elem.GetAttribute ("platforms");
-				if (platforms.Length == 0)
+	
+				string platforms = psource.Platforms;
+				if (string.IsNullOrEmpty (platforms))
 					platforms = ctx.Application.Platforms;
-
+	
 				string[] platformList = platforms.Split (new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
 				foreach (string plat in platformList)
 					if (!foundPlatforms.Add (plat))
 						throw new Exception ("Platform " + plat + " specificed in more than open Project element");
-
-				string outFile = NormalizePath (elem["AddinFile"].InnerText);
-
-				if (elem["BuildFile"] != null) {
-
+	
+				string outFile = NormalizePath (psource.AddinFile);
+	
+				if (!string.IsNullOrEmpty (psource.BuildFile)) {
+	
 					// Build the project
-
-					string solFile = Path.Combine (sourcePath, NormalizePath (elem["BuildFile"].InnerText));
-
+	
+					string solFile = Path.Combine (sourcePath, NormalizePath (psource.BuildFile));
+	
 					string ops = " \"/p:ReferencePath=" + rel.GetAssembliesPath (ctx) + "\"";
 					
-					if (elem["BuildConfiguration"] != null)
-						ops += " \"/property:Configuration=" + elem["BuildConfiguration"].InnerText + "\"";
+					if (!string.IsNullOrEmpty (psource.BuildConfiguration))
+						ops += " \"/property:Configuration=" + psource.BuildConfiguration + "\"";
 					
 					ops = ops + " \"" + solFile + "\"";
-
+	
 					StringBuilder output = new StringBuilder ();
 					try {
 						// Clean the project
@@ -417,9 +426,11 @@ namespace CydinBuildService
 						File.AppendAllText (logFile, "<pre>" + HttpUtility.HtmlEncode (output.ToString ()) + "</pre>");
 					}
 				}
-
+	
 				// Generate the package
-
+	
+				string tmpPath = Path.Combine (sourcePath, "tmp");
+				
 				File.AppendAllText (logFile, "<p><b>Building Package</b></p>");
 				LocalStatusMonitor monitor = new LocalStatusMonitor ();
 				try {
@@ -430,11 +441,11 @@ namespace CydinBuildService
 					string file = Directory.GetFiles (tmpPath, "*.mpack").FirstOrDefault ();
 					if (file == null)
 						throw new Exception ("Add-in generation failed");
-
+	
 					AddinInfo ai = ReadAddinInfo (file);
-					addinVersion = ai.Version;
-					addinId = Mono.Addins.Addin.GetIdName (ai.Id);
-
+					ainfo.AddinVersion = ai.Version;
+					ainfo.AddinId = Mono.Addins.Addin.GetIdName (ai.Id);
+	
 					if (!generatedXplatPackage && platformList.Length > 0) {
 						File.Copy (file, Path.Combine (stag.GetPackagePath (ctx), "All.mpack"), true);
 						generatedXplatPackage = true;
@@ -453,9 +464,11 @@ namespace CydinBuildService
 					File.AppendAllText (logFile, "<pre>" + HttpUtility.HtmlEncode (monitor.ToString ()) + "</pre>");
 				}
 			}
-			ctx.Server.SetSourceTagBuildData (ctx.AppId, stag.Id, addinVersion, addinId, appVersion, foundPlatforms.ToArray ());
+			ainfo.Platforms = string.Join (" ", foundPlatforms.ToArray ());
+			ainfo.AppVersion = rel.AppVersion;
+			return ainfo;
 		}
-		
+
 		void PushFiles (BuildContext ctx, SourceInfo source, SourceTagInfo stag, bool safe)
 		{
 			try {

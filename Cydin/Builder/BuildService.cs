@@ -107,7 +107,7 @@ namespace Cydin.Builder
 		
 		public static void Log (LogSeverity severity, string message)
 		{
-			string txt = severity + " [" + DateTime.Now.ToLongTimeString () + "] " + message;
+			string txt = severity + " [" + DateTime.Now.ToLongTimeString () + "] " + message + "\n";
 			lock (logLock) {
 				File.AppendAllText (LogFile, txt);
 			}
