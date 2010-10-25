@@ -43,5 +43,9 @@ namespace Cydin.Models
 
 		[DataMember]
 		public string Directory { get; set; }
+		
+		public bool IsUploadSource {
+			get { return Type == "Upload"; }
+		}
 	}
 }

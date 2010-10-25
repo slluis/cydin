@@ -340,49 +340,50 @@ namespace Cydin.Models
 			}
 		}
 
-		public void UploadRelease (int projectId, HttpPostedFileBase file)
+		public void UploadRelease (int projectId, HttpPostedFileBase file, string appVersion, string[] platforms)
 		{
-			Release rel = new Release ();
-			rel.ProjectId = projectId;
-			rel.Status = ReleaseStatus.PendingPublish;
-			rel.Platforms = CurrentApplication.Platforms;
-			rel.LastChangeTime = DateTime.Now;
-			rel.TargetAppVersion = "";
-			rel.Version = "";
-			db.InsertObject (rel);
+			if (platforms.Length == 0)
+				throw new Exception ("No platform selected");
+			
+			VcsSource uploadSource = GetSources (projectId).Where (s => s.Type == "Upload").FirstOrDefault ();
+			if (uploadSource == null) {
+				uploadSource = new VcsSource ();
+				uploadSource.ProjectId = projectId;
+				uploadSource.Type = "Upload";
+				db.InsertObject (uploadSource);
+			}
+			
+			SourceTag st = new SourceTag ();
+			st.IsUpload = true;
+			st.ProjectId = projectId;
+			st.SourceId = uploadSource.Id;
+			st.BuildDate = DateTime.Now;
+			st.Name = "Upload";
+			st.Platforms = string.Join (" ", platforms);
+			st.TargetAppVersion = appVersion;
+			st.Status = SourceTagStatus.Ready;
+			db.InsertObject (st);
 
-			if (Directory.Exists (rel.FileFolder))
-				Directory.Delete (rel.FileFolder, true);
-			Directory.CreateDirectory (rel.FileFolder);
-
-			string filePath = Path.Combine (rel.FileFolder, "All.mpack");
-			file.SaveAs (filePath);
-			AddinInfo mpack = ReadAddinInfo (filePath);
-			GuessTargetAppVersion (mpack);
-			rel.Version = mpack.Version;
-			rel.TargetAppVersion = mpack.TargetAppVersion;
-			db.UpdateObject (rel);
-			BindDownloadInfo (rel);
-		}
-
-		void GuessTargetAppVersion (AddinInfo ai)
-		{
-			// Try to guess the target app version
-			IEnumerable<string> roots = from r in db.SelectObjects<AddinRoot> () select r.RootId;
-			foreach (Dependency dep in ai.Dependencies) {
-				AddinDependency adep = dep as AddinDependency;
-				if (adep != null) {
-					string id = Addin.GetFullId (ai.Namespace, adep.AddinId, null);
-					if (roots.Contains (id)) {
-						ai.TargetAppVersion = adep.Version;
-						break;
-					}
+			string filePath = null;
+			
+			if (!Directory.Exists (st.PackagesPath))
+				Directory.CreateDirectory (st.PackagesPath);
+			
+			if (platforms.Length == CurrentApplication.PlatformsList.Length) {
+				filePath = Path.Combine (st.PackagesPath, "All.mpack");
+				file.SaveAs (filePath);
+			}
+			else {
+				foreach (string plat in platforms) {
+					filePath = Path.Combine (st.PackagesPath, plat + ".mpack");
+					file.SaveAs (filePath);
 				}
 			}
-			if (ai.TargetAppVersion != null) {
-				// Convert to app version
-				ai.TargetAppVersion = (from r in db.SelectObjects<AppRelease> () where r.AddinRootVersion == ai.TargetAppVersion select r.AppVersion).FirstOrDefault ();
-			}
+			AddinInfo mpack = ReadAddinInfo (filePath);
+			st.AddinId = Addin.GetIdName (mpack.Id);
+			st.AddinVersion = mpack.Version;
+			
+			db.UpdateObject (st);
 		}
 
 		internal static AddinInfo ReadAddinInfo (string file)
@@ -459,6 +460,7 @@ namespace Cydin.Models
 
 		public void DeleteSourceTag (SourceTag stag)
 		{
+			ValidateProject (stag.ProjectId);
 			stag.CleanPackages ();
 			db.DeleteObject (stag);
 		}
@@ -634,10 +636,27 @@ namespace Cydin.Models
 			return db.SelectObjects<Release> ("SELECT `Release`.* FROM `Release`, Project WHERE `Release`.ProjectId = Project.Id AND Project.ApplicationId = {0} AND `Release`.Status = {1} ORDER BY LastChangeTime DESC", application.Id, ReleaseStatus.Published).Take (10);
 		}
 
-		internal void SetProjectTrusted (int id, bool trusted)
+		internal void UpdateProjectFlags (int id, ProjectFlag flags)
 		{
+			CheckIsAdmin ();
 			Project p = GetProject (id);
-			p.Trusted = trusted;
+			p.Flags = flags;
+			db.UpdateObject (p);
+		}
+
+		internal void SetProjectFlags (int id, ProjectFlag flags)
+		{
+			CheckIsAdmin ();
+			Project p = GetProject (id);
+			p.Flags |= flags;
+			db.UpdateObject (p);
+		}
+
+		internal void ResetProjectFlags (int id, ProjectFlag flags)
+		{
+			CheckIsAdmin ();
+			Project p = GetProject (id);
+			p.Flags &= ~flags;
 			db.UpdateObject (p);
 		}
 

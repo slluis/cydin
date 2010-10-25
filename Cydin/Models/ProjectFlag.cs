@@ -1,5 +1,5 @@
 // 
-// Application.cs
+// ProjectFlag.cs
 //  
 // Author:
 //       Lluis Sanchez Gual <lluis@novell.com>
@@ -23,39 +23,15 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-
 using System;
 
 namespace Cydin.Models
 {
-	public class Application
+	public enum ProjectFlag
 	{
-		[DataMember (Identity = true)]
-		public int Id { get; set; }
-
-		[DataMember]
-		public string Name { get; set; }
-
-		[DataMember]
-		public string Description { get; set; }
-
-		[DataMember]
-		public string Platforms { get; set; }
-
-		[DataMember]
-		public string Subdomain { get; set; }
-		
-		public string AddinPackageSubextension {
-			get { return "monodevelop"; }
-		}
-		
-		public string AddinPackageExtension {
-			get { return "." + AddinPackageSubextension + "-mpack"; }
-		}
-		
-		public string[] PlatformsList {
-			get { return Platforms.Split (new char[] {' '}, StringSplitOptions.RemoveEmptyEntries); }
-		}
+		None = 0,
+		AllowDirectPublish = 1,
+		AllowPackageUpload = 2
 	}
 }
 

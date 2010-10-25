@@ -140,6 +140,7 @@
     <Compile Include="Controllers\ControllerHelper.cs" />
     <Compile Include="Views\UserViewPage.cs" />
     <Compile Include="Controllers\CydinController.cs" />
+    <Compile Include="Models\ProjectFlag.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />

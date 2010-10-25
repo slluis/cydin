@@ -106,8 +106,21 @@ namespace Cydin.Controllers
 		[HttpPost]
 		public ActionResult UploadReleaseFile (int projectId)
 		{
-			CurrentUserModel.UploadRelease (projectId, Request.Files[0]);
+			List<string> platforms = new List<string> ();
+			foreach (string plat in CurrentUserModel.CurrentApplication.PlatformsList) {
+				string val = Request.Form ["platform-" + plat];
+				if (val.ToLower ().IndexOf ("true") != -1)
+					platforms.Add (plat);
+			}
+			CurrentUserModel.UploadRelease (projectId, Request.Files[0], Request.Form ["appVersion"], platforms.ToArray ());
 			return RedirectToAction ("Index", new { id = projectId });
+		}
+		
+		public ActionResult DeleteUpload (int sourceId)
+		{
+			SourceTag st = CurrentUserModel.GetSourceTag (sourceId);
+			CurrentUserModel.DeleteSourceTag (st);
+			return RedirectToAction ("Index", new { id = st.ProjectId });
 		}
 
 		public ActionResult UpdateSource (int sourceTagId)
@@ -156,13 +169,18 @@ namespace Cydin.Controllers
 			return View (p);
 		}
 
-		public ActionResult ToggleTrusted (int id)
+		public ActionResult UpdateFlags (int projectId, bool allowDirectPublish, bool allowPackageUpload)
 		{
 			if (!CurrentUserModel.IsAdmin)
 				throw new Exception ("Unauthorised");
-			Project p = CurrentUserModel.GetProject (id);
-			CurrentUserModel.SetProjectTrusted (id, !p.Trusted);
-			return View ("Index", p);
+			
+			ProjectFlag flags = ProjectFlag.None;
+			if (allowDirectPublish)
+				flags |= ProjectFlag.AllowDirectPublish;
+			if (allowPackageUpload)
+				flags |= ProjectFlag.AllowPackageUpload;
+			CurrentUserModel.UpdateProjectFlags (projectId, flags);
+			return RedirectToAction ("Index", new { id=projectId });
 		}
 		
         [HttpPost]

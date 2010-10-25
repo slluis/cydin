@@ -92,8 +92,6 @@
 
     <% if (isProjectAdmin) { %>
 
-    <p><% /*=Html.ActionLink ("Upload Release", "UploadRelease", new { projectId = Model.Id })*/%></p>
-
     <h2>Sources</h2>
 
     <% if (sourceTags.Any ()) {
@@ -124,8 +122,12 @@
     <tr valign="top" class="tag-source-table-body tag-source-table-body-<%=stat%>">
     <td><%=source.AddinId + " v" + source.AddinVersion%><br>
     </td>
-    <td><a href="<%=srcUrl%>">Revision: <%=source.ShortLastRevision%> </a><br>
+    <td><% if (!source.IsUpload) {%>
+	<a href="<%=srcUrl%>">Revision: <%=source.ShortLastRevision%> </a><br>
     <%=Html.ActionLink ("Last build: " + time, "BuildLog", new { id = source.Id }, null)%><br>
+	<% } else { %>
+		Uploaded: <%=time%>
+	<% } %>
     </td><td>
     Dev Status: <%= Html.DropDownListFor (t => source.DevStatus, m.GetDevStatusItems (source.DevStatus), new { id="sts-" + source.Id, @class="sts-list" })%><br>
     Packages: 
@@ -134,10 +136,13 @@
         <% } %>
     </td>
     <td width="0px" align="right">
-        <% if (source.Status == SourceTagStatus.BuildError || source.Status == SourceTagStatus.FetchError || m.IsSiteAdmin)
+        <% if ((source.Status == SourceTagStatus.BuildError || source.Status == SourceTagStatus.FetchError || m.IsSiteAdmin) && !source.IsUpload)
                Response.Write (Html.ActionLink ("Rebuild", "UpdateSource", new { sourceTagId = source.Id }) + "<br>"); %>
         <% if (source.Status == SourceTagStatus.Ready)
-               Response.Write (Html.ActionLink ("Publish", "PublishRelease", new { sourceId = source.Id }));
+               Response.Write (Html.ActionLink ("Publish", "PublishRelease", new { sourceId = source.Id }) + "<br>");
+        %>
+        <% if (source.IsUpload)
+               Response.Write (Html.ActionLink ("Delete", "DeleteUpload", new { sourceId = source.Id }));
         %>
     </td>
     </tr>
@@ -158,6 +163,11 @@
            Response.Write ("</ul>");
        }
          %>
+	
+	<% if (Model.HasFlag (ProjectFlag.AllowPackageUpload)) { %>
+    <p><%=Html.ActionLink ("Upload Package", "UploadRelease", new { projectId = Model.Id })%></p>
+	<% } %>
+
     <p><%=Html.ActionLink ("Edit Sources", "Index", "Source", new { projectId = Model.Id }, null)%></p>
     <% } /* if(isProjectAdmin) */ %>
     
@@ -174,8 +184,12 @@
     <div class="side-panel">
     <h1>Administration</h1>
     <p><%=Html.ActionLink ("Delete Project", "ConfirmDelete", "Project", new { id = Model.Id }, null)%></p>
-    <% if (m.IsAdmin) {%>
-    <p><%=Html.ActionLink (Model.Trusted ? "Set Not Trusted" : "Set Trusted", "ToggleTrusted", "Project", new { id = Model.Id }, null)%></p>
+    <% if (m.IsAdmin)
+         using (Html.BeginForm ("UpdateFlags", "Project")) {%>
+	 	<%=Html.Hidden ("projectId", Model.Id)%>
+    <p><%=Html.CheckBox ("allowDirectPublish", Model.HasFlag (ProjectFlag.AllowDirectPublish))%> Allow direct publish<br/>
+    <%=Html.CheckBox ("allowPackageUpload", Model.HasFlag (ProjectFlag.AllowPackageUpload))%> Allow package upload</p>
+     <input type="submit" value="Save" />
     <% } %>
     </div>
     <% } /* if(isProjectAdmin) */ %>

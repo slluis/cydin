@@ -59,6 +59,14 @@ namespace Cydin.Models
 			}
 		}
 		
+		public bool IsUpload {
+			get { return Url == "(Uploaded)"; }
+			set {
+				if (value)
+					Url = "(Uploaded)";
+			}
+		}
+		
 		public IEnumerable<string> PlatformsList
 		{
 			get

@@ -18,12 +18,17 @@ namespace Cydin.Models
 		public string Description { get; set; }
 
 		[DataMember]
-		public bool Trusted { get; set; }
+		public ProjectFlag Flags { get; set; }
 
 		[DataMember]
 		public int ApplicationId { get; set; }
 
 		[DataMember]
 		public bool IsPublic { get; set; }
+		
+		public bool HasFlag (ProjectFlag flag)
+		{
+			return (Flags & flag) == flag;
+		}
 	}
 }

@@ -62,23 +62,14 @@ namespace Cydin
 			using (UserModel m = UserModel.GetAdmin (appId)) {
 				foreach (Project p in m.GetProjects ()) {
 					foreach (VcsSource s in m.GetSources (p.Id)) {
+						if (s.IsUploadSource)
+							continue;
 						List<SourceTagInfo> tags = new List<SourceTagInfo> ();
 						foreach (SourceTag st in m.GetVcsSourceTags (s.Id))
 							tags.Add (new SourceTagInfo (st));
 						list.Add (new SourceInfo (p, s, tags.ToArray ()));
 					}
 				}
-				return list.ToArray ();
-			}
-		}
-		
-		public SourceTagInfo[] GetSourceTags (int appId)
-		{
-			BuildService.CheckClient ();
-			using (UserModel m = UserModel.GetAdmin (appId)) {
-				List<SourceTagInfo> list = new List<SourceTagInfo> ();
-				foreach (SourceTag st in m.GetSourceTags ())
-					list.Add (new SourceTagInfo (st));
 				return list.ToArray ();
 			}
 		}

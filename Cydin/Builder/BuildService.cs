@@ -292,7 +292,7 @@ namespace Cydin.Builder
 			Project p = m.GetProject (source.ProjectId);
 			rel = new Release ();
 			rel.ProjectId = source.ProjectId;
-			rel.Status = p.Trusted || activate ? ReleaseStatus.PendingPublish : ReleaseStatus.PendingReview;
+			rel.Status = p.HasFlag (ProjectFlag.AllowDirectPublish) || activate ? ReleaseStatus.PendingPublish : ReleaseStatus.PendingReview;
 			rel.DevStatus = source.DevStatus;
 			rel.LastChangeTime = DateTime.Now;
 			rel.Platforms = source.Platforms;

@@ -22,7 +22,7 @@
             <th></th>
         </tr>
 
-    <% foreach (var item in Model) { %>
+    <% foreach (var item in Model.Where (s => s.Type != "Upload")) { %>
     
         <tr>
             <td>
