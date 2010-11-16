@@ -89,6 +89,7 @@
         <xs:sequence>
           <xs:element minOccurs="1" maxOccurs="1" name="Id" type="xs:int" />
           <xs:element minOccurs="0" maxOccurs="1" name="ProjectName" type="xs:string" />
+          <xs:element minOccurs="1" maxOccurs="1" name="ProjectId" type="xs:int" />
           <xs:element minOccurs="0" maxOccurs="1" name="Type" type="xs:string" />
           <xs:element minOccurs="0" maxOccurs="1" name="Url" type="xs:string" />
           <xs:element minOccurs="0" maxOccurs="1" name="Tags" type="xs:string" />

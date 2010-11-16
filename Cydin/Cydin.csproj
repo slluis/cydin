@@ -141,6 +141,7 @@
     <Compile Include="Views\UserViewPage.cs" />
     <Compile Include="Controllers\CydinController.cs" />
     <Compile Include="Models\ProjectFlag.cs" />
+    <Compile Include="Controllers\ServiceEventsHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />

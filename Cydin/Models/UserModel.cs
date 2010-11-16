@@ -276,10 +276,10 @@ namespace Cydin.Models
 		{
 			source.LastFetchTime = DateTime.Now.Subtract (TimeSpan.FromDays (1));
 			db.InsertObject (source);
-			BuildService.TriggerBuild ();
+			BuildService.Build (CurrentApplication.Id, source.ProjectId);
 		}
 
-		public void UpdateSource (VcsSource s)
+		public void UpdateSource (VcsSource s, bool rebuild)
 		{
 			VcsSource os = db.SelectObjectById<VcsSource> (s.Id);
 			db.UpdateObject (s);
@@ -291,7 +291,8 @@ namespace Cydin.Models
 				}
 			}
 			
-			BuildService.TriggerBuild ();
+			if (rebuild)
+				BuildService.Build (CurrentApplication.Id, os.ProjectId);
 		}
 
 		public Release GetRelease (int releaseId)

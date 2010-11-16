@@ -24,6 +24,7 @@ namespace Cydin.Builder
 		static AutoResetEvent updateEvent = new AutoResetEvent (false);
 		static object logLock = new object ();
 		static bool updateAllRequested;
+		static TextWriter eventsStream;
 		
 		static BuildService ()
 		{
@@ -66,7 +67,7 @@ namespace Cydin.Builder
 		{
 			string addr = HttpContext.Current.Request.UserHostAddress;
 			if (addr == AuthorisedBuildBotConnection) {
-				status = "Build bot connected";
+				status = "Build bot identified";
 				connected = true;
 				return true;
 			}
@@ -96,8 +97,51 @@ namespace Cydin.Builder
 				throw new Exception ("Not authorised");
 		}
 		
-		public static void TriggerBuild ()
+		public static void BuildAll ()
 		{
+			NotifyEvent ("build", -1, -1);
+		}
+		
+		public static void BuildAll (int appId)
+		{
+			NotifyEvent ("build", appId, -1);
+		}
+		
+		public static void Build (int appId, int projectId)
+		{
+			NotifyEvent ("build", appId, projectId);
+		}
+		
+		internal static void ConnectEventsStream (TextWriter tw)
+		{
+			if (eventsStream != null) {
+				try {
+					eventsStream.Close ();
+				} catch {}
+			}
+			status ="Build bot connected";
+			eventsStream = tw;
+		}
+		
+		static void NotifyEvent (string eventId, int appId, int projectId, params string[] args)
+		{
+			if (eventsStream != null) {
+				try {
+					eventsStream.WriteLine ("[event]");
+					eventsStream.WriteLine (eventId);
+					eventsStream.WriteLine (appId.ToString ());
+					eventsStream.WriteLine (projectId.ToString ());
+					eventsStream.WriteLine (args.Length.ToString ());
+					eventsStream.Flush ();
+				}
+				catch {
+					try {
+						eventsStream.Close ();
+					} catch { }
+					eventsStream = null;
+					status = "Build bot identified";
+				}
+			}
 		}
 		
 		public static void Log (Exception ex)

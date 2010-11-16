@@ -659,6 +659,9 @@ namespace CydinBuildService.n127_0_0_1 {
         public string ProjectName;
         
         /// <remarks/>
+        public int ProjectId;
+        
+        /// <remarks/>
         public string Type;
         
         /// <remarks/>

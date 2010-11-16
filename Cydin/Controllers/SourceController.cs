@@ -71,7 +71,7 @@ namespace Cydin.Controllers
         {
             try
             {
-				CurrentUserModel.UpdateSource (source);
+				CurrentUserModel.UpdateSource (source, true);
 				return RedirectToAction ("Index", new { projectId = source.ProjectId });
             }
             catch

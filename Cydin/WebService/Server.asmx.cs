@@ -115,7 +115,7 @@ namespace Cydin
 			using (UserModel m = UserModel.GetAdmin (appId)) {
 				VcsSource s = m.GetSource (sourceId);
 				s.LastFetchTime = fetchTime;
-				m.UpdateSource (s);
+				m.UpdateSource (s, false);
 				IEnumerable<SourceTag> currentTags = m.GetVcsSourceTags (sourceId);
 				foreach (SourceTagInfo stInfo in sourceTags) {
 					SourceTag st = currentTags.FirstOrDefault (t => t.Url == stInfo.Url);
@@ -201,6 +201,7 @@ namespace Cydin
 		{
 			Id = s.Id;
 			ProjectName = p.Name;
+			ProjectId = p.Id;
 			Type = s.Type;
 			Url = s.Url;
 			Tags = s.Tags;
@@ -213,6 +214,7 @@ namespace Cydin
 		
 		public int Id { get; set; }
 		public string ProjectName { get; set; }
+		public int ProjectId { get; set; }
 		public string Type { get; set; }
 		public string Url { get; set; }
 		public string Tags { get; set; }

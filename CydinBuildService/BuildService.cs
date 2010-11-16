@@ -18,11 +18,12 @@ namespace CydinBuildService
 	public class BuildService
 	{
 		AutoResetEvent buildEvent = new AutoResetEvent (false);
-		int waitTimeout = 1 * 60 * 1000;
+		int waitTimeout = 15 * 60 * 1000;
 //		int waitTimeout = 5000;
 		bool running = false;
 		Thread builderThread;
 		BuildContext mainContext = new BuildContext ();
+		Queue<ServerEventArgs> eventQueue = new Queue<ServerEventArgs> ();
 
 		public BuildService ()
 		{
@@ -67,6 +68,10 @@ namespace CydinBuildService
 
 		void Run ()
 		{
+			mainContext.Event += HandleEvent;
+			mainContext.Disconnected += HandleDisconnected;
+			QueueBuildAll ();
+			
 			while (running) {
 				if (!mainContext.Connected) {
 					ConnectToServer (mainContext);
@@ -76,18 +81,53 @@ namespace CydinBuildService
 					}
 				}
 				
-				if (running && mainContext.Connected)
-					Build (mainContext);
+				if (running && mainContext.Connected) {
+					ServerEventArgs ev;
+					do {
+						// Consume the event queue
+						ev = null;
+						lock (eventQueue) {
+							if (eventQueue.Count > 0)
+								ev = eventQueue.Dequeue ();
+						}
+						if (ev != null)
+							Build (mainContext, ev);
+					} while (ev != null);
+				}
 
-				buildEvent.WaitOne (waitTimeout);
+				if (!buildEvent.WaitOne (waitTimeout))
+					QueueBuildAll ();
 			}
 			mainContext.Status = "Stopped";
+		}
+
+		void HandleDisconnected (object sender, EventArgs e)
+		{
+			// Wait a bit and try reconnecting
+			Thread.Sleep (5000);
+			buildEvent.Set ();
+		}
+
+		void HandleEvent (object sender, ServerEventArgs e)
+		{
+			lock (eventQueue) {
+				eventQueue.Enqueue (e);
+			}
+			buildEvent.Set ();
+		}
+		
+		void QueueBuildAll ()
+		{
+			ServerEventArgs e = new ServerEventArgs () { EventId = "BuildAll" };
+			lock (eventQueue) {
+				eventQueue.Enqueue (e);
+			}
 		}
 		
 		bool ConnectToServer (BuildContext ctx)
 		{
 			try {
-				if (ctx.Server.ConnectBuildService ()) {
+				if (ctx.Connect ()) {
 					ctx.Connected = true;
 					return true;
 				}
@@ -107,7 +147,7 @@ namespace CydinBuildService
 			return false;
 		}
 		
-		void Build (BuildContext ctx)
+		void Build (BuildContext ctx, ServerEventArgs ev)
 		{
 			try {
 				ctx.ServerSettings = ctx.Server.GetSettings ();
@@ -117,11 +157,11 @@ namespace CydinBuildService
 				return;
 			}
 			
-			foreach (ApplicationInfo app in ctx.ServerSettings.Applications) {
+			foreach (ApplicationInfo app in ctx.ServerSettings.Applications.Where (ap => ev.AppId == -1 || ev.AppId == ap.Id)) {
 				try {
 					ctx.Application = app;
-					UpdateSourceTags (ctx);
-					BuildProjects (ctx);
+					UpdateSourceTags (ctx, ev);
+					BuildProjects (ctx, ev);
 				}
 				catch (Exception ex) {
 					if (!HandleError (ctx, ex))
@@ -194,10 +234,12 @@ namespace CydinBuildService
 			ctx.Status = "Assembly package for release " + release.AppVersion + " isntalled";
 		}
 
-		public void UpdateSourceTags (BuildContext ctx)
+		public void UpdateSourceTags (BuildContext ctx, ServerEventArgs ev)
 		{
 			ctx.Status = "Updating version control source tags";
 			foreach (SourceInfo s in ctx.Server.GetSources (ctx.AppId)) {
+				if (ev.ProjectId != -1 && s.ProjectId != ev.ProjectId)
+					continue;
 				ctx.Status = "Updating version control source tags for project '" + s.ProjectName + "'";
 				UpdateSourceTags (ctx, s, true);
 			}
@@ -242,9 +284,11 @@ namespace CydinBuildService
 			}
 		}
 
-		void BuildProjects (BuildContext ctx)
+		void BuildProjects (BuildContext ctx, ServerEventArgs ev)
 		{
 			foreach (SourceInfo source in ctx.Server.GetSources (ctx.AppId)) {
+				if (ev.ProjectId != -1 && ev.ProjectId != source.ProjectId)
+					continue;
 				foreach (SourceTagInfo stag in source.SourceTags) {
 					try {
 						string sourcesPath = source.GetAddinSourcePath (ctx, stag);
@@ -628,6 +672,8 @@ namespace CydinBuildService
 		public string ServerUrl;
 		
 		public bool Connected;
+		StreamReader eventsReader;
+		Thread eventsThread;
 		
 		string status;
 		
@@ -658,5 +704,79 @@ namespace CydinBuildService
 			Server.Log (severity, message);
 		}
 		
+		public bool Connect ()
+		{
+			if (!Server.ConnectBuildService ())
+				return false;
+			if (eventsThread != null) {
+				eventsThread.Abort ();
+				eventsThread = null;
+			}
+			try {
+				WebRequest req = HttpWebRequest.Create (ServerUrl + "/service/events");
+				req.Timeout = Timeout.Infinite;
+				eventsReader = new StreamReader (req.GetResponse ().GetResponseStream ());
+			
+				eventsThread = new Thread (ReadEvents);
+				eventsThread.IsBackground = true;
+				eventsThread.Start ();
+				return true;
+			} catch {
+				return false;
+			}
+		}
+		
+		void ReadEvents ()
+		{
+			do {
+				try {
+					string lin;
+					do {
+						lin = eventsReader.ReadLine ();
+					}
+					while (lin != "[event]" && lin != null);
+					
+					if (lin == null)
+						throw new Exception ("Disconnected");
+					
+					ServerEventArgs args = new ServerEventArgs ();
+					args.EventId = eventsReader.ReadLine ();
+					Console.WriteLine ("Got event " + args.EventId);
+					args.AppId = int.Parse (eventsReader.ReadLine ());
+					args.ProjectId = int.Parse (eventsReader.ReadLine ());
+					int nargs = int.Parse (eventsReader.ReadLine ());
+					List<string> eargs = new List<string> ();
+					for (int n=0; n<nargs; n++)
+						eargs.Add (eventsReader.ReadLine ());
+					args.EventArgs = eargs.ToArray ();
+					if (Event != null)
+						Event (this, args);
+				} catch {
+					try {
+						eventsReader.Close ();
+					} catch { }
+					Connected = false;
+					eventsThread = null;
+					eventsReader = null;
+					ThreadPool.QueueUserWorkItem (delegate {
+						if (Disconnected != null)
+							Disconnected (this, EventArgs.Empty);
+					});
+					return;
+				}
+			} while (true);
+		}
+		
+		public event EventHandler Disconnected;
+		public event EventHandler<ServerEventArgs> Event;
+	}
+	
+	
+	public class ServerEventArgs: EventArgs
+	{
+		public string EventId;
+		public int AppId;
+		public int ProjectId;
+		public string[] EventArgs;
 	}
 }

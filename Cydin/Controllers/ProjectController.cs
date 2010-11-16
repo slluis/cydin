@@ -126,8 +126,8 @@ namespace Cydin.Controllers
 		public ActionResult UpdateSource (int sourceTagId)
 		{
 			CurrentUserModel.CleanSources (sourceTagId);
-			BuildService.TriggerBuild ();
 			SourceTag st = CurrentUserModel.GetSourceTag (sourceTagId);
+			BuildService.Build (CurrentUserModel.CurrentApplication.Id, st.ProjectId);
 			return RedirectToAction ("Index", new { id = st.ProjectId });
 		}
 
