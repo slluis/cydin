@@ -202,6 +202,9 @@
     <Content Include="Views\Home\Edit.aspx" />
     <Content Include="Views\SiteAdmin\Log.aspx" />
     <Content Include="Views\SiteAdmin\EditApplication.aspx" />
+    <Content Include="Media\edit.png" />
+    <Content Include="Media\bullet_add.png" />
+    <Content Include="Media\bullet_delete.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

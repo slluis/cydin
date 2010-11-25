@@ -206,5 +206,24 @@ namespace Cydin.Controllers
 			CurrentUserModel.UpdateSourceTag (stag);
 			return Content ("OK");
 		}
+		
+		public ActionResult AddOwnerAsync (int id, string email)
+		{
+			CurrentUserModel.ValidateProject (id);
+			User u = CurrentServiceModel.GetUserByEmail (email);
+			if (u != null) {
+				CurrentUserModel.AddProjectOwner (id, u.Id);
+				return Content ("OK");
+			}
+			else
+				return Content ("");
+		}
+		
+		public ActionResult RemoveOwner (int id, int userId)
+		{
+			CurrentUserModel.ValidateProject (id);
+			CurrentUserModel.RemoveProjectOwner (id, userId);
+			return RedirectToAction ("Index", new { id=id });
+		}
 	}
 }

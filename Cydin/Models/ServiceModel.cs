@@ -117,6 +117,11 @@ namespace Cydin.Models
 			return db.SelectObjectWhere<User> ("Login = {0}", login);
 		}
 
+		public User GetUserByEmail (string email)
+		{
+			return db.SelectObjectWhere<User> ("Email = {0}", email);
+		}
+
 		public IEnumerable<User> GetUsers ()
 		{
 			CheckIsAdmin ();

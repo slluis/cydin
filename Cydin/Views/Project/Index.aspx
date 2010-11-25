@@ -12,10 +12,49 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
 <script type="text/javascript" src="/Scripts/notifications.js"></script> 
 <script type = "text/javascript">
+	var pid=<%=Model.Id%>;			
     $(document).ready(function() {
     	$(".sts-list").change (function() { updateStatus (this); });
+    	$(".owners-tr").hover (
+			function() { $(this).children("#owners-delete").show(); },
+			function() { $(this).children("#owners-delete").hide(); }
+		);
+    	$(".owners-delete-button").click (function() {
+			var uid = $(this).attr("uid");
+			$("#owner-name").text ($(this).attr("uname"));
+			$("#confirm-delete-owner-dialog").dialog({
+				modal: true,
+				width: 400,
+				resizable: false,
+				buttons: {
+					Cancel: function() { $(this).dialog("close"); },
+					Remove: function() { window.location = ("/Project/RemoveOwner?id=" + pid + "&userId=" + uid); }
+				}
+			});
+		});
+    	$("#owners-add-button").click (function() { $(this).children("#owners-delete").show(); 
+			$("#add-owner-dialog").dialog({
+				modal: true,
+				width: 400,
+				resizable: false,
+				buttons: {
+					Cancel: function() { $(this).dialog("close"); },
+					Add: function() { addOwner ($(this), $("#new-owner-mail").val()); }
+				}
+			});
+		});
     });
     
+	function addOwner (dlg, mail)
+	{
+		$.post ("/Project/AddOwnerAsync", {id: pid, email: mail}, function(xml) {
+			if (xml == "OK")
+				window.location = "/Project/Index/" + pid;
+			else
+				$("#user-not-found").show ();
+		});
+	}
+			
     function updateStatus (ob)
     {
     	var id = ob.id.substring (4);
@@ -45,7 +84,7 @@
     %>
     
     <% if (isProjectAdmin) {
-    	Response.Write (Html.ActionLink ("Edit Name and Description", "Edit", "Project", new { id = Model.Id }, null));
+    	Response.Write (Html.ActionIconLink ("edit.png", "Edit Name and Description", "Edit", "Project", new { id = Model.Id }));
     } %>
     <h2>Releases</h2>
     
@@ -173,6 +212,22 @@
     
     </td>
     <td valign="top" width="250px">
+    <% if (isProjectAdmin) { %>
+    <div class="side-panel">
+    <h1>Project Owners</h1>
+	<table width="100%">
+	<%
+	var owners = m.GetProjectOwners (Model);
+	foreach (User u in owners) {%>
+		<tr class="owners-tr"><td><%=Html.ActionLink (u.Login, "Profile", "User", new { id = u.Id }, null)%></td>
+		<% if (owners.Count() > 1) { %>
+			<td id="owners-delete" style="display:none" ><img src="/Media/bullet_delete.png"/> <a class="owners-delete-button" uname="<%=u.Login%>" uid="<%=u.Id%>" href="#" style="font-size:x-small">Remove</a></td></tr>
+		<% } %>
+	<% } %>
+	</table>
+	<img src="/Media/bullet_add.png"/> <a href="#" id="owners-add-button" style="font-size:x-small">Add</a>
+    </div>
+    <% } %>
     <% if (m.User != null) { %>
     <div class="side-panel">
     <h1>Track Project</h1>
@@ -183,7 +238,7 @@
     <% if (isProjectAdmin) { %>
     <div class="side-panel">
     <h1>Administration</h1>
-    <p><%=Html.ActionLink ("Delete Project", "ConfirmDelete", "Project", new { id = Model.Id }, null)%></p>
+    <p><%=Html.ActionLink ("Delete Project", "ConfirmDelete", "Project", new { id = Model.Id }, new {@class="command"})%></p>
     <% if (m.IsAdmin)
          using (Html.BeginForm ("UpdateFlags", "Project")) {%>
 	 	<%=Html.Hidden ("projectId", Model.Id)%>
@@ -196,4 +251,17 @@
     
     </td>
     </table>
+		
+<div id="confirm-delete-owner-dialog" title="Remove Owner" style="display:none">
+	<p>Are you sure you want to remove the user <b><span id="owner-name"></span></b> from the list of project owners?</p>
+</div>
+
+<div id="add-owner-dialog" title="Add Owner" style="display:none">
+	<p>Enter the e-mail of the user you want to add to the owners list:</p>
+	<form>
+		<input id="new-owner-mail"></input>
+	</form>
+	<p id="user-not-found" style="color:red;display:none">There is no user registered with the provided e-mail</p>
+</div>
+		
 </asp:Content>

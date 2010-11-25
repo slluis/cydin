@@ -30,6 +30,7 @@ namespace Cydin.Models
 			string login = HttpContext.Current.User.Identity.Name;
 			
 			UserModel m = new UserModel ();
+			
 			m.db = DataConnection.GetConnection ();
 			
 			if (Settings.Default.SupportsMultiApps) {
@@ -195,6 +196,28 @@ namespace Cydin.Models
 		public IEnumerable<User> GetProjectOwners (Project p)
 		{
 			return db.SelectObjects<User> ("SELECT User.* FROM User, UserProject, Project WHERE Project.Id = UserProject.ProjectId AND User.Id = UserProject.UserId AND UserProject.ProjectId = {0} AND UserProject.Permissions & {1} != 0 AND Project.ApplicationId={2}", p.Id, (int)ProjectPermission.Administer, application.Id);
+		}
+		
+		public void AddProjectOwner (int projectId, int userId)
+		{
+			UserProject up = db.SelectObjectWhere<UserProject> ("UserId={0} AND ProjectId={1}", userId, projectId);
+			if (up == null) {
+				up = new UserProject () { UserId = userId, ProjectId = projectId, Permissions = ProjectPermission.Administer };
+				db.InsertObject<UserProject> (up);
+			}
+			else {
+				up.Permissions |= ProjectPermission.Administer;
+				db.UpdateObject (up);
+			}
+		}
+
+		public void RemoveProjectOwner (int projectId, int userId)
+		{
+			UserProject up = db.SelectObjectWhere<UserProject> ("UserId={0} AND ProjectId={1}", userId, projectId);
+			if (up != null) {
+				up.Permissions &= ~ProjectPermission.Administer;
+				db.UpdateObject (up);
+			}
 		}
 
 		public Project GetProject (int id)
@@ -1065,10 +1088,17 @@ namespace Cydin.Models
 	{
 		public static MySqlConnection GetConnection ()
 		{
-			string conn_string = WebConfigurationManager.ConnectionStrings["CommunityAddinRepoConnectionString"].ConnectionString;
-			MySqlConnection db = new MySqlConnection (conn_string);
-			db.Open ();
-			return db;
+			MySqlConnection db = null;
+			try {
+				string conn_string = WebConfigurationManager.ConnectionStrings["CommunityAddinRepoConnectionString"].ConnectionString;
+				db = new MySqlConnection (conn_string);
+				db.Open ();
+				return db;
+			} catch (Exception ex) {
+				if (db != null)
+					db.Close ();
+				throw new Exception ("Database connection failed", ex);
+			}
 		}
 	}
 	

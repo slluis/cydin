@@ -72,7 +72,7 @@ namespace Cydin.Views
 			StringBuilder sb = new StringBuilder ();
 			sb.Append ("<div id='notification-summary' postUrl='" + postUrl + "'><p>");
 			sb.Append ("<span id='notification-summary-list'></span>");
-			sb.Append (" (<a href='#' id='notification-change-button'>Change</a>)");
+			sb.Append ("<br><img src='/Media/edit.png'/> <a href='#' style='font-size:x-small' id='notification-change-button'>Change Subscriptions</a>");
 			sb.Append ("</div></p>");
 			
 		    sb.Append ("<div id='notification-selector' style='display:none'>");
@@ -92,6 +92,16 @@ namespace Cydin.Views
 		    sb.Append ("<a href='#' id='notification-done-button'>Done</a>");
 		    sb.Append ("</p></div>");
 			return sb.ToString ();
+		}
+		
+		public static string ActionIconLink<T> (this HtmlHelper<T> html, string icon, string label, string actionName, string controllerName, object routeValues)
+		{
+			return "<img src='/Media/" + icon + "'/> " + html.ActionLink (label, actionName, controllerName, routeValues, new { style="font-size:x-small" });
+		}
+		
+		public static string IconLink<T> (this HtmlHelper<T> html, string icon, string label)
+		{
+			return "<img src='/Media/" + icon + "'/> <a href='#' style='font-size:x-small'>" + label + "</a>";
 		}
 	}
 	
