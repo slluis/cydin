@@ -25,13 +25,17 @@
 // THE SOFTWARE.
 
 using System;
-using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System.Web.Configuration;
 using System.Text;
 using Cydin.Builder;
 using Cydin.Properties;
 using System.IO;
+#if CYDIN_ON_SQLITE
+using MySqlConnection = Mono.Data.Sqlite.SqliteConnection;
+#else
+using MySql.Data.MySqlClient;
+#endif
 
 namespace Cydin.Models
 {

@@ -58,6 +58,11 @@ To setup the database you have to:
    connectionString attribute, set the address of the mysql server, the name
    of the database, and the database user and password for the connection.
 
+If you want to use SQLite as a database backend instead, enable the CYDIN_ON_SQLITE
+define and uncomment the corresponding connectionString line in Web.Config. To import
+the initial schema, run 'sqlite3 -import ../db/create.sqlite sqlite.db' in Cydin
+directory.
+
 RUNNING THE WEB SITE
 ====================
 
