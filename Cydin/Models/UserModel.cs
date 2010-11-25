@@ -12,8 +12,12 @@ using ICSharpCode.SharpZipLib.Zip;
 using Mono.Addins;
 using Mono.Addins.Description;
 using Mono.Addins.Setup;
-using MySql.Data.MySqlClient;
 using System.Web.Mvc;
+#if CYDIN_ON_SQLITE
+using MySqlConnection = Mono.Data.Sqlite.SqliteConnection;
+#else
+using MySql.Data.MySqlClient;
+#endif
 
 namespace Cydin.Models
 {

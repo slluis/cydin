@@ -3,9 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Data.Common;
-using MySql.Data.MySqlClient;
 using System.Reflection;
 using System.Text;
+#if CYDIN_ON_SQLITE
+using MySqlConnection = Mono.Data.Sqlite.SqliteConnection;
+using MySqlCommand = Mono.Data.Sqlite.SqliteCommand;
+#else
+using MySql.Data.MySqlClient;
+#endif
 
 namespace Cydin.Models
 {
