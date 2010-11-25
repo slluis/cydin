@@ -100,5 +100,6 @@ namespace Cydin.Models
 		public const string PendingPublish = "Publishing";
 		public const string PendingReview = "Pending";
 		public const string Rejected = "Rejected";
+		public const string Deleted = "Deleted";
 	}
 }

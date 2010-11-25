@@ -143,6 +143,7 @@
     <Compile Include="Controllers\CydinController.cs" />
     <Compile Include="Models\ProjectFlag.cs" />
     <Compile Include="Controllers\ServiceEventsHandler.cs" />
+    <Compile Include="Models\RepositoryDownload.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />

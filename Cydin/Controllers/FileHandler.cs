@@ -80,6 +80,12 @@ namespace Cydin.Controllers
 					m.IncDownloadCount (fileId);
 				}
 			}
+			else if (Path.GetFileName (path) == "main.mrep") {
+				string[] fields = subPath.Split (Path.DirectorySeparatorChar);
+				using (UserModel m = UserModel.GetCurrent ()) {
+					m.IncRepoDownloadCount (fields[0], fields[1]);
+				}
+			}
 		}
 
 		void WriteNotFound (HttpContext context)

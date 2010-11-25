@@ -24,5 +24,8 @@ namespace Cydin.Models
 
 		[DataMember]
 		public int Downloads { get; set; }
+
+		[DataMember (Key=true)]
+		public DateTime Date { get; set; }
 	}
 }

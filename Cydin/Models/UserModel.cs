@@ -361,7 +361,16 @@ namespace Cydin.Models
 		{
 			ValidateProject (rel.ProjectId);
 			bool requiresRebuild = rel.Status == ReleaseStatus.Published;
-			db.DeleteObject (rel);
+			if (db.SelectObjectWhere<ReleasePackage> ("ReleaseId = {0} AND Downloads != 0", rel.Id) != null) {
+				// If the release has download information, don't remove it, just mark it as deleted
+				rel = db.SelectObjectById<Release> (rel.Id);
+				rel.Status = ReleaseStatus.Deleted;
+				db.UpdateObject (rel);
+			}
+			else {
+				// No downloads. Delete it all
+				db.DeleteObject (rel);
+			}
 			if (requiresRebuild)
 				BuildService.UpdateRepositories (false);
 		}
@@ -765,8 +774,16 @@ namespace Cydin.Models
 
 		public void CreateRelease (Release rel)
 		{
-			db.InsertObject (rel);
+			Release oldRel = db.SelectObjectWhere<Release> ("ProjectId={0} AND Version={1} AND AddinId={2} AND TargetAppVersion={3} AND Status={4}", rel.ProjectId, rel.Version, rel.AddinId, rel.TargetAppVersion, ReleaseStatus.Deleted);
+			if (oldRel != null) {
+				rel.Id = oldRel.Id;
+				db.UpdateObject (rel);
+			}
+			else
+				db.InsertObject (rel);
+			
 			BindDownloadInfo (rel);
+			
 			Project p = GetProject (rel.ProjectId);
 			
 			if (rel.Status == ReleaseStatus.PendingReview) {
@@ -798,15 +815,14 @@ namespace Cydin.Models
 		public void BindDownloadInfo (Release rel)
 		{
 			foreach (string plat in rel.PlatformsList) {
+				// Make sure there is at least one ReleasePackage register for this platform
 				string fid = rel.GetReleasePackageId (plat);
 				ReleasePackage rp = db.SelectObjectWhere<ReleasePackage> ("FileId={0}", fid);
-				if (rp != null) {
-					rp.ReleaseId = rel.Id;
-					db.UpdateObject (rp);
-				} else {
+				if (rp == null) {
 					rp = new ReleasePackage ();
 					rp.ReleaseId = rel.Id;
 					rp.FileId = fid;
+					rp.Date = DateTime.Now;
 					rp.TargetAppVersion = rel.TargetAppVersion;
 					rp.Platform = plat;
 					rp.Downloads = 0;
@@ -884,18 +900,52 @@ namespace Cydin.Models
 
 		public IEnumerable<Release> GetProjectReleases (int projectId)
 		{
-			return db.SelectObjectsWhere<Release> ("ProjectId={0}", projectId);
+			return db.SelectObjectsWhere<Release> ("ProjectId={0} AND Status != {1}", projectId, ReleaseStatus.Deleted);
+		}
+		
+		public void IncRepoDownloadCount (string platform, string version)
+		{
+			try {
+				RepositoryDownload rp = null;
+				do {
+					rp = db.SelectObjectWhere<RepositoryDownload> ("Platform={0} AND TargetAppVersion={1} AND Date={2} AND ApplicationId={3}", platform, version, DateTime.Now.Date, application.Id);
+					if (rp == null) {
+						rp = new RepositoryDownload ();
+						rp.Platform = platform;
+						rp.TargetAppVersion = version;
+						rp.Date = DateTime.Now.Date;
+						rp.ApplicationId = application.Id;
+						rp.Downloads = 1;
+						db.InsertObject (rp);
+						return;
+					}
+					rp.Downloads++;
+				} while (!db.UpdateObject (rp));
+			} catch (Exception ex) {
+				Console.WriteLine (ex);
+			}
 		}
 		
 		public void IncDownloadCount (string file)
 		{
-			ReleasePackage rp = null;
-			do {
-				rp = db.SelectObjectWhere<ReleasePackage> ("FileId={0}", file);
-				if (rp == null)
-					return;
-				rp.Downloads++;
-			} while (!db.UpdateObject (rp));
+			try {
+				ReleasePackage rp = null;
+				do {
+					rp = db.SelectObjectWhere<ReleasePackage> ("FileId={0} AND Date={1}", file, DateTime.Now.Date);
+					if (rp == null) {
+						rp = db.SelectObject<ReleasePackage> ("SELECT * FROM ReleasePackage WHERE FileId={0} ORDER BY Date DESC", file);
+						if (rp != null) {
+							rp.Downloads = 1;
+							rp.Date = DateTime.Now;
+							db.InsertObject (rp);
+						}
+						return;
+					}
+					rp.Downloads++;
+				} while (!db.UpdateObject (rp));
+			} catch (Exception ex) {
+				Console.WriteLine (ex);
+			}
 		}
 		
 		public string GetDownloadSummary (Release rel)
@@ -904,11 +954,16 @@ namespace Cydin.Models
 			List<string> platforms = new List<string> ();
 			List<int> counts = new List<int> ();
 			
-			foreach (ReleasePackage rp in db.SelectObjectsWhere<ReleasePackage> ("ReleaseId={0}", rel.Id)) {
-				if (rp.Downloads > 0) {
-					platforms.Add (rp.Platform);
-					counts.Add (rp.Downloads);
-					total += rp.Downloads;
+			foreach (string plat in rel.PlatformsList) {
+				using (DbDataReader r = db.ExecuteSelect ("SELECT SUM(Downloads) Total FROM ReleasePackage WHERE ReleaseId={0} AND Platform={1}", rel.Id, plat)) {
+					if (r.Read ()) {
+						int ptotal = r.GetInt32 (0);
+						if (ptotal > 0) {
+							platforms.Add (plat);
+							counts.Add (ptotal);
+							total += ptotal;
+						}
+					}
 				}
 			}
 			StringBuilder sb = new StringBuilder ();
@@ -931,13 +986,18 @@ namespace Cydin.Models
 			Dictionary<string,int> platforms = new Dictionary<string, int> ();
 			
 			foreach (Release rel in GetProjectReleases (p.Id)) {
-				foreach (ReleasePackage rp in db.SelectObjectsWhere<ReleasePackage> ("ReleaseId={0}", rel.Id)) {
-					if (rp.Downloads > 0) {
-						int c = 0;
-						platforms.TryGetValue (rp.Platform, out c);
-						c += rp.Downloads;
-						platforms [rp.Platform] = c;
-						total += rp.Downloads;
+				foreach (string plat in rel.PlatformsList) {
+					using (DbDataReader r = db.ExecuteSelect ("SELECT SUM(Downloads) Total FROM ReleasePackage WHERE ReleaseId={0} AND Platform={1}", rel.Id, plat)) {
+						if (r.Read ()) {
+							int ptotal = r.GetInt32 (0);
+							if (ptotal > 0) {
+								int c = 0;
+								platforms.TryGetValue (plat, out c);
+								c += ptotal;
+								platforms [plat] = c;
+								total += ptotal;
+							}
+						}
 					}
 				}
 			}
