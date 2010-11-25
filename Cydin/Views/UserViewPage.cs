@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 using System;
 using Cydin.Models;
+using Cydin.Controllers;
 
 namespace Cydin.Views
 {
@@ -47,6 +48,11 @@ namespace Cydin.Views
 					serviceModel = ServiceModel.GetCurrent ();
 				return serviceModel;
 			}
+		}
+		
+		public string GetActionUrl (string action, string controller)
+		{
+			return ControllerHelper.GetActionUrl (CurrentUserModel.CurrentApplication.Name, action, controller);
 		}
 		
 		public override void Dispose ()
@@ -82,6 +88,11 @@ namespace Cydin.Views
 					serviceModel = ServiceModel.GetCurrent ();
 				return serviceModel;
 			}
+		}
+		
+		public string GetActionUrl (string action, string controller)
+		{
+			return ControllerHelper.GetActionUrl (CurrentUserModel.CurrentApplication.Name, action, controller);
 		}
 		
 		public override void Dispose ()

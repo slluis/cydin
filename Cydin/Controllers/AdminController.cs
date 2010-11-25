@@ -30,5 +30,23 @@ namespace Cydin.Controllers
 			return View ();
 		}
 		
+		public ActionResult AddAdminAsync (string email)
+		{
+			CurrentUserModel.CheckIsAdmin ();
+			User u = CurrentServiceModel.GetUserByEmail (email);
+			if (u != null) {
+				CurrentUserModel.SetUserApplicationPermission (u.Id, ApplicationPermission.Administer, true);
+				return Content ("OK");
+			}
+			else
+				return Content ("");
+		}
+		
+		public ActionResult RemoveAdmin (int userId)
+		{
+			CurrentUserModel.CheckIsAdmin ();
+			CurrentUserModel.SetUserApplicationPermission (userId, ApplicationPermission.Administer, false);
+			return RedirectToAction ("Index");
+		}
     }
 }

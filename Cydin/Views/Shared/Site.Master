@@ -22,6 +22,23 @@
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
   })();
 
+    $(document).ready(function() {
+		$(".command").button();
+	});
+
+	function getActionUrl (action, controller)
+	{
+<% 
+	if (Settings.Default.OperationMode == OperationMode.MultiAppPath) { 
+		var m = UserModel.GetCurrent ();			
+		string app = m.CurrentApplication != null ? m.CurrentApplication.Name : "";
+%>
+		return "/<%=app%>/" + controller + "/" + action;
+<% } else { %>
+		return "/" + controller + "/" + action;
+<% } %>
+	}
+	
 </script></head>
 
 <body>

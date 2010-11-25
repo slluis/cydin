@@ -28,11 +28,11 @@
 				resizable: false,
 				buttons: {
 					Cancel: function() { $(this).dialog("close"); },
-					Remove: function() { window.location = ("/Project/RemoveOwner?id=" + pid + "&userId=" + uid); }
+					Remove: function() { window.location = getActionUrl("RemoveOwner","Project") + "?id=" + pid + "&userId=" + uid; }
 				}
 			});
 		});
-    	$("#owners-add-button").click (function() { $(this).children("#owners-delete").show(); 
+    	$("#owners-add-button").click (function() {
 			$("#add-owner-dialog").dialog({
 				modal: true,
 				width: 400,
@@ -43,23 +43,40 @@
 				}
 			});
 		});
+    	$(".delete-release-button").click (function() {
+			var relid = $(this).attr("relid");
+			$("#confirm-delete-release-dialog").dialog({
+				modal: true,
+				width: 400,
+				resizable: false,
+				buttons: {
+					Cancel: function() { $(this).dialog("close"); },
+					Delete: function() { deleteRelease (relid); }
+				}
+			});
+		});
     });
     
 	function addOwner (dlg, mail)
 	{
-		$.post ("/Project/AddOwnerAsync", {id: pid, email: mail}, function(xml) {
+		$.post (getActionUrl("AddOwnerAsync","Project"), {id: pid, email: mail}, function(xml) {
 			if (xml == "OK")
-				window.location = "/Project/Index/" + pid;
+				window.location = getActionUrl("Index","Project") + "/" + pid;
 			else
 				$("#user-not-found").show ();
 		});
+	}
+			
+	function deleteRelease (id)
+	{
+		window.location = getActionUrl("DeleteRelease","Project") + "?releaseId=" + id;
 	}
 			
     function updateStatus (ob)
     {
     	var id = ob.id.substring (4);
     	ob.disabled = true;
-    	$.post ("/Project/SetDevStatus/<%=Model.Id%>", {stagId: id, value: ob.value}, function(xml) {
+    	$.post (getActionUrl("SetDevStatus","Project") + "/<%=Model.Id%>", {stagId: id, value: ob.value}, function(xml) {
     		ob.disabled = false;
     	});
     }
@@ -117,7 +134,7 @@
     <% if (isProjectAdmin) { %>
     <td><%=m.GetDownloadSummary (release)%></td>
     <td><%=release.Status%></td>
-    <td><%=Html.ActionLink ("Delete", "DeleteRelease", new { releaseId = release.Id })%></td>
+	<td><a href="#" class="delete-release-button command" relid="<%=release.Id%>">Delete</a></td>
     <% } %>
 
     </tr>
@@ -176,12 +193,12 @@
     </td>
     <td width="0px" align="right">
         <% if ((source.Status == SourceTagStatus.BuildError || source.Status == SourceTagStatus.FetchError || m.IsSiteAdmin) && !source.IsUpload)
-               Response.Write (Html.ActionLink ("Rebuild", "UpdateSource", new { sourceTagId = source.Id }) + "<br>"); %>
+               Response.Write (Html.ActionLink ("Rebuild", "UpdateSource", new { sourceTagId = source.Id }, new { @class="command" }) + "<br>"); %>
         <% if (source.Status == SourceTagStatus.Ready)
-               Response.Write (Html.ActionLink ("Publish", "PublishRelease", new { sourceId = source.Id }) + "<br>");
+               Response.Write (Html.ActionLink ("Publish", "PublishRelease", new { sourceId = source.Id }, new { @class="command" }) + "<br>");
         %>
         <% if (source.IsUpload)
-               Response.Write (Html.ActionLink ("Delete", "DeleteUpload", new { sourceId = source.Id }));
+               Response.Write (Html.ActionLink ("Delete", "DeleteUpload", new { sourceId = source.Id }, new { @class="command" }));
         %>
     </td>
     </tr>
@@ -203,13 +220,14 @@
        }
          %>
 	
+	<p>
 	<% if (Model.HasFlag (ProjectFlag.AllowPackageUpload)) { %>
-    <p><%=Html.ActionLink ("Upload Package", "UploadRelease", new { projectId = Model.Id })%></p>
+    <%=Html.ActionLink ("Upload Package", "UploadRelease", new { projectId = Model.Id }, new { @class="command" })%>
 	<% } %>
 
-    <p><%=Html.ActionLink ("Edit Sources", "Index", "Source", new { projectId = Model.Id }, null)%></p>
+    <%=Html.ActionLink ("Edit Sources", "Index", "Source", new { projectId = Model.Id }, new { @class="command" })%>
     <% } /* if(isProjectAdmin) */ %>
-    
+    </p>
     </td>
     <td valign="top" width="250px">
     <% if (isProjectAdmin) { %>
@@ -221,8 +239,9 @@
 	foreach (User u in owners) {%>
 		<tr class="owners-tr"><td><%=Html.ActionLink (u.Login, "Profile", "User", new { id = u.Id }, null)%></td>
 		<% if (owners.Count() > 1) { %>
-			<td id="owners-delete" style="display:none" ><img src="/Media/bullet_delete.png"/> <a class="owners-delete-button" uname="<%=u.Login%>" uid="<%=u.Id%>" href="#" style="font-size:x-small">Remove</a></td></tr>
+			<td id="owners-delete" style="display:none" ><img src="/Media/bullet_delete.png"/> <a class="owners-delete-button" uname="<%=u.Login%>" uid="<%=u.Id%>" href="#" style="font-size:x-small">Remove</a></td>
 		<% } %>
+		</tr>
 	<% } %>
 	</table>
 	<img src="/Media/bullet_add.png"/> <a href="#" id="owners-add-button" style="font-size:x-small">Add</a>
@@ -231,7 +250,7 @@
     <% if (m.User != null) { %>
     <div class="side-panel">
     <h1>Track Project</h1>
-    <%=Html.NotificationList ("/Project/SetNotification/" + Model.Id, m.GetProjectNotifications (Model.Id)) %>
+    <%=Html.NotificationList (GetActionUrl ("SetNotification","Project") + "/" + Model.Id, m.GetProjectNotifications (Model.Id)) %>
     </div>
     <% } %>
     
@@ -252,6 +271,9 @@
     </td>
     </table>
 		
+<div id="confirm-delete-release-dialog" title="Remove Owner" style="display:none">
+	<p>Are you sure you want to delete this release?</p>
+</div>
 <div id="confirm-delete-owner-dialog" title="Remove Owner" style="display:none">
 	<p>Are you sure you want to remove the user <b><span id="owner-name"></span></b> from the list of project owners?</p>
 </div>

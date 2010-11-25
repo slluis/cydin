@@ -192,6 +192,29 @@ namespace Cydin.Models
 
 			return db.SelectObjects<Project> ("SELECT * FROM Project, UserProject WHERE Project.Id = UserProject.ProjectId AND UserProject.UserId = {0} AND UserProject.Permissions & {1} != 0 AND Project.ApplicationId={2}", user.Id, (int)ProjectPermission.Administer, application.Id);
 		}
+		
+		public IEnumerable<User> GetApplicationAdministrators ()
+		{
+			return db.SelectObjects<User> ("SELECT User.* FROM User, UserApplication WHERE User.Id = UserApplication.UserId AND UserApplication.ApplicationId = {0} AND UserApplication.Permissions & {1} != 0", application.Id, (int)ApplicationPermission.Administer);
+		}
+		
+		public void SetUserApplicationPermission (int userId, ApplicationPermission perms, bool enable)
+		{
+			UserApplication up = db.SelectObjectWhere<UserApplication> ("UserId={0} AND ApplicationId={1}", userId, application.Id);
+			if (up == null) {
+				if (enable) {
+					up = new UserApplication () { UserId = userId, ApplicationId = application.Id, Permissions = perms };
+					db.InsertObject (up);
+				}
+			}
+			else {
+				if (enable)
+					up.Permissions |= ApplicationPermission.Administer;
+				else
+					up.Permissions &= ~ApplicationPermission.Administer;
+				db.UpdateObject (up);
+			}
+		}
 
 		public IEnumerable<User> GetProjectOwners (Project p)
 		{
