@@ -37,7 +37,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Linq" />
     <Reference Include="System.Drawing" />
-    <Reference Include="Mono.Data.Sqlite" />
     <Reference Include="System.ComponentModel.DataAnnotations">
     </Reference>
     <Reference Include="System.Core">
@@ -144,6 +143,7 @@
     <Compile Include="Models\ProjectFlag.cs" />
     <Compile Include="Controllers\ServiceEventsHandler.cs" />
     <Compile Include="Models\RepositoryDownload.cs" />
+    <Compile Include="Models\DownloadStats.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
@@ -207,6 +207,9 @@
     <Content Include="Media\edit.png" />
     <Content Include="Media\bullet_add.png" />
     <Content Include="Media\bullet_delete.png" />
+    <Content Include="Views\Project\Stats.aspx" />
+    <Content Include="Scripts\plot\jquery.jqplot.js" />
+    <Content Include="Content\jquery.jqplot.css" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -263,5 +266,8 @@
   <ItemGroup>
     <None Include="Scripts\notifications.js" />
     <None Include="version" />
+    <None Include="Scripts\stat.query.js" />
+    <None Include="Scripts\plot\MIT-LICENSE.txt" />
+    <None Include="Scripts\plot\copyright.txt" />
   </ItemGroup>
 </Project>

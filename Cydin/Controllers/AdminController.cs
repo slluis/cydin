@@ -48,5 +48,27 @@ namespace Cydin.Controllers
 			CurrentUserModel.SetUserApplicationPermission (userId, ApplicationPermission.Administer, false);
 			return RedirectToAction ("Index");
 		}
+		
+		public ActionResult GetDownloadStatsAsync (string period, string arg)
+		{
+			CurrentUserModel.CheckIsAdmin ();
+			DateTime end;
+			DateTime start;
+			TimePeriod pd = TimePeriod.Auto;
+			DownloadStats.ParseQuery (period, arg, out pd, out start, out end);
+			DownloadStats stats = CurrentUserModel.GetTotalDownloadStats (pd, start, end);
+			return Content (stats.ToJson ());
+		}
+		
+		public ActionResult GetRepoDownloadStatsAsync (string period, string arg)
+		{
+			CurrentUserModel.CheckIsAdmin ();
+			DateTime end;
+			DateTime start;
+			TimePeriod pd = TimePeriod.Auto;
+			DownloadStats.ParseQuery (period, arg, out pd, out start, out end);
+			DownloadStats stats = CurrentUserModel.GetTotalRepoDownloadStats (pd, start, end);
+			return Content (stats.ToJson ());
+		}
     }
 }

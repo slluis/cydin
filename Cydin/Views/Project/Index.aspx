@@ -10,6 +10,7 @@
 
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
+<link href="/Content/jquery.jqplot.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="/Scripts/notifications.js"></script> 
 <script type = "text/javascript">
 	var pid=<%=Model.Id%>;			
@@ -55,6 +56,10 @@
 				}
 			});
 		});
+    	$(".release-stats-button").click (function() {
+			var relid = $(this).attr("relid");
+			showStats(relid);
+		});
     });
     
 	function addOwner (dlg, mail)
@@ -80,6 +85,22 @@
     		ob.disabled = false;
     	});
     }
+			
+	function showStats (relid)
+	{
+		$("#stats-dialog-content").html("Loading...");
+		$("#stats-dialog-content").load (getActionUrl ("Stats","Project") + "?projectId=" + pid + "&releaseId=" + relid);
+		$("#stats-dialog").dialog({
+			modal: true,
+			resizable: true,
+			width:800,
+			height:600,
+			buttons: {
+				Close: function() { $(this).dialog("close"); }
+			}
+		});
+	}
+
 </script>
 	<table>
 	<tr>
@@ -132,7 +153,7 @@
     </td>
 
     <% if (isProjectAdmin) { %>
-    <td><%=m.GetDownloadSummary (release)%></td>
+    <td><a href="#" class="release-stats-button" relid="<%=release.Id%>"><%=m.GetDownloadSummary (release)%></a></td>
     <td><%=release.Status%></td>
 	<td><a href="#" class="delete-release-button command" relid="<%=release.Id%>">Delete</a></td>
     <% } %>
@@ -284,6 +305,12 @@
 		<input id="new-owner-mail"></input>
 	</form>
 	<p id="user-not-found" style="color:red;display:none">There is no user registered with the provided e-mail</p>
+</div>
+		
+<div id="stats-dialog" title="Download Statistics" style="display:none">
+	<div id="stats-dialog-content">
+			tt
+	</div>
 </div>
 		
 </asp:Content>

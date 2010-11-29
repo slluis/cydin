@@ -8,7 +8,17 @@
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
+	<link href="/Content/jquery.jqplot.css" rel="stylesheet" type="text/css" />
 	<script type="text/javascript" src="/Scripts/jquery.cookie.js"></script> 
+	<script type="text/javascript" src="/Scripts/stat.query.js"></script> 					
+	<script type="text/javascript" src="/Scripts/plot/jquery.jqplot.js"></script>
+	<script language="javascript" type="text/javascript" src="/Scripts/plot/plugins/jqplot.dateAxisRenderer.js"></script> 
+	<script language="javascript" type="text/javascript" src="/Scripts/plot/plugins/jqplot.canvasAxisTickRenderer.js"></script> 
+	<script language="javascript" type="text/javascript" src="/Scripts/plot/plugins/jqplot.canvasTextRenderer.js"></script> 
+	<script language="javascript" type="text/javascript" src="/Scripts/plot/plugins/jqplot.highlighter.js"></script> 
+	<script language="javascript" type="text/javascript" src="/Scripts/plot/plugins/jqplot.cursor.js"></script>
+	<script language="javascript" type="text/javascript" src="/Scripts/plot/plugins/jqplot.pieRenderer.js"></script> 
+
 	<script type="text/javascript">
 		$(function() {
 			$("#tabs").tabs( {cookie: { expires: 1 } });
@@ -43,7 +53,104 @@
 					}
 				});
 			});
+		
+			$.statQueryWidget("stat-query", 
+				[ getActionUrl ("GetRepoDownloadStatsAsync","Admin") + "?", 
+		          getActionUrl ("GetDownloadStatsAsync","Admin") + "?"
+				],
+				function () {
+					unplotData ("chartRepos");
+					unplotData ("chartAddins");
+					$("#errorMessage").hide ();
+					$("#loadingMessage").show ();
+				},
+				function (data, idx) {
+					if (idx == 0) {
+						plotData ("chartRepos", data, "Repository Index Downloads");
+					} else {
+						plotData ("chartAddins", data, "Add-in Downloads");
+					}
+					$("#loadingMessage").hide ();
+				},
+				function () {
+					$("#loadingMessage").hide ();
+					$("#errorMessage").show ();
+				}
+			);
 		})
+		
+		function unplotData (chart)
+		{
+			$("#" + chart).fadeTo (200, 0.5);
+			$("#" + chart + "Pie").fadeTo (200, 0.5);
+		}
+		
+		function plotData (chart, data, title)
+		{
+			$("#" + chart).html ("");
+	
+			$.jqplot.config.enablePlugins = true;
+			var values = [];
+			var series = [];
+			for (var n=0;n<data.series.length;n++) {
+				values[n] = data.series[n].values;
+				series[n] = {label:data.series[n].name};
+				if (data.series[n].name == "Total")
+					series[n].lineWidth=1;
+			}
+			plot1 = $.jqplot(chart, values, {
+			       legend: {show: true, location: 'nw'},
+				   title: title,
+			       series: series,
+			       axes: {
+			               xaxis: {renderer:$.jqplot.DateAxisRenderer,
+			                       rendererOptions:{tickRenderer:$.jqplot.CanvasAxisTickRenderer},
+			                       tickOptions:{
+			                               formatString:'%b %#d, %Y',
+			                               fontSize:'10pt',
+			                               angle:-30
+			                       }
+			               },
+				           yaxis: {
+				               tickOptions: {
+				                   formatString: '%d'
+				               }
+				           }
+				   },
+					highlighter: {
+						sizeAdjust: 10,
+						tooltipSeparator: '',
+						tooltipLocation: 'n',
+						tooltipAxes: 'y',
+						useAxesFormatters: true
+					},
+					cursor: { show: true }
+			});
+			$("#" + chart).fadeTo (300, 1);
+		
+			$("#" + chart + "Pie").html ("");
+		    plot2 = $.jqplot(chart + "Pie", [data.totals], {
+		        seriesDefaults:{
+					renderer:$.jqplot.PieRenderer,
+					rendererOptions: {
+						showDataLabels: true
+					}
+ 		        },
+		        grid: {
+    		        drawBorder: false,
+		            drawGridlines: false,
+		            shadow:false
+				},
+		        legend: {
+					location:"s",
+					rendererOptions: {
+						numberRows: 1
+					},
+					show:true
+				}
+		    });
+			$("#" + chart + "Pie").fadeTo (300, 1);
+		}
 		
     
 	function addAdmin (dlg, mail)
@@ -66,6 +173,7 @@
 		<li><a href="#tabs-3">Releases</a></li>
 		<li><a href="/Admin/ProjectsList">Projects</a></li>
 		<li><a href="#tabs-4">Administrators</a></li>
+		<li><a href="#tabs-5">Statistics</a></li>
 	</ul>
 	<div id="tabs-1">
     <b>Service Address:</b> <%=BuildService.AuthorisedBuildBotConnection %><br>
@@ -106,6 +214,25 @@
 	<p><a href="#" id="admin-add-button" class="command">Add Administrator</a></p>
 	</div>
     
+	<div id="tabs-5">
+		<span id="stat-query"></span> 
+		<span id="loadingMessage" style="display:none">
+		Loading data...
+		</span>			
+		<span id="errorMessage" style="display:none">
+		Data retrieval failed
+		</span>
+		<table>
+		<tr>
+		<td><div id="chartRepos" class='plot' style="margin-top:10px; margin-left:10px; width:670px; height:300px;"></div></td>
+		<td><div id="chartReposPie" class='plot' style="margin-top:10px; margin-left:10px; width:230px; height:230px;"></div></td>
+		</tr><tr>
+		<td><div id="chartAddins" class='plot' style="margin-top:10px; margin-left:10px; width:670px; height:300px;"></div></td>
+		<td><div id="chartAddinsPie" class='plot' style="margin-top:10px; margin-left:10px; width:230px; height:230px;"></div></td>
+		</tr>
+		</table>
+	</div>
+	
 	</div>
 	
 	<div id="confirm-delete-admin-dialog" title="Remove Owner" style="display:none">

@@ -225,5 +225,22 @@ namespace Cydin.Controllers
 			CurrentUserModel.RemoveProjectOwner (id, userId);
 			return RedirectToAction ("Index", new { id=id });
 		}
+		
+		public ActionResult Stats (int projectId, int releaseId)
+		{
+			ViewData["projectId"] = projectId;
+			ViewData["releaseId"] = releaseId;
+			return View ();
+		}
+		
+		public ActionResult GetStatsAsync (int pid, int relid, string period, string arg)
+		{
+			DateTime end;
+			DateTime start;
+			TimePeriod pd = TimePeriod.Auto;
+			DownloadStats.ParseQuery (period, arg, out pd, out start, out end);
+			DownloadStats stats = relid != -1 ? CurrentUserModel.GetReleaseDownloadStats (relid, pd, start, end) : CurrentUserModel.GetProjectDownloadStats (pid, pd, start, end);
+			return Content (stats.ToJson ());
+		}
 	}
 }

@@ -1051,7 +1051,122 @@ namespace Cydin.Models
 			items.Add (new SelectListItem () { Text = "Alpha", Value = ((int) DevStatus.Alpha).ToString (), Selected = current == DevStatus.Alpha });
 			return items;
 		}
-				
+		
+		public DownloadStats GetTotalRepoDownloadStats (TimePeriod period, DateTime startDate, DateTime endDate)
+		{
+			string filter = "1=1";
+			string sql = null;
+			switch (period) {
+			case TimePeriod.Day:
+				sql = "SELECT sum(Downloads), Platform, Date, Date FROM RepositoryDownload R where " + filter + " GROUP BY Platform, Date";
+				break;
+			case TimePeriod.Week:
+				sql = "SELECT sum(Downloads), Platform, MIN(Date), DATE_FORMAT(R.Date,'%u/%Y') FROM RepositoryDownload R where " + filter + " GROUP BY Platform, DATE_FORMAT(R.Date,'%u/%Y')";
+				break;
+			case TimePeriod.Month:
+				sql = "SELECT sum(Downloads), Platform, MIN(Date), DATE_FORMAT(R.Date,'%m/%Y') FROM RepositoryDownload R where " + filter + " GROUP BY Platform, DATE_FORMAT(R.Date,'%m/%Y')";
+				break;
+			case TimePeriod.Year:
+				sql = "SELECT sum(Downloads), Platform, MIN(Date), YEAR(Date) FROM RepositoryDownload R where " + filter + " GROUP BY Platform, YEAR(Date)";
+				break;
+			case TimePeriod.All:
+				sql = "SELECT sum(Downloads), Platform, MIN(Date), 'Total' FROM RepositoryDownload R where " + filter + " GROUP BY Platform";
+				break;
+			}
+			
+			DownloadStats stats = new DownloadStats ();
+			using (DbDataReader r = db.ExecuteSelect (sql)) {
+				while (r.Read ()) {
+					int count = r.GetInt32 (0);
+					string plat = r.GetString (1);
+					DateTime date = r.GetDateTime (2);
+					string label = r[3].ToString ();
+					DateTime start, end;
+					GetPeriod (period, date, out start, out end);
+					stats.AddValue (plat, label, count, start, end);
+				}
+			}
+			stats.GenerateTotals ();
+			stats.FillGaps (period, startDate, endDate);
+			return stats;
+		}
+
+		public DownloadStats GetTotalDownloadStats (TimePeriod period, DateTime startDate, DateTime endDate)
+		{
+			return GetDownloadStats (period, startDate, endDate, "", "1=1", null);
+		}
+
+		public DownloadStats GetProjectDownloadStats (int projectId, TimePeriod period, DateTime startDate, DateTime endDate)
+		{
+			return GetDownloadStats (period, startDate, endDate, ", Release E", "R.ReleaseId = E.Id AND E.ProjectId={0}", projectId);
+		}
+
+		public DownloadStats GetReleaseDownloadStats (int releaseId, TimePeriod period, DateTime startDate, DateTime endDate)
+		{
+			return GetDownloadStats (period, startDate, endDate, "", "R.ReleaseId={0}", releaseId);
+		}
+		
+		DownloadStats GetDownloadStats (TimePeriod period, DateTime startDate, DateTime endDate, string from, string filter, object arg)
+		{
+			string sql = null;
+			switch (period) {
+			case TimePeriod.Day:
+				sql = "SELECT sum(Downloads), Platform, Date, Date FROM ReleasePackage R " + from + " where " + filter + " GROUP BY Platform, Date";
+				break;
+			case TimePeriod.Week:
+				sql = "SELECT sum(Downloads), Platform, MIN(Date), DATE_FORMAT(R.Date,'%u/%Y') FROM ReleasePackage R " + from + " where " + filter + " GROUP BY Platform, DATE_FORMAT(R.Date,'%u/%Y')";
+				break;
+			case TimePeriod.Month:
+				sql = "SELECT sum(Downloads), Platform, MIN(Date), DATE_FORMAT(R.Date,'%m/%Y') FROM ReleasePackage R " + from + " where " + filter + " GROUP BY Platform, DATE_FORMAT(R.Date,'%m/%Y')";
+				break;
+			case TimePeriod.Year:
+				sql = "SELECT sum(Downloads), Platform, MIN(Date), YEAR(Date) FROM ReleasePackage R " + from + " where " + filter + " GROUP BY Platform, YEAR(Date)";
+				break;
+			case TimePeriod.All:
+				sql = "SELECT sum(Downloads), Platform, MIN(Date), 'Total' FROM ReleasePackage R " + from + " where " + filter + " GROUP BY Platform";
+				break;
+			}
+			
+			DownloadStats stats = new DownloadStats ();
+			using (DbDataReader r = db.ExecuteSelect (sql, arg)) {
+				while (r.Read ()) {
+					int count = r.GetInt32 (0);
+					string plat = r.GetString (1);
+					DateTime date = r.GetDateTime (2);
+					string label = r[3].ToString ();
+					DateTime start, end;
+					GetPeriod (period, date, out start, out end);
+					stats.AddValue (plat, label, count, start, end);
+				}
+			}
+			stats.GenerateTotals ();
+			stats.FillGaps (period, startDate, endDate);
+			return stats;
+		}
+		
+		void GetPeriod (TimePeriod period, DateTime t, out DateTime start, out DateTime end)
+		{
+			switch (period) {
+			case TimePeriod.Day:
+				start = t.Date;
+				end = start.AddDays (1);
+				break;
+			case TimePeriod.Week:
+				int dw = (int) t.DayOfWeek;
+				start = t.Date.AddDays (-dw);
+				end = start.AddDays (7);
+				break;
+			case TimePeriod.Month:
+				start = new DateTime (t.Year, t.Month, 1);
+				end = start.AddMonths (1);
+				break;
+			case TimePeriod.Year:
+				start = new DateTime (t.Year, 1, 1);
+				end = start.AddYears (1);
+				break;
+			}
+		}
+
 		public List<NotificationInfo> GetProjectNotifications (int projectId)
 		{
 			ProjectNotification notifs = (ProjectNotification) 0;
@@ -1214,5 +1329,15 @@ namespace Cydin.Models
 		public string Id { get; internal set; }
 		public bool Enabled { get; internal set; }
 		public object Value { get; internal set; }
+	}
+	
+	public enum TimePeriod
+	{
+		Day,
+		Week,
+		Month,
+		Year,
+		All,
+		Auto
 	}
 }
