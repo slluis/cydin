@@ -7,6 +7,7 @@ using System.IO;
 using Cydin.Builder;
 using CydinBuildService;
 using Cydin.Models;
+using System.Threading;
 
 namespace Cydin.Controllers
 {
@@ -28,8 +29,8 @@ namespace Cydin.Controllers
 			context.Response.Buffer = false;
 			context.Response.BufferOutput = false;
 			context.Response.Output.WriteLine ("[Connected]");
-			Cydin.Builder.BuildService.ConnectEventsStream (context.Response.Output);
-			System.Threading.Thread.Sleep (100000);
+			WaitHandle w = Cydin.Builder.BuildService.ConnectEventsStream (context.Response.Output);
+			w.WaitOne ();
 		}
 	}
 }

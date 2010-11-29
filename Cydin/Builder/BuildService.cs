@@ -23,8 +23,10 @@ namespace Cydin.Builder
 		static Thread repoUpdaterThread;
 		static AutoResetEvent updateEvent = new AutoResetEvent (false);
 		static object logLock = new object ();
+		static object eventLock = new object ();
 		static bool updateAllRequested;
 		static TextWriter eventsStream;
+		static ManualResetEvent eventsTreamClosed;
 		
 		static BuildService ()
 		{
@@ -112,34 +114,41 @@ namespace Cydin.Builder
 			NotifyEvent ("build", appId, projectId);
 		}
 		
-		internal static void ConnectEventsStream (TextWriter tw)
+		internal static WaitHandle ConnectEventsStream (TextWriter tw)
 		{
-			if (eventsStream != null) {
-				try {
-					eventsStream.Close ();
-				} catch {}
+			lock (eventLock) {
+				if (eventsStream != null) {
+					try {
+						eventsStream.Close ();
+						eventsTreamClosed.Set ();
+					} catch {}
+				}
+				status ="Build bot connected";
+				eventsStream = tw;
+				return eventsTreamClosed = new ManualResetEvent (false);
 			}
-			status ="Build bot connected";
-			eventsStream = tw;
 		}
 		
 		static void NotifyEvent (string eventId, int appId, int projectId, params string[] args)
 		{
-			if (eventsStream != null) {
-				try {
-					eventsStream.WriteLine ("[event]");
-					eventsStream.WriteLine (eventId);
-					eventsStream.WriteLine (appId.ToString ());
-					eventsStream.WriteLine (projectId.ToString ());
-					eventsStream.WriteLine (args.Length.ToString ());
-					eventsStream.Flush ();
-				}
-				catch {
+			lock (eventLock) {
+				if (eventsStream != null) {
 					try {
-						eventsStream.Close ();
-					} catch { }
-					eventsStream = null;
-					status = "Build bot identified";
+						eventsStream.WriteLine ("[event]");
+						eventsStream.WriteLine (eventId);
+						eventsStream.WriteLine (appId.ToString ());
+						eventsStream.WriteLine (projectId.ToString ());
+						eventsStream.WriteLine (args.Length.ToString ());
+						eventsStream.Flush ();
+					}
+					catch {
+						try {
+							eventsStream.Close ();
+						} catch { }
+						eventsTreamClosed.Set ();
+						eventsStream = null;
+						status = "Build bot identified";
+					}
 				}
 			}
 		}
