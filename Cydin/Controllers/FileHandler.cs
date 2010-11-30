@@ -31,6 +31,10 @@ namespace Cydin.Controllers
 		public void ProcessRequest (HttpContext context)
 		{
 			string path = context.Request.Path;
+			
+			// Workaround to an MD bug
+			path = path.Replace ("/Windows/","/Win32/");
+			
 			int i = path.IndexOf ('/');
 			if (i != -1)
 				i = path.IndexOf ('/', i + 1);
