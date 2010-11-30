@@ -31,6 +31,7 @@ namespace Cydin.Controllers
 		public void ProcessRequest (HttpContext context)
 		{
 			string path = context.Request.Path;
+			string requestPath = path;
 			
 			// Workaround to an MD bug
 			path = path.Replace ("/Windows/","/Win32/");
@@ -84,7 +85,7 @@ namespace Cydin.Controllers
 					m.IncDownloadCount (fileId);
 				}
 			}
-			else if (Path.GetFileName (path) == "main.mrep") {
+			else if (Path.GetFileName (path) == "main.mrep" && (requestPath.IndexOf ("/addins/") != -1 || requestPath.IndexOf ("/Stable/") != -1)) {
 				string[] fields = subPath.Split (Path.DirectorySeparatorChar);
 				using (UserModel m = UserModel.GetCurrent ()) {
 					m.IncRepoDownloadCount (fields[0], fields[1]);
