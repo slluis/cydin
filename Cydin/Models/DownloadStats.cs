@@ -161,13 +161,12 @@ namespace Cydin.Models
 				end = DateTime.Parse (range[1]);
 			}
 			else if (period == "month") {
-				DateTime d = DateTime.Parse (arg);
-				start = new DateTime (d.Year, d.Month, 1);
+				string[] m = arg.Split ('-');
+				start = new DateTime (int.Parse (m[1]), int.Parse (m[0]), 1);
 				end = start.AddMonths (1);
 			}
 			else if (period == "year") {
-				DateTime d = DateTime.Parse (arg);
-				start = new DateTime (d.Year, 1, 1);
+				start = new DateTime (int.Parse (arg), 1, 1);
 				end = start.AddYears (1);
 			}
 			else

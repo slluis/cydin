@@ -1054,7 +1054,7 @@ namespace Cydin.Models
 		
 		public DownloadStats GetTotalRepoDownloadStats (TimePeriod period, DateTime startDate, DateTime endDate)
 		{
-			string filter = "1=1";
+			string filter = "Date >= {0} AND Date < {1} ";
 			string sql = null;
 			switch (period) {
 			case TimePeriod.Day:
@@ -1075,7 +1075,7 @@ namespace Cydin.Models
 			}
 			
 			DownloadStats stats = new DownloadStats ();
-			using (DbDataReader r = db.ExecuteSelect (sql)) {
+			using (DbDataReader r = db.ExecuteSelect (sql, startDate, endDate)) {
 				while (r.Read ()) {
 					int count = r.GetInt32 (0);
 					string plat = r.GetString (1);
@@ -1109,6 +1109,7 @@ namespace Cydin.Models
 		DownloadStats GetDownloadStats (TimePeriod period, DateTime startDate, DateTime endDate, string from, string filter, object arg)
 		{
 			string sql = null;
+			filter += " AND R.Date >= {1} AND R.Date < {2} ";
 			switch (period) {
 			case TimePeriod.Day:
 				sql = "SELECT sum(Downloads), Platform, Date, Date FROM ReleasePackage R " + from + " where " + filter + " GROUP BY Platform, Date";
@@ -1128,7 +1129,7 @@ namespace Cydin.Models
 			}
 			
 			DownloadStats stats = new DownloadStats ();
-			using (DbDataReader r = db.ExecuteSelect (sql, arg)) {
+			using (DbDataReader r = db.ExecuteSelect (sql, arg, startDate, endDate)) {
 				while (r.Read ()) {
 					int count = r.GetInt32 (0);
 					string plat = r.GetString (1);

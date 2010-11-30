@@ -62,7 +62,9 @@
 		// Initialize controls
 		
 		this._plotDatepicker1.datepicker();
+		this._plotDatepicker1.datepicker( "option", "dateFormat", 'yy-mm-dd' )		
 		this._plotDatepicker2.datepicker();
+		this._plotDatepicker2.datepicker( "option", "dateFormat", 'yy-mm-dd' )		
 		
 		this._periodSelect.val ("last");
 		this._plotNumArg.val ("30");
@@ -94,12 +96,12 @@
 				var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 				var td = new Date ();
 				m = td.getMonth();
-				y = td.getFullYear() - 1;
-				for (n=0; n<12; n++) {
-					options += "<option value='1-" + (m+1) + "-" + y + "'>";
+				y = td.getFullYear();
+				for (n=0; n<24; n++) {
+					options += "<option value='" + (m+1) + "-" + y + "'>";
 					options += months[m] + " " + y + "</option>";
-					if (++m == 12) {
-						m = 0; y++;
+					if (m-- == 0) {
+						m = 11; y--;
 					}
 				}
 				this._plotValueSectionSel.html(options);
@@ -124,7 +126,7 @@
 				arg = this._plotNumArg.val() + this._plotLastSectionSel.val();
 			}
 			else if (period == "month" || period == "year") {
-				arg = this._plotPeriodSection.val();
+				arg = this._plotValueSectionSel.val();
 			}
 			this.loadingCallback();
 			this.queryError = false;
