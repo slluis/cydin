@@ -210,6 +210,10 @@
     <Content Include="Views\Project\Stats.aspx" />
     <Content Include="Scripts\plot\jquery.jqplot.js" />
     <Content Include="Content\jquery.jqplot.css" />
+    <Content Include="Media\md-header.png" />
+    <Content Include="Media\md-menu-bg.png" />
+    <Content Include="Media\signin-myopenid.png" />
+    <Content Include="Media\chart_bar.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

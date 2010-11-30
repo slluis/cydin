@@ -1012,7 +1012,7 @@ namespace Cydin.Models
 				for (int n=0; n<list.Count; n++) {
 					if (n > 0)
 						sb.Append (", ");
-					sb.Append (list [n].Key).Append (" ").Append (list[n].Value);
+					sb.Append (list [n].Value).Append (" ").Append (list[n].Key);
 				}
 				sb.Append (")");
 			}
