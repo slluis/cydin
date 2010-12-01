@@ -164,7 +164,7 @@ namespace Cydin.Models
 			string sql = "SELECT sum(Downloads), RP.Platform, RE.* " +
 			 	"FROM ReleasePackage RP, `Release` RE, Project P " +
 			 	"WHERE RP.Date >= {0} AND RP.Date < {1} AND RP.ReleaseId = RE.Id AND RE.ProjectId = P.Id AND P.ApplicationId = {2} " +
-			 	"GROUP BY RP.Platform, RP.Date, RP.ReleaseId " +
+			 	"GROUP BY RP.Platform, RP.ReleaseId " +
 			 	"ORDER BY sum(Downloads) DESC";
 			
 			List<DownloadInfo> stats = new List<DownloadInfo> ();
