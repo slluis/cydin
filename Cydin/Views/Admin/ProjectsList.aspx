@@ -42,7 +42,7 @@ foreach (var g in grp) {
 <% } %>
 </td>
 <td>
-<%=CurrentUserModel.GetDownloadSummary (p)%>
+<%=CurrentUserModel.Stats.GetDownloadSummary (p)%>
 </td>
 </tr>
 <% } %>

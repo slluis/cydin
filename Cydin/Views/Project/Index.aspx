@@ -154,7 +154,7 @@
     </td>
 
     <% if (isProjectAdmin) { %>
-    <td><a href="#" class="release-stats-button" relid="<%=release.Id%>"><img src="/Media/chart_bar.png"/> <%=m.GetDownloadSummary (release)%></a></td>
+    <td><a href="#" class="release-stats-button" relid="<%=release.Id%>"><img src="/Media/chart_bar.png"/> <%=m.Stats.GetDownloadSummary (release)%></a></td>
     <td><%=release.Status%></td>
 	<td><a href="#" class="delete-release-button command" relid="<%=release.Id%>">Delete</a></td>
     <% } %>

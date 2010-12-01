@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using Cydin.Models;
 using Cydin.Builder;
 using Cydin.Properties;
+using System.Text;
 
 namespace Cydin.Controllers
 {
@@ -56,7 +57,7 @@ namespace Cydin.Controllers
 			DateTime start;
 			TimePeriod pd = TimePeriod.Auto;
 			DownloadStats.ParseQuery (period, arg, out pd, out start, out end);
-			DownloadStats stats = CurrentUserModel.GetTotalDownloadStats (pd, start, end);
+			DownloadStats stats = CurrentUserModel.Stats.GetTotalDownloadStats (pd, start, end);
 			return Content (stats.ToJson ());
 		}
 		
@@ -67,8 +68,26 @@ namespace Cydin.Controllers
 			DateTime start;
 			TimePeriod pd = TimePeriod.Auto;
 			DownloadStats.ParseQuery (period, arg, out pd, out start, out end);
-			DownloadStats stats = CurrentUserModel.GetTotalRepoDownloadStats (pd, start, end);
+			DownloadStats stats = CurrentUserModel.Stats.GetTotalRepoDownloadStats (pd, start, end);
 			return Content (stats.ToJson ());
+		}
+		
+		public ActionResult GetTopDownloads (string period, string arg)
+		{
+			CurrentUserModel.CheckIsAdmin ();
+			DateTime end;
+			DateTime start;
+			TimePeriod pd = TimePeriod.Auto;
+			DownloadStats.ParseQuery (period, arg, out pd, out start, out end);
+			
+			List<DownloadInfo> stats = CurrentUserModel.Stats.GetTopDownloads (start, end);
+			StringBuilder sb = new StringBuilder ();
+			foreach (var di in stats) {
+				if (sb.Length > 0)
+					sb.Append (',');
+				sb.AppendFormat ("{{\"count\":{0},\"platform\":\"{1}\",\"projectId\":{2},\"appVersion\":\"{3}\",\"name\":\"{4}\"}}", di.Count, di.Platform, di.Release.ProjectId, di.Release.TargetAppVersion, di.Release.AddinName + " v" + di.Release.Version);
+			}
+			return Content ("[" + sb + "]");
 		}
     }
 }

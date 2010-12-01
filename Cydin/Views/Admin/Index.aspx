@@ -56,19 +56,23 @@
 		
 			$.statQueryWidget("stat-query", 
 				[ getActionUrl ("GetRepoDownloadStatsAsync","Admin") + "?", 
-		          getActionUrl ("GetDownloadStatsAsync","Admin") + "?"
+		          getActionUrl ("GetDownloadStatsAsync","Admin") + "?",
+		          getActionUrl ("GetTopDownloads","Admin") + "?"
 				],
 				function () {
 					unplotData ("chartRepos");
 					unplotData ("chartAddins");
+					$("#topDownloads").fadeTo (200, 0.5);
 					$("#errorMessage").hide ();
 					$("#loadingMessage").show ();
 				},
 				function (data, idx) {
 					if (idx == 0) {
 						plotData ("chartRepos", data, "Repository Index Downloads");
-					} else {
+					} else if (idx == 1) {
 						plotData ("chartAddins", data, "Add-in Downloads");
+					} else {
+						showTopDownloads (data);
 					}
 					$("#loadingMessage").hide ();
 				},
@@ -152,6 +156,17 @@
 			$("#" + chart + "Pie").fadeTo (300, 1);
 		}
 		
+		function showTopDownloads (data)
+		{
+			var htm = "<table><tr><th>Downloads</th><th>Add-in</th><th>Platform</th></tr>";
+			for (n=0; n<data.length; n++) {
+				var di = data[n];
+				htm += "<tr><td align='center'>" + di.count + "</td><td><a href='" + getActionUrl ("Index","Project") + "?id=" + di.projectId + "'>" + di.name + "</a></td><td>" + di.platform + "</td></tr>";
+			}
+			$("#topDownloads").html (htm);
+			$("#topDownloads").fadeTo (300, 1);
+		}
+		
     
 	function addAdmin (dlg, mail)
 	{
@@ -231,6 +246,8 @@
 		<td><div id="chartAddinsPie" class='plot' style="margin-top:10px; margin-left:10px; width:230px; height:230px;"></div></td>
 		</tr>
 		</table>
+		<p>Top Downloads:</p>
+		<div id="topDownloads"></div>
 	</div>
 	
 	</div>

@@ -144,6 +144,7 @@
     <Compile Include="Controllers\ServiceEventsHandler.cs" />
     <Compile Include="Models\RepositoryDownload.cs" />
     <Compile Include="Models\DownloadStats.cs" />
+    <Compile Include="Models\StatsModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />

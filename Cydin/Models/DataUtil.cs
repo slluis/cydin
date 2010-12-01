@@ -233,6 +233,12 @@ namespace Cydin.Models
 			}
 		}
 
+		public static T ReadObject<T> (this DbConnection gdb, DbDataReader r) where T : new ()
+		{
+			DbMap map = GetMap (typeof(T));
+			return ReadObject<T> (map, r);
+		}
+		
 		static T ReadObject<T> (DbMap map, DbDataReader r) where T : new ()
 		{
 			T obj = new T ();

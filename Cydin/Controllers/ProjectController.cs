@@ -239,7 +239,7 @@ namespace Cydin.Controllers
 			DateTime start;
 			TimePeriod pd = TimePeriod.Auto;
 			DownloadStats.ParseQuery (period, arg, out pd, out start, out end);
-			DownloadStats stats = relid != -1 ? CurrentUserModel.GetReleaseDownloadStats (relid, pd, start, end) : CurrentUserModel.GetProjectDownloadStats (pid, pd, start, end);
+			DownloadStats stats = relid != -1 ? CurrentUserModel.Stats.GetReleaseDownloadStats (relid, pd, start, end) : CurrentUserModel.Stats.GetProjectDownloadStats (pid, pd, start, end);
 			return Content (stats.ToJson ());
 		}
 	}

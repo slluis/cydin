@@ -160,6 +160,12 @@ namespace Cydin.Controllers
 			CurrentUserModel.CheckIsSiteAdmin ();
 			return View ();
 		}
+		
+		public ActionResult ClearLog ()
+		{
+			System.IO.File.WriteAllText (BuildService.LogFile, "");
+			return RedirectToAction ("Index");
+		}
 	}
 }
 

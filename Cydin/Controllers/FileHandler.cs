@@ -82,13 +82,13 @@ namespace Cydin.Controllers
 				fileId = fileId.Replace (Path.DirectorySeparatorChar, '/');
 				fileId = fileId.Substring (0, fileId.Length - 6).Trim ('/');
 				using (UserModel m = UserModel.GetCurrent ()) {
-					m.IncDownloadCount (fileId);
+					m.Stats.IncDownloadCount (fileId);
 				}
 			}
 			else if (Path.GetFileName (path) == "main.mrep" && (requestPath.IndexOf ("/addins/") != -1 || requestPath.IndexOf ("/Stable/") != -1)) {
 				string[] fields = subPath.Split (Path.DirectorySeparatorChar);
 				using (UserModel m = UserModel.GetCurrent ()) {
-					m.IncRepoDownloadCount (fields[0], fields[1]);
+					m.Stats.IncRepoDownloadCount (fields[0], fields[1]);
 				}
 			}
 		}
