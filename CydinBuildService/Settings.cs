@@ -7,7 +7,7 @@ namespace CydinBuildService
 {
 	public class Settings
 	{
-		public static Settings DefaultS;
+		public static Settings Default;
 		
 		string dataPath;
 		string msbuildCommand;
@@ -23,18 +23,33 @@ namespace CydinBuildService
 						file = Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.Personal), ".config");
 						file = Path.Combine (file, "cydin.config");
 						if (!File.Exists (file)) {
-							DefaultS = new Settings ();
+							Default = new Settings ();
 							return;
 						}
 					}
 				}
 				XmlSerializer ser = new XmlSerializer (typeof(Settings));
 				using (StreamReader sr = new StreamReader (file)) {
-					DefaultS = (Settings) ser.Deserialize (sr);
+					Default = (Settings) ser.Deserialize (sr);
 				}
 			} catch {
-				DefaultS = new Settings ();
+				Default = new Settings ();
 			}
+		}
+		
+		public Settings ()
+		{
+			LiveEventsConnection = true;
+			PollWaitMinutes = 5;
+		}
+		
+		public void Dump ()
+		{
+			Console.WriteLine ("Web Server: {0}", WebSiteUrl);
+			Console.WriteLine ("Data Path: {0}", DataPath);
+			Console.WriteLine ("MSBuild command: {0}", MSBuildCommand);
+			Console.WriteLine ("Poll wait: {0}", PollWaitMinutes + "m");
+			Console.WriteLine ("Live Events Connection: {0}", LiveEventsConnection);
 		}
 		
 		[XmlElementAttribute]
@@ -72,6 +87,12 @@ namespace CydinBuildService
 			get { return webSiteUrl; }
 			set { webSiteUrl = value; }
 		}
+		
+		[XmlElementAttribute]
+		public bool LiveEventsConnection { get; set; }
+		
+		[XmlElementAttribute]
+		public int PollWaitMinutes { get; set; }
 	}
 }
 

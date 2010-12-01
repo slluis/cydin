@@ -18,8 +18,6 @@ namespace CydinBuildService
 	public class BuildService
 	{
 		AutoResetEvent buildEvent = new AutoResetEvent (false);
-		int waitTimeout = 15 * 60 * 1000;
-//		int waitTimeout = 5000;
 		bool running = false;
 		Thread builderThread;
 		BuildContext mainContext = new BuildContext ();
@@ -32,7 +30,8 @@ namespace CydinBuildService
 		public void Start (string url)
 		{
 			mainContext.Server = new Server ();
-			mainContext.LocalSettings = Settings.DefaultS;
+			mainContext.LocalSettings = Settings.Default;
+			mainContext.LocalSettings.Dump ();
 			
 			if (url == null)
 				url = mainContext.LocalSettings.WebSiteUrl;
@@ -90,12 +89,13 @@ namespace CydinBuildService
 							if (eventQueue.Count > 0)
 								ev = eventQueue.Dequeue ();
 						}
-						if (ev != null)
+						if (ev != null) {
 							Build (mainContext, ev);
+						}
 					} while (ev != null);
 				}
-
-				if (!buildEvent.WaitOne (waitTimeout))
+				
+				if (!buildEvent.WaitOne (mainContext.LocalSettings.PollWaitMinutes * 1000 * 60))
 					QueueBuildAll ();
 			}
 			mainContext.Status = "Stopped";
@@ -118,7 +118,7 @@ namespace CydinBuildService
 		
 		void QueueBuildAll ()
 		{
-			ServerEventArgs e = new ServerEventArgs () { EventId = "BuildAll" };
+			ServerEventArgs e = new ServerEventArgs () { EventId = "BuildAll", AppId=-1, ProjectId=-1 };
 			lock (eventQueue) {
 				eventQueue.Enqueue (e);
 			}
@@ -741,7 +741,6 @@ namespace CydinBuildService
 					
 					ServerEventArgs args = new ServerEventArgs ();
 					args.EventId = eventsReader.ReadLine ();
-					Console.WriteLine ("Got event " + args.EventId);
 					args.AppId = int.Parse (eventsReader.ReadLine ());
 					args.ProjectId = int.Parse (eventsReader.ReadLine ());
 					int nargs = int.Parse (eventsReader.ReadLine ());
