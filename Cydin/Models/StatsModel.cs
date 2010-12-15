@@ -97,7 +97,7 @@ namespace Cydin.Models
 			foreach (string plat in rel.PlatformsList) {
 				using (DbDataReader r = db.ExecuteSelect ("SELECT SUM(Downloads) Total FROM ReleasePackage WHERE ReleaseId={0} AND Platform={1}", rel.Id, plat)) {
 					if (r.Read ()) {
-						int ptotal = r.GetInt32 (0);
+						int ptotal = r.IsDBNull (0) ? 0 : r.GetInt32 (0);
 						if (ptotal > 0) {
 							platforms.Add (plat);
 							counts.Add (ptotal);
@@ -129,7 +129,7 @@ namespace Cydin.Models
 				foreach (string plat in rel.PlatformsList) {
 					using (DbDataReader r = db.ExecuteSelect ("SELECT SUM(Downloads) Total FROM ReleasePackage WHERE ReleaseId={0} AND Platform={1}", rel.Id, plat)) {
 						if (r.Read ()) {
-							int ptotal = r.GetInt32 (0);
+							int ptotal = r.IsDBNull (0) ? 0 : r.GetInt32 (0);
 							if (ptotal > 0) {
 								int c = 0;
 								platforms.TryGetValue (plat, out c);
@@ -171,7 +171,7 @@ namespace Cydin.Models
 			using (DbDataReader r = db.ExecuteSelect (sql, startDate, endDate, userModel.CurrentApplication.Id)) {
 				while (r.Read ()) {
 					DownloadInfo di = new DownloadInfo ();
-					di.Count = r.GetInt32 (0);
+					di.Count = r.IsDBNull (0) ? 0 : r.GetInt32 (0);
 					di.Platform = r.GetString (1);
 					di.Release = db.ReadObject<Release> (r);
 					stats.Add (di);
@@ -205,7 +205,7 @@ namespace Cydin.Models
 			DownloadStats stats = new DownloadStats ();
 			using (DbDataReader r = db.ExecuteSelect (sql, startDate, endDate)) {
 				while (r.Read ()) {
-					int count = r.GetInt32 (0);
+					int count = r.IsDBNull (0) ? 0 : r.GetInt32 (0);
 					string plat = r.GetString (1);
 					DateTime date = r.GetDateTime (2);
 					string label = r[3].ToString ();
@@ -259,7 +259,7 @@ namespace Cydin.Models
 			DownloadStats stats = new DownloadStats ();
 			using (DbDataReader r = db.ExecuteSelect (sql, arg, startDate, endDate)) {
 				while (r.Read ()) {
-					int count = r.GetInt32 (0);
+					int count = r.IsDBNull (0) ? 0 : r.GetInt32 (0);
 					string plat = r.GetString (1);
 					DateTime date = r.GetDateTime (2);
 					string label = r[3].ToString ();
