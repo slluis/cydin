@@ -112,7 +112,8 @@ namespace CydinBuildService
 			else {
 				try {
 					RunCommand (bzrDir, "update", output);
-				} catch {
+				} catch (Exception ex) {
+					Console.WriteLine (ex);
 					// If something goes wrong while updating, reclone
 					Directory.Delete (bzrDir, true);
 					RunCommand (".", "checkout " + url + " " + bzrDir, output);
@@ -128,9 +129,9 @@ namespace CydinBuildService
 			StringBuilder output = new StringBuilder ();
 			StringBuilder error = new StringBuilder ();
 			try {
-				BuildService.RunCommand (BzrCommand, cmd, output, error, Timeout, bzrDir);
+				BuildService.RunCommand (false, BzrCommand, cmd, output, error, Timeout, bzrDir);
 			} catch (Exception ex) {
-				throw new Exception (ex.Message + ": " + output.ToString ());
+				throw new Exception (ex.Message + ": " + output + ". " + error);
 			}
 			if (log != null) {
 				log.AppendLine (output.ToString ());

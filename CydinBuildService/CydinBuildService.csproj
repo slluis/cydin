@@ -67,6 +67,7 @@
     <Compile Include="SourcePullers\SubversionPuller.cs" />
     <Compile Include="SourcePullers\BazaarPuller.cs" />
     <Compile Include="AddinProject.cs" />
+    <Compile Include="SandboxService.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

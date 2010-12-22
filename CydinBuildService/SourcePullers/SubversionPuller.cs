@@ -53,7 +53,7 @@ namespace CydinBuildService
 			string url = source.Url;
 			
 			if (!url.EndsWith ("/*")) {
-				BuildService.RunCommand (SubversionCommand, "info --xml " + url, output, error, Timeout);
+				BuildService.RunCommand (false, SubversionCommand, "info --xml " + url, output, error, Timeout);
 				XmlDocument doc = new XmlDocument ();
 				doc.LoadXml (output.ToString ());
 				XmlElement elem = (XmlElement) doc.SelectSingleNode ("/info/entry");
@@ -70,7 +70,7 @@ namespace CydinBuildService
 			}
 			else {
 				url = url.Substring (0, url.Length - 2);
-				BuildService.RunCommand (SubversionCommand, "ls --xml " + url, output, error, Timeout);
+				BuildService.RunCommand (false, SubversionCommand, "ls --xml " + url, output, error, Timeout);
 				XmlDocument doc = new XmlDocument ();
 				try {
 					doc.LoadXml (output.ToString ());
@@ -101,7 +101,7 @@ namespace CydinBuildService
 			args = "export --force " + stag.Url + " \"" + targetPath + "\"";
 
 			output.AppendLine (command + " " + args);
-			BuildService.RunCommand (command, args, output, error, Timeout);
+			BuildService.RunCommand (false, command, args, output, error, Timeout);
 		}
 	}
 }

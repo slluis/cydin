@@ -44,6 +44,10 @@ namespace CydinBuildService
 			
 			if (running)
 				return;
+			
+			if (mainContext.LocalSettings.AppArmorSandbox)
+				SandboxService.Initialize ();
+			
 			running = true;
 			builderThread = new Thread (Run);
 			builderThread.Start ();
@@ -97,6 +101,7 @@ namespace CydinBuildService
 				
 				if (!buildEvent.WaitOne (mainContext.LocalSettings.PollWaitMinutes * 1000 * 60))
 					QueueBuildAll ();
+					
 			}
 			mainContext.Status = "Stopped";
 		}
@@ -110,6 +115,7 @@ namespace CydinBuildService
 
 		void HandleEvent (object sender, ServerEventArgs e)
 		{
+			Console.WriteLine ("Got event: " + e.AppId + " " + e.ProjectId + " " + e.EventId + " " + e.EventArgs);
 			lock (eventQueue) {
 				eventQueue.Enqueue (e);
 			}
@@ -448,26 +454,43 @@ namespace CydinBuildService
 				if (!string.IsNullOrEmpty (psource.BuildFile)) {
 	
 					// Build the project
-	
-					string solFile = Path.Combine (sourcePath, NormalizePath (psource.BuildFile));
-	
-					string ops = " \"/p:ReferencePath=" + rel.GetAssembliesPath (ctx) + "\"";
 					
-					if (!string.IsNullOrEmpty (psource.BuildConfiguration))
-						ops += " \"/property:Configuration=" + psource.BuildConfiguration + "\"";
+					// Move the sources to the work area (which is sandboxed)
 					
-					ops = ops + " \"" + solFile + "\"";
-	
-					StringBuilder output = new StringBuilder ();
+					if (!Directory.Exists (ctx.LocalSettings.WorkAreaPath))
+						Directory.CreateDirectory (ctx.LocalSettings.WorkAreaPath);
+					
+					string workArea = Path.Combine (ctx.LocalSettings.WorkAreaPath, "builder");
+					if (Directory.Exists (workArea))
+						Directory.Delete (workArea, true);
+					
+					Directory.Move (sourcePath, workArea);
+					
 					try {
-						// Clean the project
-						RunCommand (ctx.LocalSettings.MSBuildCommand, "/t:Clean " + ops, output, output, Timeout.Infinite);
+		
+						string solFile = Path.Combine (workArea, NormalizePath (psource.BuildFile));
+		
+						string ops = " \"/p:ReferencePath=" + rel.GetAssembliesPath (ctx) + "\"";
 						
-						// Build
-						RunCommand (ctx.LocalSettings.MSBuildCommand, ops, output, output, Timeout.Infinite);
+						if (!string.IsNullOrEmpty (psource.BuildConfiguration))
+							ops += " \"/property:Configuration=" + psource.BuildConfiguration + "\"";
+						
+						ops = ops + " \"" + solFile + "\"";
+		
+						StringBuilder output = new StringBuilder ();
+						try {
+							// Clean the project
+							RunCommand (true, ctx.LocalSettings.MSBuildCommand, "/t:Clean " + ops, output, output, Timeout.Infinite);
+							
+							// Build
+							RunCommand (true, ctx.LocalSettings.MSBuildCommand, ops, output, output, Timeout.Infinite);
+						}
+						finally {
+							File.AppendAllText (logFile, "<pre>" + HttpUtility.HtmlEncode (output.ToString ()) + "</pre>");
+						}
 					}
 					finally {
-						File.AppendAllText (logFile, "<pre>" + HttpUtility.HtmlEncode (output.ToString ()) + "</pre>");
+						Directory.Move (workArea, sourcePath);
 					}
 				}
 	
@@ -557,12 +580,12 @@ namespace CydinBuildService
 			}
 		}
 
-		internal static void RunCommand (string command, string args, StringBuilder output, StringBuilder error, int timeout)
+		internal static void RunCommand (bool sandboxed, string command, string args, StringBuilder output, StringBuilder error, int timeout)
 		{
-			RunCommand (command, args, output, error, timeout, null);
+			RunCommand (sandboxed, command, args, output, error, timeout, null);
 		}
 		
-		internal static void RunCommand (string command, string args, StringBuilder output, StringBuilder error, int timeout, string workDir)
+		internal static void RunCommand (bool sandboxed, string command, string args, StringBuilder output, StringBuilder error, int timeout, string workDir)
 		{
 			Process p = new Process ();
 			ProcessStartInfo pinfo = p.StartInfo;
@@ -586,7 +609,14 @@ namespace CydinBuildService
 				lock (error)
 					error.Append (e.Data + "\n");
 			};
-			p.Start ();
+			try {
+				if (sandboxed)
+					SandboxService.EnterSandbox ();
+				p.Start ();
+			} finally {
+				if (sandboxed)
+					SandboxService.ExitSandbox ();
+			}
 			p.BeginOutputReadLine ();
 			p.BeginErrorReadLine ();
 
@@ -708,22 +738,26 @@ namespace CydinBuildService
 		{
 			if (!Server.ConnectBuildService ())
 				return false;
-			if (eventsThread != null) {
-				eventsThread.Abort ();
-				eventsThread = null;
-			}
-			try {
-				WebRequest req = HttpWebRequest.Create (ServerUrl + "/service/events");
-				req.Timeout = Timeout.Infinite;
-				eventsReader = new StreamReader (req.GetResponse ().GetResponseStream ());
 			
-				eventsThread = new Thread (ReadEvents);
-				eventsThread.IsBackground = true;
-				eventsThread.Start ();
-				return true;
-			} catch {
-				return false;
+			if (LocalSettings.LiveEventsConnection) {
+				if (eventsThread != null) {
+					eventsThread.Abort ();
+					eventsThread = null;
+				}
+				try {
+					WebRequest req = HttpWebRequest.Create (ServerUrl + "/service/events");
+					req.ConnectionGroupName = "EventListener";
+					req.Timeout = Timeout.Infinite;
+					eventsReader = new StreamReader (req.GetResponse ().GetResponseStream ());
+				
+					eventsThread = new Thread (ReadEvents);
+					eventsThread.IsBackground = true;
+					eventsThread.Start ();
+				} catch {
+					return false;
+				}
 			}
+			return true;
 		}
 		
 		void ReadEvents ()
@@ -750,7 +784,7 @@ namespace CydinBuildService
 					args.EventArgs = eargs.ToArray ();
 					if (Event != null)
 						Event (this, args);
-				} catch {
+				} catch (Exception ex) {
 					try {
 						eventsReader.Close ();
 					} catch { }

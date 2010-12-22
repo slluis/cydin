@@ -159,7 +159,7 @@ namespace CydinBuildService
 			StringBuilder output = new StringBuilder ();
 			StringBuilder error = new StringBuilder ();
 			try {
-				BuildService.RunCommand (GitCommand, cmd, output, error, Timeout, gitDir);
+				BuildService.RunCommand (false, GitCommand, cmd, output, error, Timeout, gitDir);
 			} catch (Exception ex) {
 				throw new Exception (ex.Message + ": " + output.ToString () + " " + error.ToString ());
 			}

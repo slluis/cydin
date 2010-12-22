@@ -32,7 +32,8 @@ namespace CydinBuildService
 				using (StreamReader sr = new StreamReader (file)) {
 					Default = (Settings) ser.Deserialize (sr);
 				}
-			} catch {
+			} catch (Exception ex) {
+				Console.WriteLine (ex);
 				Default = new Settings ();
 			}
 		}
@@ -76,6 +77,10 @@ namespace CydinBuildService
 			get { return Path.Combine (DataPath, "Packages"); }
 		}
 		
+		public string WorkAreaPath {
+			get { return Path.Combine (DataPath, "WorkArea"); }
+		}
+		
 		[XmlElementAttribute]
 		public string MSBuildCommand {
 			get { return msbuildCommand ?? "xbuild"; }
@@ -93,6 +98,9 @@ namespace CydinBuildService
 		
 		[XmlElementAttribute]
 		public int PollWaitMinutes { get; set; }
+		
+		[XmlElementAttribute]
+		public bool AppArmorSandbox { get; set; }
 	}
 }
 
