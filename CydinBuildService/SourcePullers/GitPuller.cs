@@ -84,25 +84,35 @@ namespace CydinBuildService
 			UpdateRepo (ctx, source.Id, source.Url, null);
 			
 			string gitDir = GetGitPath (ctx, source.Id);
+			string remotePrefix = "origin/";
 			
-			foreach (string b in RunCommand (gitDir, "branch", null)) {
-				if (b.Length < 3)
-					continue;
-				string br = b.Substring (2);
-				if (Util.FindMatch (br, selBranches)) {
-					RunCommand (gitDir, "checkout " + br, null);
-					string rev = GetCurrentRevision (gitDir);
-					yield return new SourceTagInfo () { Url = source.Url + "|b" + br, Name = br, LastRevision = rev };
+			if (selBranches.Count > 0) {
+				foreach (string b in RunCommand (gitDir, "branch -r", null)) {
+					if (b.Length < 3)
+						continue;
+					string br = b.Substring (2);
+					int i = br.IndexOf (" -> ");
+					if (i != -1)
+						br = br.Substring (0, i);
+					string branchName = br;
+					if (br.StartsWith (remotePrefix))
+						branchName = br.Substring (remotePrefix.Length);
+						
+					if (Util.FindMatch (branchName, selBranches)) {
+						string rev = GetCurrentRevision (gitDir, br);
+						yield return new SourceTagInfo () { Url = source.Url + "|b" + br, Name = branchName, LastRevision = rev };
+					}
 				}
 			}
 			
-			foreach (string t in RunCommand (gitDir, "tag", null)) {
-				if (t.Trim ().Length == 0)
-					continue;
-				if (Util.FindMatch (t, selTags)) {
-					RunCommand (gitDir, "checkout " + t, null);
-					string rev = GetCurrentRevision (gitDir);
-					yield return new SourceTagInfo () { Url = source.Url + "|t" + t, Name = t, LastRevision = rev };
+			if (selTags.Count > 0) {
+				foreach (string t in RunCommand (gitDir, "tag", null)) {
+					if (t.Trim ().Length == 0)
+						continue;
+					if (Util.FindMatch (t, selTags)) {
+						string rev = GetCurrentRevision (gitDir, t);
+						yield return new SourceTagInfo () { Url = source.Url + "|t" + t, Name = t, LastRevision = rev };
+					}
 				}
 			}
 		}
@@ -112,12 +122,7 @@ namespace CydinBuildService
 			int i = stag.Url.IndexOf ('|');
 			string bname = stag.Url.Substring (i + 2);
 			string url = stag.Url.Substring (0, i);
-			
 			UpdateRepo (ctx, sourceId, url, output);
-			
-			string gitDir = GetGitPath (ctx, sourceId);
-			
-			RunCommand (gitDir, "checkout " + bname, output);
 		}
 		
 		public override void PrepareForBuild (BuildContext ctx, int sourceId, SourceTagInfo stag)
@@ -125,6 +130,7 @@ namespace CydinBuildService
 			int i = stag.Url.IndexOf ('|');
 			string bname = stag.Url.Substring (i + 2);
 			string gitDir = GetGitPath (ctx, sourceId);
+			RunCommand (gitDir, "reset --hard", null);
 			RunCommand (gitDir, "checkout " + bname, null);
 		}
 		
@@ -135,8 +141,7 @@ namespace CydinBuildService
 				RunCommand (".", "clone --depth=1 " + url + " " + gitDir, output);
 			else {
 				try {
-					RunCommand (gitDir, "checkout master", output);
-					RunCommand (gitDir, "pull", output);
+					RunCommand (gitDir, "fetch origin", output);
 				} catch (Exception ex) {
 					Console.WriteLine ("Error: " + ex.Message);
 					// If something goes wrong while updating, reclone
@@ -146,9 +151,9 @@ namespace CydinBuildService
 			}
 		}
 		
-		string GetCurrentRevision (string gitDir)
+		string GetCurrentRevision (string gitDir, string bt)
 		{
-			return RunCommand (gitDir, "log -1 --format=format:%H", null).First ();
+			return RunCommand (gitDir, "log -1 --format=format:%H " + bt, null).First ();
 		}
 		
 		IEnumerable<string> RunCommand (string gitDir, string cmd, StringBuilder log)
