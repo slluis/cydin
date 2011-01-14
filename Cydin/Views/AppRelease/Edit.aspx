@@ -1,7 +1,7 @@
-<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage<Cydin.Models.AppRelease>" %>
+<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="Cydin.Views.UserViewPage<Cydin.Models.AppRelease>" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="TitleContent" runat="server">
-	Edit
+	Edit Application Version
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
@@ -13,7 +13,7 @@
         
             <%= Html.HiddenFor(model => model.Id) %>
             <div class="editor-label">
-                <%= Html.LabelFor(model => model.AppVersion) %>
+                Application Version
             </div>
             <div class="editor-field">
                 <%= Html.TextBoxFor(model => model.AppVersion) %>
@@ -21,13 +21,30 @@
             </div>
             
             <div class="editor-label">
-                <%= Html.LabelFor(model => model.AddinRootVersion) %>
+                Root Add-in Version
             </div>
             <div class="editor-field">
                 <%= Html.TextBoxFor(model => model.AddinRootVersion) %>
                 <%= Html.ValidationMessageFor(model => model.AddinRootVersion) %>
             </div>
             
+            <div class="editor-label">
+                Backwards Compatible With:
+            </div>
+            <div class="editor-field">
+				<% var appList = new List<SelectListItem> ();
+				   appList.Add (new SelectListItem () { Text="None", Value="0" });
+				   foreach (var app in CurrentUserModel.GetAppReleases ()) {
+				   		SelectListItem item = new SelectListItem () { Text=CurrentUserModel.CurrentApplication.Name + " " + app.AppVersion, Value=app.Id.ToString() };
+				   		if (Model.CompatibleAppReleaseId == app.Id)
+				   			item.Selected = true;
+				   		appList.Add (item);
+				   	}
+				   	appList [0].Selected = Model.CompatibleAppReleaseId==0;
+				 %>
+			     <%= Html.DropDownList ("CompatibleAppReleaseId", appList)%>
+            </div>
+		
             <div class="editor-label">
                 <%= Html.Label("Assemblies Archive") %>
             </div>

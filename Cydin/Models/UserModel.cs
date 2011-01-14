@@ -556,13 +556,15 @@ namespace Cydin.Models
 			release.LastUpdateTime = DateTime.Now;
 			db.UpdateObject (release);
 
-			string filePath = release.ZipPath;
-			string dir = Path.GetDirectoryName (filePath);
-
-			if (!Directory.Exists (dir))
-				Directory.CreateDirectory (dir);
-			
-			file.SaveAs (filePath);
+			if (file != null) {
+				string filePath = release.ZipPath;
+				string dir = Path.GetDirectoryName (filePath);
+	
+				if (!Directory.Exists (dir))
+					Directory.CreateDirectory (dir);
+				
+				file.SaveAs (filePath);
+			}
 		}
 
 		void SaveFile (Stream inStream, string path)
