@@ -255,7 +255,7 @@ namespace Cydin.Builder
 								Directory.CreateDirectory (repoPath);
 								reposToBuild.Add (repoPath);
 							}
-							else if (!File.Exists (Path.Combine (repoPath, "main.mrep")))
+							else if (!File.Exists (Path.Combine (repoPath, "main.mrep")) || updateAll)
 								reposToBuild.Add (repoPath);
 						}
 					}
