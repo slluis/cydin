@@ -1,14 +1,19 @@
 <%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="Cydin.Views.UserViewPage<Cydin.Models.AppRelease>" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="TitleContent" runat="server">
-	Edit Application Version
+	Application Release
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
+<link href="/Content/jquery.jqplot.css" rel="stylesheet" type="text/css" />
+	<h2>
+    <% if ((bool)ViewData["Creating"])
+           Response.Write ("New Application Release");
+       else
+           Response.Write ("Edit Application Release");%>
+    </h2>
 
-    <h2>Edit</h2>
-
-    <% using (Html.BeginForm ("UploadAssemblies", "AppRelease", FormMethod.Post, new { enctype = "multipart/form-data" })) { %>
+    <% using (Html.BeginForm ((bool)ViewData["Creating"] ? "CreateRelease" : "UpdateRelease", "AppRelease", FormMethod.Post, new { enctype = "multipart/form-data" })) { %>
         <%= Html.ValidationSummary(true) %>
         
             <%= Html.HiddenFor(model => model.Id) %>
@@ -33,14 +38,16 @@
             </div>
             <div class="editor-field">
 				<% var appList = new List<SelectListItem> ();
-				   appList.Add (new SelectListItem () { Text="None", Value="0" });
+				   appList.Add (new SelectListItem () { Text="None", Value="" });
 				   foreach (var app in CurrentUserModel.GetAppReleases ()) {
+				   		if (app.Id == Model.Id)
+				   			continue;
 				   		SelectListItem item = new SelectListItem () { Text=CurrentUserModel.CurrentApplication.Name + " " + app.AppVersion, Value=app.Id.ToString() };
 				   		if (Model.CompatibleAppReleaseId == app.Id)
 				   			item.Selected = true;
 				   		appList.Add (item);
 				   	}
-				   	appList [0].Selected = Model.CompatibleAppReleaseId==0;
+				   	appList [0].Selected = !Model.CompatibleAppReleaseId.HasValue;
 				 %>
 			     <%= Html.DropDownList ("CompatibleAppReleaseId", appList)%>
             </div>
@@ -51,16 +58,17 @@
             <div class="editor-field">
                 <input type="file" name="file" />
             </div>
-            
 
+		<br/>
+		<hr/>
             <p>
-                <input type="submit" value="Save" />
+                <input type="submit" value="Save" class="command"/>
+		        <%= Html.ActionLink("Cancel", "Index", "Admin", null, new { @class="command" }) %>
             </p>
 
     <% } %>
 
     <div>
-        <%= Html.ActionLink("Back to List", "Index") %>
     </div>
 
 </asp:Content>

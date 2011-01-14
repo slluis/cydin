@@ -50,18 +50,25 @@ namespace Cydin.Controllers
  
         public ActionResult Delete(int id)
         {
-            return View();
+			CurrentUserModel.DeleteAppRelease (id);
+			return RedirectToAction ("Index", "Admin");
         }
 
-
 		[HttpPost]
-		public ActionResult UploadAssemblies (AppRelease release)
+		public ActionResult UpdateRelease (AppRelease release)
 		{
 			AppRelease rp = CurrentUserModel.GetAppRelease (release.Id);
 			rp.AppVersion = release.AppVersion;
 			rp.AddinRootVersion = release.AddinRootVersion;
 			rp.CompatibleAppReleaseId = release.CompatibleAppReleaseId;
 			CurrentUserModel.UpdateAppRelease (rp, Request.Files.Count > 0 ? Request.Files[0] : null);
+			return RedirectToAction ("Index", "Admin");
+		}
+
+		[HttpPost]
+		public ActionResult CreateRelease (AppRelease release)
+		{
+			CurrentUserModel.CreateAppRelease (release, Request.Files.Count > 0 ? Request.Files[0] : null);
 			return RedirectToAction ("Index", "Admin");
 		}
 	}

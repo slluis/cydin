@@ -550,12 +550,32 @@ namespace Cydin.Models
 			CheckIsAdmin ();
 			return db.SelectObjectWhere<AppRelease> ("ApplicationId = {0} && AppVersion = {1}", application.Id, version);
 		}
+		
+		public void DeleteAppRelease (int id)
+		{
+			CheckIsAdmin ();
+			db.DeleteObject (GetAppRelease (id));
+		}
 
+		internal void CreateAppRelease (AppRelease release, HttpPostedFileBase file)
+		{
+			CheckIsAdmin ();
+			release.ApplicationId = application.Id;
+			release.LastUpdateTime = DateTime.Now;
+			db.InsertObject (release);
+			UpdateAppReleaseFile (release, file);
+		}
+		
 		internal void UpdateAppRelease (AppRelease release, HttpPostedFileBase file)
 		{
+			CheckIsAdmin ();
 			release.LastUpdateTime = DateTime.Now;
 			db.UpdateObject (release);
+			UpdateAppReleaseFile (release, file);
+		}
 
+		void UpdateAppReleaseFile (AppRelease release, HttpPostedFileBase file)
+		{
 			if (file != null) {
 				string filePath = release.ZipPath;
 				string dir = Path.GetDirectoryName (filePath);

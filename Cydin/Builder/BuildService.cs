@@ -317,9 +317,9 @@ namespace Cydin.Builder
 		{
 			string appVersion = Path.GetFileName (Path.GetDirectoryName (file));
 			AppRelease rel = m.GetAppReleaseByVersion (appVersion);
-			if (rel == null || rel.CompatibleAppReleaseId == 0)
+			if (rel == null || !rel.CompatibleAppReleaseId.HasValue)
 				return;
-			rel = m.GetAppRelease (rel.CompatibleAppReleaseId);
+			rel = m.GetAppRelease (rel.CompatibleAppReleaseId.Value);
 			if (rel == null)
 				return;
 			

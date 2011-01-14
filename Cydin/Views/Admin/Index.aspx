@@ -54,6 +54,19 @@
 				});
 			});
 		
+	    	$(".delete-release-button").click (function() {
+				var relid = $(this).attr("relid");
+				$("#confirm-delete-release-dialog").dialog({
+					modal: true,
+					width: 400,
+					resizable: false,
+					buttons: {
+						Cancel: function() { $(this).dialog("close"); },
+						Delete: function() { deleteRelease (relid); }
+					}
+				});
+			});
+		
 			$.statQueryWidget("stat-query", 
 				[ getActionUrl ("GetRepoDownloadStatsAsync","Admin") + "?", 
 		          getActionUrl ("GetDownloadStatsAsync","Admin") + "?",
@@ -82,6 +95,11 @@
 				}
 			);
 		})
+			
+		function deleteRelease (id)
+		{
+			window.location = getActionUrl("Delete","AppRelease") + "?id=" + id;
+		}
 		
 		function unplotData (chart)
 		{
@@ -199,14 +217,17 @@
 	</div>
 
 	<div id="tabs-3">
+	<p><%=Html.ActionLink ("Add New Release", "Create", "AppRelease", null, new { @class="command" }) %></p>
     <table>
-    <tr><th>Release</th><th></th></tr>
+    <tr><th>Release</th><th>Add-in Version</th><th>Compatible With</th><th></th></tr>
     <% 
     UserModel m = CurrentUserModel;
     foreach (AppRelease r in m.GetAppReleases ()) { %>
     <tr>
     <td> <%= m.CurrentApplication.Name + " " + r.AppVersion%> </td>
-    <td> <%=Html.ActionLink ("Delete", "Delete", "AppRelease", new { id = r.Id }, null) %> <%=Html.ActionLink ("Edit", "Edit", "AppRelease", new { id = r.Id }, null) %> </td>
+    <td> <%= r.AddinRootVersion%> </td>
+    <td> <%= r.CompatibleAppReleaseId.HasValue ? m.GetAppRelease (r.CompatibleAppReleaseId.Value).AppVersion : "" %> </td>
+    <td> <a href="#" class="command delete-release-button" relid="<%=r.Id%>">Delete</a> <%=Html.ActionLink ("Edit", "Edit", "AppRelease", new { id = r.Id }, new { @class="command" }) %> </td>
     </tr>
     <% } %>
     </table>
@@ -264,4 +285,7 @@
 		<p id="user-not-found" style="color:red;display:none">There is no user registered with the provided e-mail</p>
 	</div>
     
+<div id="confirm-delete-release-dialog" title="Remove Application Release" style="display:none">
+	<p>Are you sure you want to delete this release?</p>
+</div>
 </asp:Content>
