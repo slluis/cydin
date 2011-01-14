@@ -210,6 +210,7 @@ namespace Cydin
 			AutoPublish = s.AutoPublish;
 			Directory = s.Directory;
 			SourceTags = stags;
+			ProjectFlags = p.Flags;
 		}
 		
 		public int Id { get; set; }
@@ -223,6 +224,7 @@ namespace Cydin
 		public DateTime LastFetchTime { get; set; }
 		public bool AutoPublish { get; set; }
 		public string Directory { get; set; }
+		public ProjectFlag ProjectFlags { get; set; }
 	}
 	
 	public class SourceTagInfo

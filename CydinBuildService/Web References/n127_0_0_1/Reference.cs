@@ -684,6 +684,9 @@ namespace CydinBuildService.n127_0_0_1 {
         
         /// <remarks/>
         public string Directory;
+        
+        /// <remarks/>
+        public ProjectFlag ProjectFlags;
     }
     
     /// <remarks/>
@@ -708,6 +711,23 @@ namespace CydinBuildService.n127_0_0_1 {
         
         /// <remarks/>
         public string Status;
+    }
+    
+    /// <remarks/>
+    [System.FlagsAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "2.0.50727.1433")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://tempuri.org/")]
+    public enum ProjectFlag {
+        
+        /// <remarks/>
+        None = 1,
+        
+        /// <remarks/>
+        AllowDirectPublish = 2,
+        
+        /// <remarks/>
+        AllowPackageUpload = 4,
     }
     
     /// <remarks/>
