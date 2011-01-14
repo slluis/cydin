@@ -264,14 +264,18 @@ namespace Cydin.Builder
 				// Update the repos
 	
 				foreach (string r in reposToBuild) {
+					string mainFile = Path.Combine (r, "main.mrep");
+					if (File.Exists (mainFile))
+						File.Delete (mainFile);
 					setupService.BuildRepository (monitor, r);
+					AppendCompatibleRepo (m, mainFile);
 					string ds = r.Substring (basePath.Length + 1);
 					int i = ds.IndexOf (Path.DirectorySeparatorChar);
 					ds = ds.Substring (0, i);
 					string title = "MonoDevelop Add-in Repository";
 					if (ds != DevStatus.Stable.ToString())
 						title += " (" + ds + " channel)";
-					AppendName (Path.Combine (r, "main.mrep"), title);
+					AppendName (mainFile, title);
 					AppendName (Path.Combine (r, "root.mrep"), title);
 				}
 	
@@ -289,6 +293,29 @@ namespace Cydin.Builder
 			XmlElement nameElem = repDoc.CreateElement ("Name");
 			repDoc.DocumentElement.AppendChild (nameElem);
 			nameElem.InnerText = name;
+			repDoc.Save (file);
+		}
+
+		static void AppendCompatibleRepo (UserModel m, string file)
+		{
+			string appVersion = Path.GetFileName (Path.GetDirectoryName (file));
+			AppRelease rel = m.GetAppReleaseByVersion (appVersion);
+			if (rel == null || rel.CompatibleAppReleaseId == 0)
+				return;
+			rel = m.GetAppRelease (rel.CompatibleAppReleaseId);
+			if (rel == null)
+				return;
+			
+			XmlDocument repDoc = new XmlDocument ();
+			repDoc.Load (file);
+			XmlElement repoElem = repDoc.CreateElement ("Repository");
+			repDoc.DocumentElement.AppendChild (repoElem);
+			XmlElement elem = repDoc.CreateElement ("Url");
+			elem.InnerText = "../" + rel.AppVersion + "/main.mrep";
+			repoElem.AppendChild (elem);
+			elem = repDoc.CreateElement ("LastModified");
+			elem.InnerText = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fffffffzzz", System.Globalization.CultureInfo.InvariantCulture);
+			repoElem.AppendChild (elem);
 			repDoc.Save (file);
 		}
 

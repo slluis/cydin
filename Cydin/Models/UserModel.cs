@@ -545,6 +545,12 @@ namespace Cydin.Models
 			return db.SelectObjectById<AppRelease> (id);
 		}
 
+		public AppRelease GetAppReleaseByVersion (string version)
+		{
+			CheckIsAdmin ();
+			return db.SelectObjectWhere<AppRelease> ("ApplicationId = {0} && AppVersion = {1}", application.Id, version);
+		}
+
 		internal void UpdateAppRelease (AppRelease release, HttpPostedFileBase file)
 		{
 			release.LastUpdateTime = DateTime.Now;

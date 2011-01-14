@@ -27,6 +27,7 @@ using System;
 
 namespace Cydin.Models
 {
+	[Flags]
 	public enum ProjectFlag
 	{
 		None = 0,

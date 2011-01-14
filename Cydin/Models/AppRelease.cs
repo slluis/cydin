@@ -23,6 +23,9 @@ namespace Cydin.Models
 
 		[DataMember]
 		public DateTime LastUpdateTime { get; set; }
+
+		[DataMember]
+		public int CompatibleAppReleaseId { get; set; }
 		
 		public string ZipPath {
 			get {
