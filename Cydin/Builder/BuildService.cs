@@ -245,6 +245,21 @@ namespace Cydin.Builder
 						}
 					}
 				}
+				foreach (AppRelease arel in m.GetAppReleases ()) {
+					foreach (object status in Enum.GetValues (typeof(DevStatus))) {
+						foreach (string plat in m.CurrentApplication.PlatformsList) {
+							string repoPath = Path.Combine (basePath, status.ToString ());
+							repoPath = Path.Combine (repoPath, plat);
+							repoPath = Path.Combine (repoPath, arel.AppVersion);
+							if (!Directory.Exists (repoPath)) {
+								Directory.CreateDirectory (repoPath);
+								reposToBuild.Add (repoPath);
+							}
+							else if (!File.Exists (Path.Combine (repoPath, "main.mrep")))
+								reposToBuild.Add (repoPath);
+						}
+					}
+				}
 	
 				// Remove old add-ins
 	
@@ -286,6 +301,8 @@ namespace Cydin.Builder
 		
 		static void AppendName (string file, string name)
 		{
+			if (!File.Exists (file))
+				return;
 			XmlDocument repDoc = new XmlDocument ();
 			repDoc.Load (file);
 			if (repDoc.DocumentElement ["Name"] != null)
