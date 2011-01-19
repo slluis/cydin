@@ -32,7 +32,7 @@ namespace Cydin.Models
 		public string TargetAppVersion { get; set; }
 
 		[DataMember]
-		public int SourceTagId { get; set; }
+		public int? SourceTagId { get; set; }
 
 		[DataMember]
 		public string Platforms { get; set; }
