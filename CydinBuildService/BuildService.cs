@@ -486,6 +486,7 @@ namespace CydinBuildService
 							RunCommand (true, ctx.LocalSettings.MSBuildCommand, ops, output, output, Timeout.Infinite);
 						}
 						finally {
+							output = output.Replace (workArea, "/build");
 							File.AppendAllText (logFile, "<pre>" + HttpUtility.HtmlEncode (output.ToString ()) + "</pre>");
 						}
 					}
@@ -587,6 +588,7 @@ namespace CydinBuildService
 		
 		internal static void RunCommand (bool sandboxed, string command, string args, StringBuilder output, StringBuilder error, int timeout, string workDir)
 		{
+//			Console.WriteLine ("> " + command + " " + args);
 			Process p = new Process ();
 			ProcessStartInfo pinfo = p.StartInfo;
 			pinfo.FileName = command;
