@@ -77,18 +77,21 @@ namespace Cydin.Controllers
 			
 			context.Response.TransmitFile (path);
 			
-			if (path.EndsWith (".mpack")) {
-				string fileId = subPath;
-				fileId = fileId.Replace (Path.DirectorySeparatorChar, '/');
-				fileId = fileId.Substring (0, fileId.Length - 6).Trim ('/');
-				using (UserModel m = UserModel.GetCurrent ()) {
-					m.Stats.IncDownloadCount (fileId);
+			if (devStatus != "Test") {
+				// Don't count downloads from the test repo
+				if (path.EndsWith (".mpack")) {
+					string fileId = subPath;
+					fileId = fileId.Replace (Path.DirectorySeparatorChar, '/');
+					fileId = fileId.Substring (0, fileId.Length - 6).Trim ('/');
+					using (UserModel m = UserModel.GetCurrent ()) {
+						m.Stats.IncDownloadCount (fileId);
+					}
 				}
-			}
-			else if (Path.GetFileName (path) == "main.mrep" && (requestPath.IndexOf ("/addins/") != -1 || requestPath.IndexOf ("/Stable/") != -1)) {
-				string[] fields = subPath.Split (Path.DirectorySeparatorChar);
-				using (UserModel m = UserModel.GetCurrent ()) {
-					m.Stats.IncRepoDownloadCount (fields[0], fields[1]);
+				else if (Path.GetFileName (path) == "main.mrep" && (requestPath.IndexOf ("/addins/") != -1 || requestPath.IndexOf ("/Stable/") != -1)) {
+					string[] fields = subPath.Split (Path.DirectorySeparatorChar);
+					using (UserModel m = UserModel.GetCurrent ()) {
+						m.Stats.IncRepoDownloadCount (fields[0], fields[1]);
+					}
 				}
 			}
 		}

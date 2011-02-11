@@ -32,7 +32,8 @@ namespace Cydin.Models
 	{
 		Stable,
 		Beta,
-		Alpha
+		Alpha,
+		Test
 	}
 }
 

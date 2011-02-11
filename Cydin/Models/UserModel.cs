@@ -730,7 +730,7 @@ namespace Cydin.Models
 
 		public IEnumerable<Release> GetRecentReleases ()
 		{
-			return db.SelectObjects<Release> ("SELECT `Release`.* FROM `Release`, Project WHERE `Release`.ProjectId = Project.Id AND Project.ApplicationId = {0} AND `Release`.Status = {1} ORDER BY LastChangeTime DESC", application.Id, ReleaseStatus.Published).Take (10);
+			return db.SelectObjects<Release> ("SELECT `Release`.* FROM `Release`, Project WHERE `Release`.ProjectId = Project.Id AND Project.ApplicationId = {0} AND `Release`.Status = {1} AND `Release`.DevStatus != {2} ORDER BY LastChangeTime DESC", application.Id, ReleaseStatus.Published, DevStatus.Test).Take (10);
 		}
 
 		internal void UpdateProjectFlags (int id, ProjectFlag flags)
@@ -792,16 +792,18 @@ namespace Cydin.Models
 				db.UpdateObject (p);
 			}
 			
-			string subject = "New add-in release published: " + rel.AddinId + " v" + rel.Version;
-			StringBuilder msg = new StringBuilder ();
-			msg.AppendLine ("The add-in " + rel.AddinId + " v" + rel.Version + " has been released.");
-			msg.AppendLine ();
-			msg.AppendFormat ("[Go to {0} Project Page]({1}).\n", p.Name, GetProjectUrl (p.Id));
-			
-			if (firstRelease)
-				SendMail (subject, msg.ToString (), p.Id, ProjectNotification.NewRelease, ApplicationNotification.ProjectNewRelease, ApplicationNotification.FirstProjectRelease);
-			else
-				SendMail (subject, msg.ToString (), p.Id, ProjectNotification.NewRelease, ApplicationNotification.ProjectNewRelease);
+			if (rel.DevStatus != DevStatus.Test) {
+				string subject = "New add-in release published: " + rel.AddinId + " v" + rel.Version;
+				StringBuilder msg = new StringBuilder ();
+				msg.AppendLine ("The add-in " + rel.AddinId + " v" + rel.Version + " has been released.");
+				msg.AppendLine ();
+				msg.AppendFormat ("[Go to {0} Project Page]({1}).\n", p.Name, GetProjectUrl (p.Id));
+				
+				if (firstRelease)
+					SendMail (subject, msg.ToString (), p.Id, ProjectNotification.NewRelease, ApplicationNotification.ProjectNewRelease, ApplicationNotification.FirstProjectRelease);
+				else
+					SendMail (subject, msg.ToString (), p.Id, ProjectNotification.NewRelease, ApplicationNotification.ProjectNewRelease);
+			}
 		}
 
 		public Release GetPublishedRelease (SourceTag st)
@@ -970,6 +972,7 @@ namespace Cydin.Models
 			items.Add (new SelectListItem () { Text = "Stable", Value = ((int) DevStatus.Stable).ToString (), Selected = current == DevStatus.Stable });
 			items.Add (new SelectListItem () { Text = "Beta", Value = ((int) DevStatus.Beta).ToString (), Selected = current == DevStatus.Beta });
 			items.Add (new SelectListItem () { Text = "Alpha", Value = ((int) DevStatus.Alpha).ToString (), Selected = current == DevStatus.Alpha });
+			items.Add (new SelectListItem () { Text = "Test", Value = ((int) DevStatus.Test).ToString (), Selected = current == DevStatus.Test });
 			return items;
 		}
 		

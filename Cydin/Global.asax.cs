@@ -22,6 +22,7 @@ namespace Cydin
 			routes.Add (new Route ("Stable/{platform}/{version}/{*file}", new FileHandler ("Stable")));
 			routes.Add (new Route ("Beta/{platform}/{version}/{*file}", new FileHandler ("Beta")));
 			routes.Add (new Route ("Alpha/{platform}/{version}/{*file}", new FileHandler ("Alpha")));
+			routes.Add (new Route ("Test/{platform}/{version}/{*file}", new FileHandler ("Test")));
 			routes.Add (new Route ("package/{upload}", new PackageUploadHandler ()));
 			routes.Add (new Route ("service/{events}", new ServiceEventsHandler ()));
 		}
