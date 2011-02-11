@@ -122,7 +122,7 @@
     %>
     
     <% if (isProjectAdmin) {
-    	Response.Write (Html.ActionIconLink ("edit.png", "Edit Name and Description", "Edit", "Project", new { id = Model.Id }));
+    	Response.Write (Html.ActionLink ("Edit Name and Description", "Edit", "Project", new { id = Model.Id }, new { @class = "command" }));
     } %>
     <h2>Releases</h2>
     
@@ -198,16 +198,16 @@
     </tr>
     
     <tr valign="top" class="tag-source-table-body tag-source-table-body-<%=stat%>">
-    <td><%=source.AddinId + " v" + source.AddinVersion%><br>
+    <td><%=source.AddinId + " v" + source.AddinVersion%><br/>
     </td>
     <td><% if (!source.IsUpload) {%>
-	<a href="<%=srcUrl%>">Revision: <%=source.ShortLastRevision%> </a><br>
-    <%=Html.ActionLink ("Last build: " + time, "BuildLog", new { id = source.Id }, null)%><br>
+	<a href="<%=srcUrl%>">Revision: <%=source.ShortLastRevision%> </a><br/>
+    <%=Html.ActionLink ("Last build: " + time, "BuildLog", new { id = source.Id }, null)%><br/>
 	<% } else { %>
 		Uploaded: <%=time%>
 	<% } %>
     </td><td>
-    Dev Status: <%= Html.DropDownListFor (t => source.DevStatus, m.GetDevStatusItems (source.DevStatus), new { id="sts-" + source.Id, @class="sts-list" })%><br>
+    Dev Status: <%= Html.DropDownListFor (t => source.DevStatus, m.GetDevStatusItems (source.DevStatus), new { id="sts-" + source.Id, @class="sts-list" })%><br/>
     Packages: 
         <% foreach (var plat in source.PlatformsList) { %>
             <a href="<%=source.GetVirtualPath (plat)%>"><%=plat%></a>
@@ -266,7 +266,7 @@
 		</tr>
 	<% } %>
 	</table>
-	<img src="/Media/bullet_add.png"/> <a href="#" id="owners-add-button" style="font-size:x-small">Add</a>
+	<a href="#" id="owners-add-button" class="command">Add</a>
     </div>
     <% } %>
     <% if (m.User != null) { %>
@@ -285,7 +285,7 @@
 	 	<%=Html.Hidden ("projectId", Model.Id)%>
     <p><%=Html.CheckBox ("allowDirectPublish", Model.HasFlag (ProjectFlag.AllowDirectPublish))%> Allow direct publish<br/>
     <%=Html.CheckBox ("allowPackageUpload", Model.HasFlag (ProjectFlag.AllowPackageUpload))%> Allow package upload</p>
-     <input type="submit" value="Save" />
+     <input type="submit" value="Save"  class="command"/>
     <% } %>
     </div>
     <% } /* if(isProjectAdmin) */ %>

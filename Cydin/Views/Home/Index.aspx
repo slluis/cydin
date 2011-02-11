@@ -43,7 +43,7 @@
        <p>There are no projects.</p>
        <% } %>
 
-    <%= Html.ActionLink ("Create a new Project", "Create", "Project")%>
+    <%= Html.ActionLink ("Create a new Project", "Create", "Project", null, new { @class="command"})%>
     </div>
     <div id="user-notifications" class="side-panel">
     <h1>My Notifications</h1>

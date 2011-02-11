@@ -35,8 +35,8 @@
                 <%= Html.Encode(item.AutoPublish) %>
             </td>
             <td>
-                <%= Html.ActionLink("Edit", "Edit", new { id=item.Id }) %> |
-                <%= Html.ActionLink ("Delete", "Delete", new { id = item.Id, projectId = ViewData["ProjectId"] })%>
+                <%= Html.ActionLink("Edit", "Edit", new { id=item.Id }, new { @class="command" }) %> 
+                <%= Html.ActionLink ("Delete", "Delete", new { id = item.Id, projectId = ViewData["ProjectId"] }, new { @class="command" })%>
             </td>
         </tr>
     
@@ -45,7 +45,7 @@
     </table>
 
     <p>
-        <%= Html.ActionLink ("Create New", "Create", new { projectId = ViewData["ProjectId"] }, null)%>
+        <%= Html.ActionLink ("Create New", "Create", new { projectId = ViewData["ProjectId"] }, new { @class="command" })%>
     </p>
     <p>
         <%= Html.ActionLink ("Back to Project", "Index", "Project", new { id = ViewData["ProjectId"] }, null)%>

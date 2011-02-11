@@ -33,13 +33,13 @@
             
             <p>
             <% if (creating) { %>
-                <input type="submit" value="Create" />
+                <input type="submit" value="Create" class="command" />
             <% } else { %> 
 	            <%=Html.HiddenFor (model => model.Id)%>
 	            <%=Html.HiddenFor (model => model.ApplicationId)%>
-                <input type="submit" value="Save" />
+                <input type="submit" value="Save" class="command" />
             <% } %>
-                <input type="button" value="Cancel" onclick="window.location.href='/'"/>
+                <input type="button" value="Cancel" class="command" onclick="window.location.href='/'"/>
             </p>
 
     <% } %>
