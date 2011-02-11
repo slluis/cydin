@@ -119,3 +119,30 @@ The configuration file must be named cydin.config, and can be placed:
    the site administration page and click on the Build Service tab.
    Click on 'Change Service' and authorize the service connection
    when it shows up.
+
+APPARMOR SETUP
+==============
+
+The build service can be sandboxed using AppArmor. This is a basic guide
+about how AppArmor can be configured to work with Cydin.
+
+1) Enable AppSupport by setting the AppArmorSandbox property to 'true'
+   in the cyding.config configuration file.
+
+2) Create an AppArmor profile called 'cydin'. The AppArmor directory
+   included in the cydin code contains a profile that can be used as a
+   template. This template depends on a generic 'mono' profile also
+   included in that directory.
+
+3) Install the profile in /etc/apparmor.d. If you use the mono profile,
+   install it in /etc/apparmor.d/abstractions.
+
+4) Make sure apparmor is running by executing 'rcapparmor start'
+
+Some projects may fail to build if they depend on tools which are not
+authorised in the cydin profile. Access violations detected by
+AppArmor are logged in /var/log/audit/audit.log. For logging to work,
+the packaged 'audit' and 'auditd' need to be installed.
+
+
+

@@ -1,0 +1,21 @@
+#include <tunables/global>
+
+@{MONO_PREFIX} = /usr
+@{CYDIN_FILES} = /home/builder/cydin-files
+
+profile cydin {
+  #include <abstractions/base>
+  #include <abstractions/mono>
+
+  /** krwix,
+
+  ^sandbox {
+	#include <abstractions/base>
+	#include <abstractions/mono>
+  	@{CYDIN_FILES}/AppReleases/** mr,
+	@{CYDIN_FILES}/WorkArea/** mrw,
+	/home/*/.config/xbuild/* rw,
+	/tmp/* rw,
+  }
+}
+
