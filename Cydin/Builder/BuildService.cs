@@ -240,7 +240,7 @@ namespace Cydin.Builder
 							File.Copy (rel.GetFilePath (plat), path, true);
 							GenerateInstallerFile (m, path, rel, plat);
 							reposToBuild.Add (repoPath);
-							if (!releases.Contains (rel))
+							if (!releases.Contains (rel) && rel.Status == ReleaseStatus.PendingPublish)
 								releases.Add (rel);
 						}
 					}
