@@ -330,9 +330,6 @@ namespace Cydin.Builder
 			XmlElement elem = repDoc.CreateElement ("Url");
 			elem.InnerText = "../" + rel.AppVersion + "/main.mrep";
 			repoElem.AppendChild (elem);
-			elem = repDoc.CreateElement ("LastModified");
-			elem.InnerText = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fffffffzzz", System.Globalization.CultureInfo.InvariantCulture);
-			repoElem.AppendChild (elem);
 			repDoc.Save (file);
 		}
 
