@@ -260,10 +260,14 @@
 		</span>
 		<table>
 		<tr>
-		<td><div id="chartRepos" class='plot' style="margin-top:10px; margin-left:10px; width:670px; height:300px;"></div></td>
+		<td><div id="chartRepos" class='plot' style="margin-top:10px; margin-left:10px; width:670px; height:300px;"></div>
+		<%= Html.ActionLink("Export to CSV file", "GetRepoDownloadsCSV")%>
+		</td>
 		<td><div id="chartReposPie" class='plot' style="margin-top:10px; margin-left:10px; width:230px; height:230px;"></div></td>
 		</tr><tr>
-		<td><div id="chartAddins" class='plot' style="margin-top:10px; margin-left:10px; width:670px; height:300px;"></div></td>
+		<td><div id="chartAddins" class='plot' style="margin-top:10px; margin-left:10px; width:670px; height:300px;"></div>
+		<%= Html.ActionLink("Export to CSV file", "GetDownloadsCSV")%>
+		</td>
 		<td><div id="chartAddinsPie" class='plot' style="margin-top:10px; margin-left:10px; width:230px; height:230px;"></div></td>
 		</tr>
 		</table>

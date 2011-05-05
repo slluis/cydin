@@ -219,6 +219,40 @@ namespace Cydin.Models
 			return stats;
 		}
 
+		public string GetRepoDownloadStatsCSV ()
+		{
+			StringBuilder sb = new StringBuilder ();
+			sb.Append ("Release,Platform,Date,Downloads\n");
+			foreach (var rd in db.SelectObjectsWhere<RepositoryDownload> ("ApplicationId={0}", userModel.CurrentApplication.Id)) {
+				sb.Append (rd.TargetAppVersion).Append (',');
+				sb.Append (rd.Platform).Append (',');
+				sb.Append (rd.Date).Append (',');
+				sb.Append (rd.Downloads).AppendLine ();
+			}
+			return sb.ToString ();
+		}
+
+		public string GetDownloadStatsCSV ()
+		{
+			StringBuilder sb = new StringBuilder ();
+			sb.Append ("Release,Platform,Date,Addin,Version,DevStatus,Project,Downloads\n");
+			
+			string sql = "SELECT R.TargetAppVersion, R.Platform, R.Date, E.AddinId, E.Version, E.DevStatus, P.Name, R.Downloads FROM ReleasePackage R, `Release` E, Project P where P.ApplicationId={0} AND R.ReleaseId = E.Id AND E.ProjectId = P.Id";
+			using (DbDataReader r = db.ExecuteSelect (sql, userModel.CurrentApplication.Id)) {
+				while (r.Read ()) {
+					sb.Append (r.GetString (0)).Append (',');
+					sb.Append (r.GetString (1)).Append (',');
+					sb.Append (r.GetDateTime (2).ToString ("u")).Append (',');
+					sb.Append (r.GetString (3)).Append (',');
+					sb.Append (r.GetString (4)).Append (',');
+					sb.Append ((DevStatus)r.GetInt32 (5)).Append (','); // DevStatus
+					sb.Append (r.GetString (6)).Append (',');
+					sb.Append (r.GetInt32 (7)).AppendLine ();
+				}
+			}
+			return sb.ToString ();
+		}
+
 		public DownloadStats GetTotalDownloadStats (TimePeriod period, DateTime startDate, DateTime endDate)
 		{
 			return GetDownloadStats (period, startDate, endDate, "", "1=1", null);

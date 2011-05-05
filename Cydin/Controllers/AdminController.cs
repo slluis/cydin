@@ -7,6 +7,7 @@ using Cydin.Models;
 using Cydin.Builder;
 using Cydin.Properties;
 using System.Text;
+using System.IO;
 
 namespace Cydin.Controllers
 {
@@ -88,6 +89,28 @@ namespace Cydin.Controllers
 				sb.AppendFormat ("{{\"count\":{0},\"platform\":\"{1}\",\"projectId\":{2},\"appVersion\":\"{3}\",\"name\":\"{4}\"}}", di.Count, di.Platform, di.Release.ProjectId, di.Release.TargetAppVersion, di.Release.AddinName + " v" + di.Release.Version);
 			}
 			return Content ("[" + sb + "]");
+		}
+		
+		public ActionResult GetRepoDownloadsCSV (string period, string arg)
+		{
+			CurrentUserModel.CheckIsAdmin ();
+			MemoryStream ms = new MemoryStream ();
+			StreamWriter sw = new StreamWriter (ms);
+			sw.Write (CurrentUserModel.Stats.GetRepoDownloadStatsCSV ());
+			sw.Flush ();
+			ms.Position = 0;
+			return File (ms, "text/plain", "repository-download.csv");
+		}
+		
+		public ActionResult GetDownloadsCSV (string period, string arg)
+		{
+			CurrentUserModel.CheckIsAdmin ();
+			MemoryStream ms = new MemoryStream ();
+			StreamWriter sw = new StreamWriter (ms);
+			sw.Write (CurrentUserModel.Stats.GetDownloadStatsCSV ());
+			sw.Flush ();
+			ms.Position = 0;
+			return File (ms, "text/plain", "addins-download.csv");
 		}
     }
 }
