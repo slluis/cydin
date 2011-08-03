@@ -47,7 +47,7 @@ namespace Cydin.Controllers
         {
 			if (Settings.Default.OperationMode != OperationMode.NotSet) {
 				if (!CurrentServiceModel.ThereIsAdministrator ())
-					return Redirect (ControllerHelper.GetActionUrl ("home", "User", "Login"));
+					return Redirect (ControllerHelper.GetActionUrl ("home", "Login", "User"));
 				else
 					RedirectToAction ("Index", "Home");
 			}

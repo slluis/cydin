@@ -28,8 +28,12 @@ namespace Cydin.Controllers
 				if (string.IsNullOrEmpty (app) || app == "home")
 					return Redirect (ControllerHelper.GetActionUrl ("home", "Index", "SiteHome"));
 			}
-			else if (CurrentUserModel.CurrentApplication == null)
-				return RedirectToAction ("Index", "SiteAdmin");
+			else if (CurrentUserModel.CurrentApplication == null) {
+				if (CurrentUserModel.User == null)
+					return Redirect (ControllerHelper.GetActionUrl ("home", "Login", "User"));
+				else
+					return RedirectToAction ("Index", "SiteAdmin");
+			}
 				
 			return View ();
 		}
