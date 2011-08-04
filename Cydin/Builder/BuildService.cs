@@ -224,6 +224,8 @@ namespace Cydin.Builder
 				List<Release> releases = new List<Release> ();
 	
 				foreach (Release rel in m.GetReleases ()) {
+					if (rel.Status == ReleaseStatus.Deleted)
+						continue;
 					foreach (string plat in rel.PlatformsList) {
 						string repoPath = Path.Combine (basePath, rel.DevStatus.ToString ());
 						repoPath = Path.Combine (repoPath, plat);
