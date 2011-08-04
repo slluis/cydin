@@ -1,8 +1,6 @@
--- MySQL dump 10.13  Distrib 5.1.46, for suse-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: cydin-md
 -- ------------------------------------------------------
--- Server version	5.1.46-log
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -40,10 +38,13 @@ CREATE TABLE `AppRelease` (
   `AddinRootVersion` varchar(50) DEFAULT NULL,
   `LastUpdateTime` datetime NOT NULL,
   `ApplicationId` int(11) NOT NULL,
+  `CompatibleAppReleaseId` int(11) DEFAULT NULL,
   PRIMARY KEY (`Id`),
   KEY `new_fk_AppRelease_Application` (`ApplicationId`),
-  CONSTRAINT `new_fk_AppRelease_Application` FOREIGN KEY (`ApplicationId`) REFERENCES `Application` (`Id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+  KEY `new_fk_CompatAppRelease` (`CompatibleAppReleaseId`),
+  CONSTRAINT `new_fk_AppRelease_Application` FOREIGN KEY (`ApplicationId`) REFERENCES `Application` (`Id`) ON DELETE CASCADE,
+  CONSTRAINT `new_fk_CompatAppRelease` FOREIGN KEY (`CompatibleAppReleaseId`) REFERENCES `AppRelease` (`Id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -58,7 +59,7 @@ CREATE TABLE `Application` (
   `Name` varchar(150) COLLATE utf8_unicode_ci NOT NULL,
   `Platforms` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL,
   `Description` text COLLATE utf8_unicode_ci,
-  `Subdomain` varchar(150) COLLATE utf8_unicode_ci NOT NULL,
+  `Subdomain` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -88,7 +89,7 @@ CREATE TABLE `Project` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `Name` varchar(150) DEFAULT NULL,
   `Description` text,
-  `Trusted` tinyint(1) NOT NULL,
+  `Flags` int(11) NOT NULL,
   `AddinId` varchar(500) DEFAULT NULL,
   `ApplicationId` int(11) NOT NULL,
   `IsPublic` tinyint(1) NOT NULL DEFAULT '1',
@@ -135,14 +136,34 @@ DROP TABLE IF EXISTS `ReleasePackage`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `ReleasePackage` (
   `ReleaseId` int(11) DEFAULT NULL,
-  `FileId` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `FileId` varchar(500) NOT NULL,
   `Downloads` int(11) NOT NULL,
-  `Platform` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `TargetAppVersion` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  PRIMARY KEY (`FileId`),
+  `Platform` varchar(50) NOT NULL,
+  `TargetAppVersion` varchar(50) NOT NULL,
+  `Date` date NOT NULL,
+  PRIMARY KEY (`FileId`,`Date`) USING BTREE,
   KEY `fk_ReleasePackage_Release` (`ReleaseId`),
-  CONSTRAINT `fk_ReleasePackage_Release` FOREIGN KEY (`ReleaseId`) REFERENCES `Release` (`Id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  CONSTRAINT `fk_ReleasePackage_Release` FOREIGN KEY (`ReleaseId`) REFERENCES `Release` (`Id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `RepositoryDownload`
+--
+
+DROP TABLE IF EXISTS `RepositoryDownload`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `RepositoryDownload` (
+  `Platform` varchar(50) NOT NULL,
+  `TargetAppVersion` varchar(50) NOT NULL,
+  `Date` date NOT NULL,
+  `ApplicationId` int(11) NOT NULL,
+  `Downloads` int(11) NOT NULL,
+  PRIMARY KEY (`Platform`,`TargetAppVersion`,`Date`,`ApplicationId`),
+  KEY `new_fk_RD_Application` (`ApplicationId`),
+  CONSTRAINT `new_fk_RD_Application` FOREIGN KEY (`ApplicationId`) REFERENCES `Application` (`Id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -287,4 +308,3 @@ CREATE TABLE `sysdiagrams` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-10-20 12:19:10
