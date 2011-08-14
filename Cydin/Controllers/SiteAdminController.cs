@@ -166,6 +166,20 @@ namespace Cydin.Controllers
 			System.IO.File.WriteAllText (BuildService.LogFile, "");
 			return RedirectToAction ("Index");
 		}
+		
+		public ActionResult AddUser (string login, string password, string email)
+		{
+			CurrentUserModel.CheckIsSiteAdmin ();
+			
+			User u = new User ();
+			u.Email = email;
+			u.Login = login;
+			u.Name = login;
+			u.SetPassword (password);
+			
+			CurrentServiceModel.CreateUser (u);
+			return RedirectToAction ("Index");
+		}
 	}
 }
 

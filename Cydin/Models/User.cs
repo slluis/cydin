@@ -36,7 +36,7 @@ namespace Cydin.Models
 		
 		public bool CheckPassword (string password)
 		{
-			SHA256 shaM = new SHA256Managed(); 
+			SHA256 shaM = new SHA256Managed();
 			byte[] result = shaM.ComputeHash (System.Text.Encoding.UTF8.GetBytes (password + PasswordSalt));
 			return PasswordHash == Convert.ToBase64String (result);
 		}

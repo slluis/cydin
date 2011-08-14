@@ -3,7 +3,9 @@ using System.Linq;
 using System.Web.Services;
 using Cydin.Models;
 using System.Collections.Generic;
-
+using System.Security.Cryptography;
+using System.Text;
+	
 namespace Cydin
 {
 	public class UserService : System.Web.Services.WebService
@@ -89,17 +91,17 @@ namespace Cydin
 		}
 		
 		[WebMethod]
-		public int UploadAddin (LoginInfo login, string projectName, string targetAppVersion, string[] platforms, byte[] fileContent)
+		public SourceTagAddinInfo UploadAddin (LoginInfo login, string projectName, string targetAppVersion, string[] platforms, byte[] fileContent)
 		{
 			using (UserModel m = GetUserModel (login)) {
 				int pid = GetProjectId (m, projectName);
 				m.ValidateProject (pid);
-				return m.UploadRelease (pid, fileContent, targetAppVersion, platforms).Id;
+				return new SourceTagAddinInfo (m.UploadRelease (pid, fileContent, targetAppVersion, platforms));
 			}
 		}
 		
 		[WebMethod]
-		public void PublishAddin (LoginInfo login, int addinSourceId, DevStatus devStatus)
+		public ReleaseInfo PublishAddin (LoginInfo login, int addinSourceId, DevStatus devStatus)
 		{
 			using (UserModel m = GetUserModel (login)) {
 				var st = m.GetSourceTag (addinSourceId);
@@ -107,7 +109,38 @@ namespace Cydin
 					st.DevStatus = devStatus;
 					m.UpdateSourceTag (st);
 				}
-				m.PublishRelease (addinSourceId);
+				return new ReleaseInfo (m.PublishRelease (addinSourceId));
+			}
+		}
+		
+		[WebMethod]
+		public string GetSourceTagPackageHash (LoginInfo login, int sourceId, string platform)
+		{
+			using (UserModel m = GetUserModel (login)) {
+				var rel = m.GetSourceTag (sourceId);
+				string file = rel.GetFilePath (platform);
+				using (var f = System.IO.File.OpenRead (file)) {
+					MD5 md5 = MD5.Create ();
+					byte[] hash = md5.ComputeHash (f);
+					StringBuilder sb = new StringBuilder ();
+					foreach (byte b in hash)
+						sb.Append (b.ToString ("x"));
+					return sb.ToString ();
+				}
+			}
+		}
+		
+		[WebMethod]
+		public string GetReleasePackageHash (LoginInfo login, int releaseId, string platform)
+		{
+			using (UserModel m = GetUserModel (login)) {
+				var rel = m.GetRelease (releaseId);
+				string file = rel.GetFilePath (platform);
+				using (var f = System.IO.File.OpenRead (file)) {
+					MD5 md5 = MD5.Create ();
+					byte[] hash = md5.ComputeHash (f);
+					return Convert.ToBase64String (hash);
+				}
 			}
 		}
 	}

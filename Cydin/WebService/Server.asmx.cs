@@ -247,6 +247,7 @@ namespace Cydin
 			LastRevision = st.LastRevision;
 			Url = st.Url;
 			Status = st.Status;
+			DevStatus = st.DevStatus;
 		}
 		
 		public void MergeTo (SourceTag st)
@@ -262,6 +263,7 @@ namespace Cydin
 		public string LastRevision { get; set; }
 		public string Url { get; set; }
 		public string Status { get; set; }
+		public DevStatus DevStatus { get; set; }
 	}
 	
 	[XmlType ("AddinData")]
@@ -272,6 +274,7 @@ namespace Cydin
 		public string AddinId { get; set; }
 		public string AppVersion { get; set; }
 		public string Platforms { get; set; }
+		public DevStatus DevStatus { get; set; }
 		
 		public SourceTagAddinInfo ()
 		{
@@ -284,6 +287,7 @@ namespace Cydin
 			AddinId = stag.AddinId;
 			AppVersion = stag.TargetAppVersion;
 			Platforms = stag.Platforms;
+			DevStatus = stag.DevStatus;
 		}
 	}
 	
@@ -301,6 +305,7 @@ namespace Cydin
 			TargetAppVersion = rel.TargetAppVersion;
 			Platforms = rel.PlatformsList;
 			Status = rel.Status;
+			DevStatus = rel.DevStatus;
 		}
 
 
@@ -310,6 +315,7 @@ namespace Cydin
 		public string TargetAppVersion { get; set; }
 		public string[] Platforms { get; set; }
 		public string Status { get; set; }
+		public DevStatus DevStatus { get; set; }
 	}
 	
 	public class AppReleaseInfo

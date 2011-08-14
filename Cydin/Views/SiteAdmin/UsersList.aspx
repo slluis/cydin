@@ -20,5 +20,10 @@
 </tr>
 <% } %>
 </table>
+
+<p>Add new user:</p>
+<% using (Html.BeginForm ("AddUser", "SiteAdmin")) {%>
+Login: <input name="login" type="text" />&nbsp;&nbsp;Password: <input name="password" type="password" />&nbsp;&nbsp;E-mail: <input name="email" type="text" />&nbsp;&nbsp;<input type="submit"/>
+<% } %>		
 </body>
 </html>
