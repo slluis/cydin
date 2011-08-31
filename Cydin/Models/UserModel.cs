@@ -32,13 +32,19 @@ namespace Cydin.Models
 
 		public static UserModel GetCurrent ()
 		{
-			string login = HttpContext.Current.User.Identity.Name;
-			
+			return GetForUser (HttpContext.Current.User.Identity.Name, null, -1);
+		}
+		
+		public static UserModel GetForUser (string login, string password, int appId)
+		{
 			UserModel m = new UserModel ();
 			
 			m.db = DataConnection.GetConnection ();
 			
-			if (Settings.Default.SupportsMultiApps) {
+			if (appId != -1) {
+				m.application = m.db.SelectObjectById<Application> (appId);
+			}
+			else if (Settings.Default.SupportsMultiApps) {
 				string app = GetCurrentAppName ();
 				if (app != null)
 					m.application = m.db.SelectObjectWhere<Application> ("Subdomain={0}", app);
@@ -48,8 +54,11 @@ namespace Cydin.Models
 			}
 			
 			ServiceModel sm = ServiceModel.GetCurrent ();
-			if (!string.IsNullOrEmpty (login))
+			if (!string.IsNullOrEmpty (login)) {
 				m.user = sm.GetUser (login);
+				if (password != null && !m.user.CheckPassword (password))
+					m.user = null;
+			}
 			sm.Dispose ();
 			
 			if (m.application != null && m.user != null) {
@@ -261,6 +270,11 @@ namespace Cydin.Models
 			return db.SelectObjectById<Project> (id);
 		}
 
+		public Project GetProjectByName (string name)
+		{
+			return db.SelectObjectWhere<Project> ("Name={0}", name);
+		}
+
 		public void CreateProject (Project p)
 		{
 			p.ApplicationId = application.Id;
@@ -409,7 +423,17 @@ namespace Cydin.Models
 			}
 		}
 
-		public void UploadRelease (int projectId, HttpPostedFileBase file, string appVersion, string[] platforms)
+		public SourceTag UploadRelease (int projectId, byte[] fileData, string appVersion, string[] platforms)
+		{
+			return UploadRelease (projectId, null, fileData, appVersion, platforms);
+		}
+		
+		public SourceTag UploadRelease (int projectId, HttpPostedFileBase file, string appVersion, string[] platforms)
+		{
+			return UploadRelease (projectId, file, null, appVersion, platforms);
+		}
+		
+		SourceTag UploadRelease (int projectId, HttpPostedFileBase file, byte[] fileData, string appVersion, string[] platforms)
 		{
 			if (platforms.Length == 0)
 				throw new Exception ("No platform selected");
@@ -440,12 +464,18 @@ namespace Cydin.Models
 			
 			if (platforms.Length == CurrentApplication.PlatformsList.Length) {
 				filePath = Path.Combine (st.PackagesPath, "All.mpack");
-				file.SaveAs (filePath);
+				if (file != null)
+					file.SaveAs (filePath);
+				else
+					File.WriteAllBytes (filePath, fileData);
 			}
 			else {
 				foreach (string plat in platforms) {
 					filePath = Path.Combine (st.PackagesPath, plat + ".mpack");
-					file.SaveAs (filePath);
+					if (file != null)
+						file.SaveAs (filePath);
+					else
+						File.WriteAllBytes (filePath, fileData);
 				}
 			}
 			AddinInfo mpack = ReadAddinInfo (filePath);
@@ -453,6 +483,7 @@ namespace Cydin.Models
 			st.AddinVersion = mpack.Version;
 			
 			db.UpdateObject (st);
+			return st;
 		}
 
 		internal static AddinInfo ReadAddinInfo (string file)

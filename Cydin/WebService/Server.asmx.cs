@@ -191,6 +191,13 @@ namespace Cydin
 		}
 	}
 	
+	public class LoginInfo
+	{
+		public string User { get; set; }
+		public string Password { get; set; }
+		public int AppId { get; set; }
+	}
+	
 	public class SourceInfo
 	{
 		public SourceInfo ()
@@ -260,10 +267,24 @@ namespace Cydin
 	[XmlType ("AddinData")]
 	public class SourceTagAddinInfo
 	{
+		public int Id { get; set; }
 		public string AddinVersion { get; set; }
 		public string AddinId { get; set; }
 		public string AppVersion { get; set; }
 		public string Platforms { get; set; }
+		
+		public SourceTagAddinInfo ()
+		{
+		}
+		
+		public SourceTagAddinInfo (SourceTag stag)
+		{
+			Id = stag.Id;
+			AddinVersion = stag.AddinVersion;
+			AddinId = stag.AddinId;
+			AppVersion = stag.TargetAppVersion;
+			Platforms = stag.Platforms;
+		}
 	}
 	
 	public class ReleaseInfo

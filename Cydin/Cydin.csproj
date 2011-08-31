@@ -37,53 +37,40 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Linq" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.ComponentModel.DataAnnotations">
-    </Reference>
-    <Reference Include="System.Core">
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-    </Reference>
-    <Reference Include="System.Xml.Linq">
-    </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Web" />
-    <Reference Include="System.Web.Extensions">
-    </Reference>
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Abstractions" />
     <Reference Include="System.Web.Routing" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.EnterpriseServices" />
-    <Reference Include="System.Web.Mvc, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="System.Web.Mvc">
       <HintPath>libs\System.Web.Mvc.dll</HintPath>
     </Reference>
-    <Reference Include="ICSharpCode.SharpZipLib, Version=2.84.0.0, Culture=neutral, PublicKeyToken=1b03e6acf1164f73">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>libs\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
-    <Reference Include="Mono.Addins, Version=0.5.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Mono.Addins">
       <HintPath>libs\Mono.Addins.dll</HintPath>
     </Reference>
-    <Reference Include="Mono.Addins.Setup, Version=0.5.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Mono.Addins.Setup">
       <HintPath>libs\Mono.Addins.Setup.dll</HintPath>
     </Reference>
-    <Reference Include="MySql.Data, Version=6.2.3.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="MySql.Data">
       <HintPath>libs\mysql.data.dll</HintPath>
     </Reference>
-    <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="log4net">
       <HintPath>libs\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="DotNetOpenAuth, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="DotNetOpenAuth">
       <HintPath>libs\DotNetOpenAuth.dll</HintPath>
     </Reference>
-    <Reference Include="Contracts_Standalone, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Contracts_Standalone">
       <HintPath>libs\Contracts.dll</HintPath>
     </Reference>
   </ItemGroup>
@@ -145,6 +132,9 @@
     <Compile Include="Models\RepositoryDownload.cs" />
     <Compile Include="Models\DownloadStats.cs" />
     <Compile Include="Models\StatsModel.cs" />
+    <Compile Include="WebService\UserService.asmx.cs">
+      <DependentUpon>UserService.asmx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
@@ -215,6 +205,7 @@
     <Content Include="Media\md-menu-bg.png" />
     <Content Include="Media\signin-myopenid.png" />
     <Content Include="Media\chart_bar.png" />
+    <Content Include="WebService\UserService.asmx" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -56,6 +56,12 @@ namespace Cydin.Properties
         [DataMember]
 		public string PreviousWebSiteHost { get; set; }
 		
+        [DataMember]
+		public string RootPath { get; set; }
+		
+        [DataMember (DefaultValue = MaintenanceMode.Disabled)]
+		public MaintenanceMode MaintenanceMode { get; set; }
+		
 		public string WebSiteUrl {
 			get { return "http://" + WebSiteHost; }
 		}
@@ -84,4 +90,11 @@ namespace Cydin.Properties
 		MultiAppDomain = 2,
 		MultiAppPath = 3
 	}
+	
+	public enum MaintenanceMode {
+		Disabled = 0,
+		NoWrites = 1,
+		NoReadWrites = 2
+	}
+		
 }
