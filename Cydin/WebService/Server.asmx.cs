@@ -167,7 +167,7 @@ namespace Cydin
 			List<AppReleaseInfo> list = new List<AppReleaseInfo> ();
 			using (UserModel m = UserModel.GetAdmin (appId)) {
 				foreach (AppRelease r in m.GetAppReleases ()) {
-					list.Add (new AppReleaseInfo (r));
+					list.Add (new AppReleaseInfo (m, r));
 				}
 				return list.ToArray ();
 			}
@@ -324,16 +324,23 @@ namespace Cydin
 		{
 		}
 		
-		public AppReleaseInfo (AppRelease r)
+		public AppReleaseInfo (UserModel m, AppRelease r)
 		{
 			Id = r.Id;
 			AppVersion = r.AppVersion;
+			AddinRootVersion = r.AddinRootVersion;
 			LastUpdateTime = r.LastUpdateTime;
+			if (r.CompatibleAppReleaseId != null) {
+				var cr = m.GetAppRelease (r.CompatibleAppReleaseId.Value);
+				CompatibleAppVersion = cr.AppVersion;
+			}
 			ZipUrl = "/Project/AppReleasePackage/" + Id;
 		}
 
 		public int Id { get; set; }
 		public string AppVersion { get; set; }
+		public string AddinRootVersion { get; set; }
+		public string CompatibleAppVersion { get; set; }
 		public string ZipUrl { get; set; }
 		public DateTime LastUpdateTime { get; set; }
 	}

@@ -65,12 +65,12 @@ namespace Cydin
 		}
 		
 		[WebMethod]
-		public AppReleaseInfo[] GetAppReleases (LoginInfo login, int appId)
+		public AppReleaseInfo[] GetAppReleases (LoginInfo login)
 		{
 			List<AppReleaseInfo> list = new List<AppReleaseInfo> ();
 			using (UserModel m = GetUserModel (login)) {
 				foreach (AppRelease r in m.GetAppReleases ()) {
-					list.Add (new AppReleaseInfo (r));
+					list.Add (new AppReleaseInfo (m, r));
 				}
 				return list.ToArray ();
 			}
@@ -83,10 +83,44 @@ namespace Cydin
 				AppRelease rel = new AppRelease ();
 				rel.AppVersion = version;
 				rel.AddinRootVersion = addinsVersion;
-				var compatRel = m.GetAppReleases ().FirstOrDefault (r => r.AppVersion == compatibleVersion);
-				if (compatRel != null)
-					rel.CompatibleAppReleaseId = compatRel.Id;
+				if (!string.IsNullOrEmpty (compatibleVersion)) {
+					var compatRel = m.GetAppReleases ().FirstOrDefault (r => r.AppVersion == compatibleVersion);
+					if (compatRel != null)
+						rel.CompatibleAppReleaseId = compatRel.Id;
+					else
+						throw new Exception ("Invalid compatible release number. Release '" + compatibleVersion + "' not found");
+				}
 				m.CreateAppRelease (rel, null);
+			}
+		}
+		
+		[WebMethod]
+		public void UpdateAppRelease (LoginInfo login, AppReleaseInfo appRelease)
+		{
+			using (UserModel m = GetUserModel (login)) {
+				var arel = m.GetAppRelease (appRelease.Id);
+				if (arel == null)
+					throw new Exception ("Release not found: " + appRelease.Id);
+				arel.AppVersion = appRelease.AppVersion;
+				if (!string.IsNullOrEmpty (appRelease.CompatibleAppVersion)) {
+					var compatRel = m.GetAppReleases ().FirstOrDefault (r => r.AppVersion == appRelease.CompatibleAppVersion);
+					if (compatRel != null)
+						arel.CompatibleAppReleaseId = compatRel.Id;
+					else
+						throw new Exception ("Invalid compatible release number. Release '" + appRelease.CompatibleAppVersion + "' not found");
+				} else
+					arel.CompatibleAppReleaseId = null;
+				
+				m.UpdateAppRelease (arel, null);
+			}
+		}
+		
+		[WebMethod]
+		public void DeleteAppRelease (LoginInfo login, AppReleaseInfo appRelease)
+		{
+			using (UserModel m = GetUserModel (login)) {
+				var arel = m.GetAppRelease (appRelease.Id);
+				m.DeleteAppRelease (arel.Id);
 			}
 		}
 		
