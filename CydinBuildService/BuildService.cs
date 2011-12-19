@@ -200,7 +200,6 @@ namespace CydinBuildService
 		public void RefreshAppRelease (BuildContext ctx, AppReleaseInfo release)
 		{
 			string filePath = release.GetAssembliesPath (ctx);
-			string file = Path.Combine (filePath, "__release.zip");
 
 			string timestamp = release.LastUpdateTime.ToString ();
 			string timestampFile = Path.Combine (filePath, "__timestamp");
@@ -220,24 +219,85 @@ namespace CydinBuildService
 			
 			WebRequest req = HttpWebRequest.Create (ctx.ServerUrl + release.ZipUrl);
 			WebResponse res = req.GetResponse ();
+			string wfname = res.Headers["Content-Disposition"];
+			string ext;
+			if (string.IsNullOrEmpty (wfname))
+				ext = ".zip";
+			else
+				ext = Path.GetExtension (wfname);
+			
+			string file = Path.Combine (filePath, "__release" + ext);
 			res.GetResponseStream ().SaveToFile (file);
 
 			ctx.Status = "Extracting assemblies for release " + release.AppVersion;
-
-			using (Stream fs = File.OpenRead (file)) {
-				ZipFile zfile = new ZipFile (fs);
-				foreach (ZipEntry ze in zfile) {
-					string fname = ze.Name.ToLower ();
-					if (fname.EndsWith (".dll") || fname.EndsWith (".exe")) {
-						using (Stream s = zfile.GetInputStream (ze)) {
-							s.SaveToFile (Path.Combine (filePath, Path.GetFileName (ze.Name)));
+			
+			if (ext == ".dmg") {
+				ExtractDmg (ctx, filePath, file);
+			}
+			else {
+				try {
+					using (Stream fs = File.OpenRead (file)) {
+						ZipFile zfile = new ZipFile (fs);
+						foreach (ZipEntry ze in zfile) {
+							string fname = ze.Name.ToLower ();
+							if (fname.EndsWith (".dll") || fname.EndsWith (".exe")) {
+								using (Stream s = zfile.GetInputStream (ze)) {
+									s.SaveToFile (Path.Combine (filePath, Path.GetFileName (ze.Name)));
+								}
+							}
 						}
 					}
+				} catch (ZipException) {
+					// Maybe it is a dmg after all
+					ExtractDmg (ctx, filePath, file);
 				}
 			}
 			File.Delete (file);
 			File.WriteAllText (timestampFile, timestamp);
 			ctx.Status = "Assembly package for release " + release.AppVersion + " isntalled";
+		}
+		
+		void ExtractDmg (BuildContext ctx, string filePath, string file)
+		{
+			ctx.Status ="Extracting DMG";
+			string tempPath = Path.Combine (filePath, "__tmp_release");
+			string tempPath2 = Path.Combine (filePath, "__tmp_release2");
+			Util.ResetFolder (tempPath);
+			try {
+				Run7z (file, tempPath);
+				string hfs = Directory.GetFiles (tempPath, "*.hfs").FirstOrDefault ();
+				if (hfs == null) {
+					ctx.Log (LogSeverity.Error, "Unknown release archive: " + file);
+					return;
+				}
+				Run7z (hfs, tempPath2);
+				CopyDlls (tempPath2, filePath);
+			} finally {
+				if (Directory.Exists (tempPath))
+					Directory.Delete (tempPath, true);
+				if (Directory.Exists (tempPath2))
+					Directory.Delete (tempPath2, true);
+			}
+		}
+		
+		void Run7z (string archiveFile, string targetDir)
+		{
+			RunCommand (true, "7z", "x -o" + targetDir + " " + archiveFile, new StringBuilder (), new StringBuilder (), Timeout.Infinite);
+		}
+		
+		void CopyDlls (string dir, string targetDir)
+		{
+			foreach (var f in Directory.GetFiles (dir)) {
+				if (f.IndexOf ("/moonlight/") != -1)
+					continue;
+				var ext = Path.GetExtension (f);
+				if (ext == ".dll" || ext == ".exe") {
+					string tfile = Path.Combine (targetDir, Path.GetFileName (f));
+					File.Copy (f, tfile, true);
+				}
+			}
+			foreach (var d in Directory.GetDirectories (dir))
+				CopyDlls (d, targetDir);
 		}
 
 		public void UpdateSourceTags (BuildContext ctx, ServerEventArgs ev)
