@@ -152,7 +152,7 @@ namespace Cydin.Controllers
 		public ActionResult AppReleasePackage (int id)
 		{
 			AppRelease release = CurrentServiceModel.GetAppRelease (id);
-			return File (release.ZipPath, "application/zip");
+			return File (release.ZipPath, "application/zip", Path.GetFileName (release.ZipPath));
 		}
 
 		public ActionResult ReleasePackageInstaller (int id)
