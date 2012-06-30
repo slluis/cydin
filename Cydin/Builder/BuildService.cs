@@ -289,7 +289,7 @@ namespace Cydin.Builder
 					string ds = r.Substring (basePath.Length + 1);
 					int i = ds.IndexOf (Path.DirectorySeparatorChar);
 					ds = ds.Substring (0, i);
-					string title = "MonoDevelop Add-in Repository";
+					string title = Cydin.Models.UserModel.GetSettings ().WebSiteUrl + " Add-in Repository";
 					if (ds != DevStatus.Stable.ToString())
 						title += " (" + ds + " channel)";
 					AppendName (mainFile, title);
