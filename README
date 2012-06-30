@@ -25,7 +25,7 @@ DEPENDENCIES
 
 The basic dependencies are:
 
-* Mono 2.6
+* Mono 2.6 (Install mono-complete or equivalent packages to get everything)
 * Mysql (tested with 5.1.46)
 
 Cydin also depends on some open source libraries which are included as
