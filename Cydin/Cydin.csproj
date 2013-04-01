@@ -64,6 +64,7 @@
     <Reference Include="MySql.Data">
       <HintPath>libs\mysql.data.dll</HintPath>
     </Reference>
+    <Reference Include="Mono.Data.Sqlite" />
     <Reference Include="log4net">
       <HintPath>libs\log4net.dll</HintPath>
     </Reference>
