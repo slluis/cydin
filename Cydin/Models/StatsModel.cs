@@ -309,6 +309,7 @@ namespace Cydin.Models
 		
 		void GetPeriod (TimePeriod period, DateTime t, out DateTime start, out DateTime end)
 		{
+			start = end = t;
 			switch (period) {
 			case TimePeriod.Day:
 				start = t.Date;

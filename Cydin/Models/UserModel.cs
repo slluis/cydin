@@ -903,13 +903,14 @@ namespace Cydin.Models
 
 		public void SetSourceTagStatus (SourceTag stag, string status)
 		{
+			bool statusChanged = stag.Status != status;
 			stag.Status = status;
 			stag.BuildDate = DateTime.Now;
 			db.UpdateObject (stag);
 			
 			Project p = GetProject (stag.ProjectId);
 
-			if (status == SourceTagStatus.BuildError) {
+			if (status == SourceTagStatus.BuildError && statusChanged) {
 				string subject = "Project build failed: " + p.Name + " (" + stag.Name + ")";
 				StringBuilder msg = new StringBuilder ();
 				msg.AppendLine ("The project **" + p.Name + "** failed to build.");
@@ -935,7 +936,7 @@ namespace Cydin.Models
 				msg.AppendFormat ("[View Build Log]({0}).\n", GetBuildLogUrl (stag.Id));
 				SendMail (subject, msg.ToString (), p.Id, ProjectNotification.BuildSuccess, ApplicationNotification.ProjectBuildSuccess);
 			}
-			else if (status == SourceTagStatus.FetchError) {
+			else if (status == SourceTagStatus.FetchError && statusChanged) {
 				string subject = "Project fetch failed: " + p.Name + " (" + stag.Name + ")";
 				StringBuilder msg = new StringBuilder ();
 				msg.AppendLine ("The source code of the project **" + p.Name + "** could not be fetched.");

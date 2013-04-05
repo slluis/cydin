@@ -145,7 +145,7 @@
 	foreach (var release in appReleases) { %>
     <tr>
     <td><%=release.LastChangeTime.ToShortDateString ()%></td>
-    <td><%=release.Version%> (<%=release.DevStatus%>)</td>
+    <td><%=release.AddinId%> <%=release.Version%> (<%=release.DevStatus%>)</td>
     <td>
 <!--    	<a href="<%=release.GetInstallerVirtualPath ()%>">Install</a> -->
         <% foreach (var plat in release.PlatformsList) { %>
