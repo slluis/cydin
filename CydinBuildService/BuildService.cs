@@ -445,18 +445,25 @@ namespace CydinBuildService
 			
 			string destPath = Path.GetFullPath (source.GetAddinSourcePath (ctx, stag));
 			string sourcePath = destPath;
+
 			if (!string.IsNullOrEmpty (source.Directory))
 				sourcePath = Path.Combine (sourcePath, NormalizePath (source.Directory));
+
 			sourcePath = Path.GetFullPath (sourcePath);
 			
 			if (sourcePath != destPath && !sourcePath.StartsWith (destPath))
 				throw new Exception ("Invalid source directory: " + source.Directory);
-			
-			string projectFile = Path.Combine (sourcePath, "addin-project.xml");
+
+			string projectFile = sourcePath;
+			if (!File.Exists (projectFile) && !projectFile.EndsWith (".xml"))
+				projectFile = Path.Combine (sourcePath, "addin-project.xml");
+			else
+				sourcePath = Path.GetDirectoryName (projectFile);
+
 			if (!File.Exists (projectFile)) {
 				string msg = "addin-project.xml file not found";
 				if (!string.IsNullOrEmpty (source.Directory))
-					msg += " (looked in '" + source.Directory + "' directory)";
+					msg += " (looked in '" + source.Directory + "')";
 				throw new Exception (msg);
 			}
 
