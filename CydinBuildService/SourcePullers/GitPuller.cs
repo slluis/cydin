@@ -132,6 +132,7 @@ namespace CydinBuildService
 			string gitDir = GetGitPath (ctx, sourceId);
 			RunCommand (gitDir, "reset --hard", null);
 			RunCommand (gitDir, "checkout " + bname, null);
+			RunCommand (gitDir, "submodule update --init --recursive", null);
 		}
 		
 		void UpdateRepo (BuildContext ctx, int sourceId, string url, StringBuilder output)
