@@ -44,7 +44,11 @@ function updateSelection ()
 
     <p>Specify the location of the version control repository where the project source code has to be pulled from. The specified location must follow some rules:</p>
 	<ul>
-		<li>The root directory must have a file named <b>addin-project.xml</b>, with the content specified <%= Html.ActionLink("here", "AddinProjectHelp", new { projectId=Model.ProjectId }, new { target="_blank" }) %>.</li>
+		<li>There must be a manifest file with information about how to build the project
+			<ul><li>The content of the file is specified <%= Html.ActionLink("here", "AddinProjectHelp", new { projectId=Model.ProjectId }, new { target="_blank" }) %>.
+			<li>By default, the file must be named <b>addin-project.xml</b> and must be located at the root directory.</li>
+			<li>You can use the <b>Manifest Path</b> field to specify a custom location and file name for the manifest.</li>
+			</ul></li>
 		<li>There must be a <b>MSbuild solution</b> or project file, which will be used to build the project.</li>
 	</ul>
 
@@ -77,7 +81,7 @@ function updateSelection ()
             </td>
             </tr>
             <tr>
-            <td><b>Directory</b></td>
+            <td><b>Manifest Path</b></td>
             <td>
                 <%= Html.TextBoxFor (model => model.Directory, new { style = "width:350px" })%>
                 <%= Html.ValidationMessageFor (model => model.Directory)%>
@@ -107,13 +111,13 @@ function updateSelection ()
             You can also import a set of branches or tags at a specified location. For example:
             <blockquote> https://test.googlecode.com/svn/trunk/tags/test-project/* </blockquote>
             When appending '*' to the URL, all branches or tags below the specified location will be imported.
-            <p>In the <b>Directory</b> field you can specify a directory relative to the repository root where the addin-project.xml file is located.</p>
+            <p>In the <b>Manifest Path</b> field you can specify a path relative to the repository root where the addin-project.xml file is located. It can be a file (in which case it doesn't need to be named addin-project.xml) or a directory.</p>
             </span>
             
 			<span id="help-GIT">
             The <b>URL</b> is the address of the source code repository. For example, to import a 'test-project' project hosted in github you would specify:
             <blockquote> git://github.com/someuser/test-project.git </blockquote>
-            <p>In the <b>Directory</b> field you can specify a directory relative to the repository root where the addin-project.xml file is located.</p>
+            <p>In the <b>Manifest Path</b> field you can specify a path relative to the repository root where the addin-project.xml file is located. It can be a file (in which case it doesn't need to be named addin-project.xml) or a directory.</p>
             <p>In the <b>Tags</b> and <b>Branches</b> fields you can specify a comma separated list of tags and branches to import.
             Wildcards are allowed, for example: "v1.0, v1.1, v2.*". If you want to import all branches or tags, specify "*" in the corresponding field.</p>
             </span>
@@ -121,7 +125,7 @@ function updateSelection ()
 			<span id="help-BZR">
             The URL is the address of the source code repository. For example, to import a 'test-project' project hosted in Launchpad you would specify:
             <blockquote> http://bazaar.launchpad.net/~someuser/test-project </blockquote>
-            <p>In the <b>Directory</b> field you can specify a directory relative to the repository root where the addin-project.xml file is located.</p>
+            <p>In the <b>Manifest Path</b> field you can specify a path relative to the repository root where the addin-project.xml file is located. It can be a file (in which case it doesn't need to be named addin-project.xml) or a directory.</p>
             <p>In the <b>Tags</b> field you can specify a comma separated list of tags to import.
             Wildcards are allowed, for example: "v1.0, v1.1, v2.*". If you want to import all tags, specify "*" in the corresponding field.</p>
             </span>
