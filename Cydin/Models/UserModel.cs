@@ -903,8 +903,15 @@ namespace Cydin.Models
 
 		public void SetSourceTagStatus (SourceTag stag, string status)
 		{
-			bool statusChanged = stag.Status != status;
+			bool statusChanged = false;
 			stag.Status = status;
+
+			if (status != SourceTagStatus.Building && status != SourceTagStatus.Fetching && status != SourceTagStatus.Waiting) {
+				// A final status
+				statusChanged = stag.LastStatus != status;
+				stag.LastStatus = status;
+			}
+
 			stag.BuildDate = DateTime.Now;
 			db.UpdateObject (stag);
 			

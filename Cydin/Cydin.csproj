@@ -212,7 +212,6 @@
     <Folder Include="WebService\" />
     <Folder Include="Views\SiteAdmin\" />
     <Folder Include="Views\Admin\" />
-    <Folder Include="Views\Admin\" />
     <Folder Include="Views\SiteHome\" />
     <Folder Include="Models\" />
   </ItemGroup>

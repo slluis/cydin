@@ -2,13 +2,14 @@
 <%@ Import Namespace="Cydin.Builder" %>
 <%@ Import Namespace="Cydin.Properties" %>
 <%@ Import Namespace="Cydin.Models" %>
+<%@ Import Namespace="System.Linq" %>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <body>
 
 <table>
 <tr><th>Project</th><th>Owner</th><th>Sources</th><th>Releases</th><th>Downloads</th></tr>
-<% foreach (Project p in CurrentUserModel.GetProjects ()) { %>
+<% foreach (Project p in CurrentUserModel.GetProjects ().OrderBy (p => p.Name)) { %>
 <tr>
 <td><%=Html.ActionLink (p.Name, "Index", "Project", new { id = p.Id }, null)%></td>
 <td>

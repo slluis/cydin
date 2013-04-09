@@ -37,6 +37,9 @@ namespace Cydin.Models
 
 		[DataMember]
 		public string Status { get; set; }
+		
+		[DataMember]
+		public string LastStatus { get; set; }
 
 		[DataMember]
 		public string Url { get; set; }

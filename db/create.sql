@@ -187,6 +187,7 @@ CREATE TABLE `SourceTag` (
   `DevStatus` int(11) NOT NULL DEFAULT '0',
   `AddinId` varchar(300) DEFAULT NULL,
   `BuildDate` datetime DEFAULT NULL,
+  `LastStatus` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`Id`),
   KEY `new_fk_constraint_st_project` (`ProjectId`),
   KEY `new_fk_constraint_st_source` (`SourceId`),
