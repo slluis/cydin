@@ -60,6 +60,18 @@
 			var relid = $(this).attr("relid");
 			showStats(relid);
 		});
+    	$(".show-old-button").click (function() {
+			var section = $(this).attr("sectionId");
+			$(".release-row-" + section).css('display', '');
+			$(".show-old-row-" + section).hide ();
+			return false;
+		});
+    	$(".hide-old-button").click (function() {
+			var section = $(this).attr("sectionId");
+			$(".release-row-" + section).hide ();
+			$(".show-old-row-" + section).show ();
+			return false;
+		});
     });
     
 	function addOwner (dlg, mail)
@@ -125,46 +137,71 @@
     	Response.Write (Html.ActionLink ("Edit Name and Description", "Edit", "Project", new { id = Model.Id }, new { @class = "command" }));
     } %>
     <h2>Releases</h2>
-    
-    <% if (releases.Any ()) { 
-    foreach (var appRel in m.GetAppReleases ().OrderBy (r => r.AppVersion)) {
-    	var appReleases = releases.Where (r => r.TargetAppVersion == appRel.AppVersion).OrderBy (r => r.LastChangeTime).Reverse ();
+    <% if (releases.Any ()) { %>
+    <table width="100%">
+    <%
+    foreach (var appRel in m.GetAppReleases ().OrderBy (r => r.AppVersion).Reverse ()) {
+    	var appReleases = releases.Where (r => r.TargetAppVersion == appRel.AppVersion).ToList ();
+    	
     	if (!appReleases.Any())
     		continue;
+    	appReleases.Sort ((s1,s2) => Mono.Addins.Addin.CompareVersions (s2.Version, s1.Version));
+    	appReleases.Reverse ();
     %>
-    <h3><%=m.CurrentApplication.Name%> <%=appRel.AppVersion%></h3>
-    <table>
-    <thead>
-    <tr><th>Date</th><th>Release</th><th>Packages</th>
-    <% if (isProjectAdmin) { %>
-    <th>Downloads</th><th>Status</th><th></th></tr>
-    <% } %>
-    </thead>
+    <tr><td valign="top">
+    <b><%=m.CurrentApplication.Name%> <%=appRel.AppVersion%></b>
+    </td>
+    <td valign="top">
+    <table width="100%">
     <tbody>
     <%
+    bool showingLatest = true;
 	foreach (var release in appReleases) { %>
+	
+    <% if (showingLatest && release != appReleases[0] && release.Status != ReleaseStatus.PendingReview) { 
+    	showingLatest = false;
+    %>
+    <tr class="show-old-row-<%=appRel.Id%>"><td>
+    <a href="#" class='show-old-button' sectionId="<%=appRel.Id%>">Show old releases</a>
+    </td></tr>
+    </tbody>
+    <tbody class="release-row-<%=appRel.Id%>" style="display:none">
+    <% } %>
+    
     <tr>
-    <td><%=release.LastChangeTime.ToShortDateString ()%></td>
-    <td><%=release.AddinId%> <%=release.Version%> (<%=release.DevStatus%>)</td>
-    <td>
+    <td valign="top" style="padding-top:0" width="50%">
+    <b><%=release.Version%> (<%=release.DevStatus%>)</b><br/>
+    <%=release.AddinId%><br/>
+    <%=release.LastChangeTime.ToShortDateString ()%>
+    </td>
+    <td valign="top" style="padding-top:0" width="50%">
 <!--    	<a href="<%=release.GetInstallerVirtualPath ()%>">Install</a> -->
+		<img src="/Media/package.png"/>
         <% foreach (var plat in release.PlatformsList) { %>
             <a href="<%=release.GetPublishedVirtualPath (plat)%>"><%=plat%></a>
         <% } %>
+	    <% if (isProjectAdmin) { %>
+	    <br/><a href="#" class="release-stats-button" relid="<%=release.Id%>"><img src="/Media/chart_bar.png"/> <%=m.Stats.GetDownloadSummary (release)%></a>
+	    <% } %>
     </td>
 
     <% if (isProjectAdmin) { %>
-    <td><a href="#" class="release-stats-button" relid="<%=release.Id%>"><img src="/Media/chart_bar.png"/> <%=m.Stats.GetDownloadSummary (release)%></a></td>
-    <td><%=release.Status%></td>
-	<td><a href="#" class="delete-release-button command" relid="<%=release.Id%>">Delete</a></td>
+	<td valign="top" style="padding-top:0" width="1%"><%=release.Status%><br/><br/><a href="#" class="delete-release-button command" relid="<%=release.Id%>">Delete</a></td>
     <% } %>
 
     </tr>
     <% } %>
+    <% if (!showingLatest) { %>
+    <tr><td>
+    <a href="#" class='hide-old-button' sectionId="<%=appRel.Id%>">Hide old releases</a>
+    </td></tr>
+    <% } %>
     </tbody>
     </table>
-    <% } }
-       else {/* if (Model.Releases.Any ())*/ %>
+    </td></tr>
+    <% } %>
+    </table>
+    <% } else {/* if (Model.Releases.Any ())*/ %>
        <p>There isn't yet any release.</p>
     <% } %>
 
@@ -173,7 +210,7 @@
     <h2>Sources</h2>
 
     <% if (sourceTags.Any ()) {
-    	List<string> rels = m.GetAppReleases ().OrderBy (r => r.AppVersion).Select (r => r.AppVersion).ToList ();
+    	List<string> rels = m.GetAppReleases ().OrderBy (r => r.AppVersion).Reverse().Select (r => r.AppVersion).ToList ();
     	rels.Add ("");
     	bool oneShown = false;
     	foreach (var appRel in rels) {

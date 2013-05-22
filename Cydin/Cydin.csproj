@@ -206,6 +206,7 @@
     <Content Include="Media\signin-myopenid.png" />
     <Content Include="Media\chart_bar.png" />
     <Content Include="WebService\UserService.asmx" />
+    <Content Include="Media\package.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

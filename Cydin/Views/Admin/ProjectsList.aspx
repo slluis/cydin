@@ -11,10 +11,10 @@
 <tr><th>Project</th><th>Owner</th><th>Sources</th><th>Releases</th><th>Downloads</th></tr>
 <% foreach (Project p in CurrentUserModel.GetProjects ().OrderBy (p => p.Name)) { %>
 <tr>
-<td><%=Html.ActionLink (p.Name, "Index", "Project", new { id = p.Id }, null)%></td>
+<td><%=Html.ActionLink (p.Name ?? "?", "Index", "Project", new { id = p.Id }, null)%></td>
 <td>
 	<% foreach (User u in CurrentUserModel.GetProjectOwners (p)) { %>
-		<%=Html.ActionLink (u.Login, "Profile", "User", u, null)%> 
+		<%=Html.ActionLink (u.Login ?? "?", "Profile", "User", u, null)%> 
 	<% } %>
 </td>
 <td>
