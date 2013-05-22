@@ -222,11 +222,14 @@ namespace Cydin.Builder
 				HashSet<string> reposToBuild = new HashSet<string> ();
 	
 				List<Release> releases = new List<Release> ();
-	
-				foreach (Release rel in m.GetReleases ()) {
+				var allReleases = m.GetReleases ().ToList ();
+
+				foreach (Release rel in allReleases) {
 					if (rel.Status == ReleaseStatus.Deleted)
 						continue;
 					foreach (string plat in rel.PlatformsList) {
+						if (!IsLatestRelease (allReleases, rel, plat))
+							continue;
 						string repoPath = Path.Combine (basePath, rel.DevStatus.ToString ());
 						repoPath = Path.Combine (repoPath, plat);
 						repoPath = Path.Combine (repoPath, rel.TargetAppVersion);
@@ -299,6 +302,17 @@ namespace Cydin.Builder
 				foreach (Release rel in releases)
 					m.SetPublished (rel);
 			}
+		}
+
+		static bool IsLatestRelease (List<Release> releases, Release release, string platform)
+		{
+			return !releases.Any (r => r.ProjectId == release.ProjectId && 
+				r.AddinId == release.AddinId && 
+				(r.Status == ReleaseStatus.Published || r.Status == ReleaseStatus.PendingPublish) &&
+				r.PlatformsList.Contains (platform) &&
+				r.TargetAppVersion == release.TargetAppVersion &&
+				(Mono.Addins.Addin.CompareVersions (r.Version, release.Version) < 0 || (r.Version == release.Version && r.LastChangeTime > release.LastChangeTime))
+			);
 		}
 		
 		static void AppendName (string file, string name)
