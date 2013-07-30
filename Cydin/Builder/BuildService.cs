@@ -213,6 +213,7 @@ namespace Cydin.Builder
 		{
 			using (UserModel m = UserModel.GetAdmin (appId)) {
 				string basePath = AddinsPath;
+				cachedCompatibleVersions = new Dictionary<string, string[]> ();
 	
 				SetupService setupService = new SetupService ();
 				LocalStatusMonitor monitor = new LocalStatusMonitor ();
@@ -221,36 +222,42 @@ namespace Cydin.Builder
 				FindFiles (fileList, basePath);
 				HashSet<string> reposToBuild = new HashSet<string> ();
 	
-				List<Release> releases = new List<Release> ();
+				HashSet<Release> releases = new HashSet<Release> ();
 				var allReleases = m.GetReleases ().ToList ();
+
+				List<AppRelease> allAppReleases = m.GetAppReleases ().ToList ();
 
 				foreach (Release rel in allReleases) {
 					if (rel.Status == ReleaseStatus.Deleted)
 						continue;
-					foreach (string plat in rel.PlatformsList) {
-						if (!IsLatestRelease (allReleases, rel, plat))
-							continue;
-						string repoPath = Path.Combine (basePath, rel.DevStatus.ToString ());
-						repoPath = Path.Combine (repoPath, plat);
-						repoPath = Path.Combine (repoPath, rel.TargetAppVersion);
-						string path = Path.GetFullPath (Path.Combine (repoPath, rel.AddinId + "-" + rel.Version + ".mpack"));
-						fileList.Remove (path);
-						if (rel.Status == ReleaseStatus.PendingPublish || updateAll) {
-							if (!Directory.Exists (repoPath))
-								Directory.CreateDirectory (repoPath);
-							if (!File.Exists (rel.GetFilePath (plat))) {
-								Log (LogSeverity.Error, "Could not publish release " + rel.Version + " of add-in " + rel.AddinId + ". File " + rel.GetFilePath (plat) + " not found");
+
+					// Register the add-in for each compatible repo
+					foreach (var appVersion in GetNewerCompatibleAppVersions (m, allAppReleases, rel.TargetAppVersion)) {
+						foreach (string plat in rel.PlatformsList) {
+							if (!IsLatestRelease (m, allReleases, rel, plat, appVersion))
 								continue;
+							string repoPath = Path.Combine (basePath, rel.DevStatus.ToString ());
+							repoPath = Path.Combine (repoPath, plat);
+							repoPath = Path.Combine (repoPath, appVersion);
+							string path = Path.GetFullPath (Path.Combine (repoPath, rel.AddinId + "-" + rel.Version + ".mpack"));
+							fileList.Remove (path);
+							if (rel.Status == ReleaseStatus.PendingPublish || updateAll) {
+								if (!Directory.Exists (repoPath))
+									Directory.CreateDirectory (repoPath);
+								if (!File.Exists (rel.GetFilePath (plat))) {
+									Log (LogSeverity.Error, "Could not publish release " + rel.Version + " of add-in " + rel.AddinId + ". File " + rel.GetFilePath (plat) + " not found");
+									continue;
+								}
+								File.Copy (rel.GetFilePath (plat), path, true);
+								GenerateInstallerFile (m, path, rel, plat);
+								reposToBuild.Add (repoPath);
+								if (!releases.Contains (rel) && rel.Status == ReleaseStatus.PendingPublish)
+									releases.Add (rel);
 							}
-							File.Copy (rel.GetFilePath (plat), path, true);
-							GenerateInstallerFile (m, path, rel, plat);
-							reposToBuild.Add (repoPath);
-							if (!releases.Contains (rel) && rel.Status == ReleaseStatus.PendingPublish)
-								releases.Add (rel);
 						}
 					}
 				}
-				foreach (AppRelease arel in m.GetAppReleases ()) {
+				foreach (AppRelease arel in allAppReleases) {
 					foreach (object status in Enum.GetValues (typeof(DevStatus))) {
 						foreach (string plat in m.CurrentApplication.PlatformsList) {
 							string repoPath = Path.Combine (basePath, status.ToString ());
@@ -282,13 +289,15 @@ namespace Cydin.Builder
 				}
 	
 				// Update the repos
+
+				var sortedRepos = reposToBuild.ToList ();
+				sortedRepos.Sort ((p1,p2) => Mono.Addins.Addin.CompareVersions (Path.GetFileName (Path.GetDirectoryName (p2)), Path.GetFileName (Path.GetDirectoryName (p1))));
 	
-				foreach (string r in reposToBuild) {
+				foreach (string r in sortedRepos) {
 					string mainFile = Path.Combine (r, "main.mrep");
 					if (File.Exists (mainFile))
 						File.Delete (mainFile);
 					setupService.BuildRepository (monitor, r);
-					AppendCompatibleRepo (m, mainFile);
 					string ds = r.Substring (basePath.Length + 1);
 					int i = ds.IndexOf (Path.DirectorySeparatorChar);
 					ds = ds.Substring (0, i);
@@ -304,13 +313,14 @@ namespace Cydin.Builder
 			}
 		}
 
-		static bool IsLatestRelease (List<Release> releases, Release release, string platform)
+		static bool IsLatestRelease (UserModel m, List<Release> releases, Release release, string platform, string targetAppVersion)
 		{
+			var compatReleases = GetCompatibleAppVersions (m, targetAppVersion);
 			return !releases.Any (r => r.ProjectId == release.ProjectId && 
 				r.AddinId == release.AddinId && 
 				(r.Status == ReleaseStatus.Published || r.Status == ReleaseStatus.PendingPublish) &&
 				r.PlatformsList.Contains (platform) &&
-				r.TargetAppVersion == release.TargetAppVersion &&
+				compatReleases.Contains (r.TargetAppVersion) &&
 				(Mono.Addins.Addin.CompareVersions (r.Version, release.Version) < 0 || (r.Version == release.Version && r.LastChangeTime > release.LastChangeTime))
 			);
 		}
@@ -327,6 +337,38 @@ namespace Cydin.Builder
 			repDoc.DocumentElement.AppendChild (nameElem);
 			nameElem.InnerText = name;
 			repDoc.Save (file);
+		}
+
+		static Dictionary<string,string[]> cachedCompatibleVersions = new Dictionary<string, string[]> ();
+
+		static List<string> GetNewerCompatibleAppVersions (UserModel m, List<AppRelease> allAppReleases, string appVersion)
+		{
+			List<string> res = new List<string> ();
+			foreach (var ar in allAppReleases) {
+				if (GetCompatibleAppVersions (m, ar.AppVersion).Contains (appVersion))
+					res.Add (ar.AppVersion);
+			}
+			return res;
+		}
+
+		static string[] GetCompatibleAppVersions (UserModel m, string appVersion)
+		{
+			string[] res;
+			if (!cachedCompatibleVersions.TryGetValue (appVersion, out res))
+				res = cachedCompatibleVersions [appVersion] = GetCompatibleAppVersionsRec (m, appVersion).ToArray ();
+			return res;
+		}
+
+		static IEnumerable<string> GetCompatibleAppVersionsRec (UserModel m, string appVersion)
+		{
+			yield return appVersion;
+
+			AppRelease rel = m.GetAppReleaseByVersion (appVersion);
+			if (rel != null && rel.CompatibleAppReleaseId.HasValue) {
+				rel = m.GetAppRelease (rel.CompatibleAppReleaseId.Value);
+				foreach (var v in GetCompatibleAppVersionsRec (m, rel.AppVersion))
+					yield return v;
+			}
 		}
 
 		static void AppendCompatibleRepo (UserModel m, string file)
