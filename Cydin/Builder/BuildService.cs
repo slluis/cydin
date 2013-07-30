@@ -234,7 +234,7 @@ namespace Cydin.Builder
 					// Register the add-in for each compatible repo
 					foreach (var appVersion in GetNewerCompatibleAppVersions (m, allAppReleases, rel.TargetAppVersion)) {
 						foreach (string plat in rel.PlatformsList) {
-							if (!IsLatestRelease (m, allReleases, rel, plat, appVersion))
+							if (!IsLatestRelease (m, allAppReleases, allReleases, rel, plat, appVersion))
 								continue;
 							string repoPath = Path.Combine (basePath, rel.DevStatus.ToString ());
 							repoPath = Path.Combine (repoPath, plat);
@@ -313,9 +313,9 @@ namespace Cydin.Builder
 			}
 		}
 
-		static bool IsLatestRelease (UserModel m, List<Release> releases, Release release, string platform, string targetAppVersion)
+		static bool IsLatestRelease (UserModel m, List<AppRelease> allAppReleases, List<Release> releases, Release release, string platform, string targetAppVersion)
 		{
-			var compatReleases = GetCompatibleAppVersions (m, targetAppVersion);
+			var compatReleases = GetCompatibleAppVersions (m, allAppReleases, targetAppVersion);
 			return !releases.Any (r => r.ProjectId == release.ProjectId && 
 				r.AddinId == release.AddinId && 
 				(r.Status == ReleaseStatus.Published || r.Status == ReleaseStatus.PendingPublish) &&
@@ -345,50 +345,29 @@ namespace Cydin.Builder
 		{
 			List<string> res = new List<string> ();
 			foreach (var ar in allAppReleases) {
-				if (GetCompatibleAppVersions (m, ar.AppVersion).Contains (appVersion))
+				if (GetCompatibleAppVersions (m, allAppReleases, ar.AppVersion).Contains (appVersion))
 					res.Add (ar.AppVersion);
 			}
 			return res;
 		}
 
-		static string[] GetCompatibleAppVersions (UserModel m, string appVersion)
+		static string[] GetCompatibleAppVersions (UserModel m, List<AppRelease> allAppReleases, string appVersion)
 		{
 			string[] res;
-			if (!cachedCompatibleVersions.TryGetValue (appVersion, out res))
-				res = cachedCompatibleVersions [appVersion] = GetCompatibleAppVersionsRec (m, appVersion).ToArray ();
-			return res;
-		}
-
-		static IEnumerable<string> GetCompatibleAppVersionsRec (UserModel m, string appVersion)
-		{
-			yield return appVersion;
-
-			AppRelease rel = m.GetAppReleaseByVersion (appVersion);
-			if (rel != null && rel.CompatibleAppReleaseId.HasValue) {
-				rel = m.GetAppRelease (rel.CompatibleAppReleaseId.Value);
-				foreach (var v in GetCompatibleAppVersionsRec (m, rel.AppVersion))
-					yield return v;
+			if (!cachedCompatibleVersions.TryGetValue (appVersion, out res)) {
+				List<string> versions = new List<string> ();
+				foreach (var app in allAppReleases) {
+					if (app.AppVersion == appVersion)
+						versions.Add (app.AppVersion);
+					else if (app.CompatibleAppReleaseId.HasValue && Mono.Addins.Addin.CompareVersions (appVersion, app.AppVersion) >= 0) {
+						var rel = m.GetAppRelease (app.CompatibleAppReleaseId.Value);
+						if (rel != null && Mono.Addins.Addin.CompareVersions (rel.AppVersion, appVersion) >= 0)
+							versions.Add (app.AppVersion);
+					}
+				}
+				res = cachedCompatibleVersions [appVersion] = versions.ToArray ();
 			}
-		}
-
-		static void AppendCompatibleRepo (UserModel m, string file)
-		{
-			string appVersion = Path.GetFileName (Path.GetDirectoryName (file));
-			AppRelease rel = m.GetAppReleaseByVersion (appVersion);
-			if (rel == null || !rel.CompatibleAppReleaseId.HasValue)
-				return;
-			rel = m.GetAppRelease (rel.CompatibleAppReleaseId.Value);
-			if (rel == null)
-				return;
-			
-			XmlDocument repDoc = new XmlDocument ();
-			repDoc.Load (file);
-			XmlElement repoElem = repDoc.CreateElement ("Repository");
-			repDoc.DocumentElement.AppendChild (repoElem);
-			XmlElement elem = repDoc.CreateElement ("Url");
-			elem.InnerText = "../" + rel.AppVersion + "/main.mrep";
-			repoElem.AppendChild (elem);
-			repDoc.Save (file);
+			return res;
 		}
 
 		static void FindFiles (HashSet<string> fileList, string path)
