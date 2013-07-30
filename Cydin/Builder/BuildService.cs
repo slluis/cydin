@@ -355,16 +355,21 @@ namespace Cydin.Builder
 		{
 			string[] res;
 			if (!cachedCompatibleVersions.TryGetValue (appVersion, out res)) {
+				var appRel = m.GetAppReleaseByVersion (appVersion);
+
 				List<string> versions = new List<string> ();
-				foreach (var app in allAppReleases) {
-					if (app.AppVersion == appVersion)
-						versions.Add (app.AppVersion);
-					else if (app.CompatibleAppReleaseId.HasValue && Mono.Addins.Addin.CompareVersions (appVersion, app.AppVersion) >= 0) {
-						var rel = m.GetAppRelease (app.CompatibleAppReleaseId.Value);
-						if (rel != null && Mono.Addins.Addin.CompareVersions (rel.AppVersion, appVersion) >= 0)
-							versions.Add (app.AppVersion);
+				versions.Add (appVersion);
+
+				if (appRel.CompatibleAppReleaseId.HasValue) {
+					var compatRel = m.GetAppRelease (appRel.CompatibleAppReleaseId.Value);
+					if (compatRel != null) {
+						foreach (var app in allAppReleases) {
+							if (Mono.Addins.Addin.CompareVersions (app.AppVersion, appRel.AppVersion) > 0 && Mono.Addins.Addin.CompareVersions (compatRel.AppVersion, app.AppVersion) >= 0)
+								versions.Add (app.AppVersion);
+						}
 					}
 				}
+
 				res = cachedCompatibleVersions [appVersion] = versions.ToArray ();
 			}
 			return res;
