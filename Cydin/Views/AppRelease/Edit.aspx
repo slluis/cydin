@@ -58,6 +58,14 @@
             <div class="editor-field">
                 <input type="file" name="file" />
             </div>
+            
+            <div class="editor-label">
+                Url to Assemblies Archive
+            </div>
+            <div class="editor-field">
+                <%= Html.TextBoxFor(model => model.ZipUrl) %>
+                <%= Html.ValidationMessageFor(model => model.ZipUrl) %>
+            </div>
 
 		<br/>
 		<hr/>

@@ -594,20 +594,23 @@ namespace Cydin.Models
 			release.ApplicationId = application.Id;
 			release.LastUpdateTime = DateTime.Now;
 			db.InsertObject (release);
-			UpdateAppReleaseFile (release, file);
+			if (release.ZipUrl != null)
+				UpdateAppReleaseFileFromUrl (release, release.ZipUrl);
+			else
+				UpdateAppReleaseFile (release, file);
 		}
 		
 		internal void UpdateAppRelease (AppRelease release, HttpPostedFileBase file)
 		{
 			CheckIsAdmin ();
+			UpdateAppReleaseFile (release, file);
 			release.LastUpdateTime = DateTime.Now;
 			db.UpdateObject (release);
-			UpdateAppReleaseFile (release, file);
 		}
 
 		void UpdateAppReleaseFile (AppRelease release, HttpPostedFileBase file)
 		{
-			if (file != null) {
+			if (file != null && file.ContentLength > 0) {
 				string filePath = release.ZipPath;
 				string dir = Path.GetDirectoryName (filePath);
 	
@@ -616,6 +619,37 @@ namespace Cydin.Models
 				
 				file.SaveAs (filePath);
 			}
+		}
+
+		internal void UpdateAppReleaseFileFromUrl (AppRelease release, string url)
+		{
+			CheckIsAdmin ();
+			var rid = release.Id;
+			System.Threading.ThreadPool.QueueUserWorkItem (delegate {
+				string file = Path.GetTempFileName ();
+				try {
+					System.Net.WebClient wc = new System.Net.WebClient ();
+					wc.DownloadFile (url, file);
+
+					string filePath = release.ZipPath;
+					string dir = Path.GetDirectoryName (filePath);
+
+					if (!Directory.Exists (dir))
+						Directory.CreateDirectory (dir);
+
+					if (File.Exists (filePath))
+						File.Delete (filePath);
+					File.Move (file, filePath);
+
+					using (var db = DataConnection.GetConnection ()) {
+						var r = db.SelectObjectById<AppRelease> (rid);
+						r.LastUpdateTime = DateTime.Now;
+						db.UpdateObject (r);
+					}
+				} finally {
+					File.Delete (file);
+				}
+			});
 		}
 
 		void SaveFile (Stream inStream, string path)

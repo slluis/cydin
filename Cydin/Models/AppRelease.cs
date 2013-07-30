@@ -26,6 +26,8 @@ namespace Cydin.Models
 
 		[DataMember]
 		public int? CompatibleAppReleaseId { get; set; }
+
+		public string ZipUrl { get; set; }
 		
 		public string ZipPath {
 			get {

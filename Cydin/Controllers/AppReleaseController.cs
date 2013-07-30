@@ -61,7 +61,10 @@ namespace Cydin.Controllers
 			rp.AppVersion = release.AppVersion;
 			rp.AddinRootVersion = release.AddinRootVersion;
 			rp.CompatibleAppReleaseId = release.CompatibleAppReleaseId;
-			CurrentUserModel.UpdateAppRelease (rp, Request.Files.Count > 0 ? Request.Files[0] : null);
+			if (release.ZipUrl != null)
+				CurrentUserModel.UpdateAppReleaseFileFromUrl (rp, release.ZipUrl);
+			else
+				CurrentUserModel.UpdateAppRelease (rp, Request.Files.Count > 0 ? Request.Files[0] : null);
 			return RedirectToAction ("Index", "Admin");
 		}
 
