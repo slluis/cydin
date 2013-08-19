@@ -91,6 +91,7 @@ namespace Cydin
 						throw new Exception ("Invalid compatible release number. Release '" + compatibleVersion + "' not found");
 				}
 				m.CreateAppRelease (rel, null);
+				Cydin.Builder.BuildService.UpdateRepositories (true);
 			}
 		}
 		
@@ -112,6 +113,7 @@ namespace Cydin
 					arel.CompatibleAppReleaseId = null;
 				
 				m.UpdateAppRelease (arel, null);
+				Cydin.Builder.BuildService.UpdateRepositories (true);
 			}
 		}
 		

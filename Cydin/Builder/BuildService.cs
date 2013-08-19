@@ -24,6 +24,7 @@ namespace Cydin.Builder
 		static AutoResetEvent updateEvent = new AutoResetEvent (false);
 		static object logLock = new object ();
 		static object eventLock = new object ();
+		static object localLock = new object ();
 		static bool updateAllRequested;
 		static TextWriter eventsStream;
 		static ManualResetEvent eventsTreamClosed;
@@ -168,11 +169,13 @@ namespace Cydin.Builder
 		
 		public static void UpdateRepositories (bool forceUpdate)
 		{
-			updateAllRequested = forceUpdate;
-			if (repoUpdaterThread == null) {
-				repoUpdaterThread = new Thread (RunUpdater);
-				repoUpdaterThread.IsBackground = true;
-				repoUpdaterThread.Start ();
+			updateAllRequested = updateAllRequested || forceUpdate;
+			lock (localLock) {
+				if (repoUpdaterThread == null) {
+					repoUpdaterThread = new Thread (RunUpdater);
+					repoUpdaterThread.IsBackground = true;
+					repoUpdaterThread.Start ();
+				}
 			}
 			updateEvent.Set ();
 		}
