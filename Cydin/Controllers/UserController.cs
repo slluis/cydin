@@ -40,6 +40,7 @@ namespace Cydin.Controllers
 		public ActionResult Login ()
 		{
 			// Stage 1: display login form to user
+			ViewData["ReturnUrl"] = "/Home";
 			return View ("Login");
 		}
 
@@ -77,6 +78,7 @@ namespace Cydin.Controllers
 		[ValidateInput (false)]
 		public ActionResult Authenticate (string returnUrl, string ticket)
 		{
+			var r = HttpContext.Request;
 			bool updating = !string.IsNullOrEmpty (ticket);
 			string loginView = "Login";
 			var response = openid.GetResponse ();
@@ -93,8 +95,8 @@ namespace Cydin.Controllers
 						else
 							realm = new Realm ("http://*." + host);
 						
-//						IAuthenticationRequest req = openid.CreateRequest (Request.Form["openid_identifier"]);
-						IAuthenticationRequest req = openid.CreateRequest (Request.Form["openid_identifier"], realm);
+						IAuthenticationRequest req = openid.CreateRequest (Request.Form["openid_identifier"]);
+//						IAuthenticationRequest req = openid.CreateRequest (Request.Form["openid_identifier"], realm);
 						OutgoingWebResponse res = req.RedirectingResponse;
 						return new InternalOutgoingWebResponseActionResult (res);
 					}

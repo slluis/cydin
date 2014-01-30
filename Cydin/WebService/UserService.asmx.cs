@@ -137,6 +137,20 @@ namespace Cydin
 		}
 		
 		[WebMethod]
+		public SourceTagAddinInfo GetAddinInfo (LoginInfo login, string projectName, string targetAppVersion, string addinId, string version)
+		{
+			using (UserModel m = GetUserModel (login)) {
+				int pid = GetProjectId (m, projectName);
+				m.ValidateProject (pid);
+				var s = m.GetProjectSourceTags (pid).FirstOrDefault (st => st.TargetAppVersion == targetAppVersion && st.AddinVersion == version && st.AddinId == addinId);
+				if (s != null)
+					return new SourceTagAddinInfo (s);
+				else
+					return null;
+			}
+		}
+
+		[WebMethod]
 		public ReleaseInfo PublishAddin (LoginInfo login, int addinSourceId, DevStatus devStatus)
 		{
 			using (UserModel m = GetUserModel (login)) {
@@ -166,6 +180,15 @@ namespace Cydin
 			}
 		}
 		
+		[WebMethod]
+		public void RemoveAddinSourceTag (LoginInfo login, int addinSourceId)
+		{
+			using (UserModel m = GetUserModel (login)) {
+				var st = m.GetSourceTag (addinSourceId);
+				m.DeleteSourceTag (st);
+			}
+		}
+
 		[WebMethod]
 		public string GetReleasePackageHash (LoginInfo login, int releaseId, string platform)
 		{

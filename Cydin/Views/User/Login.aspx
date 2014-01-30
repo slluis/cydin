@@ -37,7 +37,7 @@
         Or specify another OpenID provider:</p>
     
     <p>
-    <form action="Authenticate?ReturnUrl=<%=HttpUtility.UrlEncode(Request.QueryString["ReturnUrl"]) + "&ticket=" + HttpUtility.UrlEncode (ViewData["ticket"] as string) %>" method="post">
+    <form action="Authenticate?ReturnUrl=<%=HttpUtility.UrlEncode(ViewData["ReturnUrl"] as string) + "&ticket=" + HttpUtility.UrlEncode (ViewData["ticket"] as string) %>" method="post">
         <label for="openid_identifier">OpenID:</label>
         <input id="openid_identifier" name="openid_identifier" size="40" />
         <input id="openid_submit" type="submit" value="Login" />
