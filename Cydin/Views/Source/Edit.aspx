@@ -116,7 +116,7 @@ function updateSelection ()
             
 			<span id="help-GIT">
             The <b>URL</b> is the address of the source code repository. For example, to import a 'test-project' project hosted in github you would specify:
-            <blockquote> git://github.com/someuser/test-project.git </blockquote>
+            <blockquote> https://github.com/someuser/test-project.git </blockquote>
             <p>In the <b>Manifest Path</b> field you can specify a path relative to the repository root where the addin-project.xml file is located. It can be a file (in which case it doesn't need to be named addin-project.xml) or a directory.</p>
             <p>In the <b>Tags</b> and <b>Branches</b> fields you can specify a comma separated list of tags and branches to import.
             Wildcards are allowed, for example: "v1.0, v1.1, v2.*". If you want to import all branches or tags, specify "*" in the corresponding field.</p>
