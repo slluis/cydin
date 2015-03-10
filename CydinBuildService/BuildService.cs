@@ -201,10 +201,11 @@ namespace CydinBuildService
 		{
 			string filePath = release.GetAssembliesPath (ctx);
 
+			string installPath = Path.Combine (filePath, "__install");
 			string timestamp = release.LastUpdateTime.ToString ();
 			string timestampFile = Path.Combine (filePath, "__timestamp");
 			try {
-				if (File.Exists (timestampFile)) {
+				if (File.Exists (timestampFile) && Directory.Exists (installPath)) {
 					string date = File.ReadAllText (timestampFile);
 					if (date == timestamp)
 						return;
@@ -252,6 +253,11 @@ namespace CydinBuildService
 					ExtractDmg (ctx, filePath, file);
 				}
 			}
+
+			// Extract the whole app, keeping the directory structure
+
+			Run7z (file, installPath);
+
 			File.Delete (file);
 			File.WriteAllText (timestampFile, timestamp);
 			ctx.Status = "Assembly package for release " + release.AppVersion + " isntalled";
@@ -480,7 +486,7 @@ namespace CydinBuildService
 			AppReleaseInfo rel = ctx.Server.GetAppReleases (ctx.AppId).Where (r => r.AppVersion == addinProject.AppVersion).FirstOrDefault ();
 			if (rel == null)
 				throw new Exception ("Application release " + addinProject.AppVersion + " not found.");
-			
+
 			RefreshAppRelease (ctx, rel);
 
 			// Delete old packages
@@ -537,18 +543,26 @@ namespace CydinBuildService
 		
 						string solFile = Path.Combine (workArea, NormalizePath (psource.BuildFile));
 		
-						string ops = " \"/p:ReferencePath=" + rel.GetAssembliesPath (ctx) + "\"";
+						string refPath = rel.GetAssembliesPath (ctx);
+
+						if (ContaintsMdTargetsFile (workArea) && !string.IsNullOrEmpty (ctx.LocalSettings.LocalAppInstallPath))
+							refPath = Path.Combine (refPath, "__install", ctx.LocalSettings.LocalAppInstallPath);
+
+						string ops = " \"/p:ReferencePath=" + refPath + "\"";
 						
 						if (!string.IsNullOrEmpty (psource.BuildConfiguration))
 							ops += " \"/property:Configuration=" + psource.BuildConfiguration + "\"";
 						
 						ops = ops + " \"" + solFile + "\"";
-		
+
 						StringBuilder output = new StringBuilder ();
 						try {
+							// Restore packages
+							RunCommand (true, "nuget", "restore \"" + solFile + "\"", output, output, Timeout.Infinite);
+
 							// Clean the project
 							RunCommand (true, ctx.LocalSettings.MSBuildCommand, "/t:Clean " + ops, output, output, Timeout.Infinite);
-							
+
 							// Build
 							RunCommand (true, ctx.LocalSettings.MSBuildCommand, ops, output, output, Timeout.Infinite);
 						}
@@ -628,6 +642,18 @@ namespace CydinBuildService
 			finally {
 				ctx.Status = "Files uploaded";
 			}
+		}
+
+		bool ContaintsMdTargetsFile (string path)
+		{
+			foreach (var f in Directory.GetFiles (path))
+				if (Path.GetFileName (f) == "MonoDevelop.Addins.targets")
+					return true;
+			foreach (var d in Directory.GetDirectories (path)) {
+				if (ContaintsMdTargetsFile (d))
+					return true;
+			}
+			return false;
 		}
 		
 		internal static AddinInfo ReadAddinInfo (string file)

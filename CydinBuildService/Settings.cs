@@ -92,7 +92,10 @@ namespace CydinBuildService
 			get { return webSiteUrl; }
 			set { webSiteUrl = value; }
 		}
-		
+
+		[XmlElementAttribute]
+		public string LocalAppInstallPath { get; set; }
+
 		[XmlElementAttribute]
 		public bool LiveEventsConnection { get; set; }
 		
