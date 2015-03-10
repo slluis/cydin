@@ -33,7 +33,7 @@ namespace CydinBuildService
 					Default = (Settings) ser.Deserialize (sr);
 				}
 			} catch (Exception ex) {
-				Console.WriteLine (ex);
+				LogService.WriteLine (ex);
 				Default = new Settings ();
 			}
 		}
@@ -46,11 +46,11 @@ namespace CydinBuildService
 		
 		public void Dump ()
 		{
-			Console.WriteLine ("Web Server: {0}", WebSiteUrl);
-			Console.WriteLine ("Data Path: {0}", DataPath);
-			Console.WriteLine ("MSBuild command: {0}", MSBuildCommand);
-			Console.WriteLine ("Poll wait: {0}", PollWaitMinutes + "m");
-			Console.WriteLine ("Live Events Connection: {0}", LiveEventsConnection);
+			LogService.WriteLine ("Web Server: {0}", WebSiteUrl);
+			LogService.WriteLine ("Data Path: {0}", DataPath);
+			LogService.WriteLine ("MSBuild command: {0}", MSBuildCommand);
+			LogService.WriteLine ("Poll wait: {0}", PollWaitMinutes + "m");
+			LogService.WriteLine ("Live Events Connection: {0}", LiveEventsConnection);
 		}
 		
 		[XmlElementAttribute]

@@ -144,7 +144,7 @@ namespace CydinBuildService
 				try {
 					RunCommand (gitDir, "fetch origin", output);
 				} catch (Exception ex) {
-					Console.WriteLine ("Error: " + ex.Message);
+					LogService.WriteLine ("Error: " + ex.Message);
 					// If something goes wrong while updating, reclone
 					Directory.Delete (gitDir, true);
 					RunCommand (null, "clone --depth=1 --no-single-branch " + url + " " + gitDir, output);
@@ -161,7 +161,7 @@ namespace CydinBuildService
 		{
 			if (log != null)
 				log.AppendLine ("> git " + cmd);
-			Console.WriteLine ("> git " + cmd);
+			LogService.WriteLine ("> git " + cmd);
 			StringBuilder output = new StringBuilder ();
 			StringBuilder error = new StringBuilder ();
 			try {
@@ -171,7 +171,7 @@ namespace CydinBuildService
 			}
 			if (log != null)
 				log.AppendLine (output.ToString ());
-			Console.WriteLine (output.ToString ());
+			LogService.WriteLine (output.ToString ());
 			
 			List<string> lines = new List<string> ();
 			StringReader sr = new StringReader (output.ToString ());

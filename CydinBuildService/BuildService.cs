@@ -40,7 +40,7 @@ namespace CydinBuildService
 			
 			int i = mainContext.Server.Url.IndexOf ("/WebService");
 			mainContext.ServerUrl = mainContext.Server.Url.Substring (0, i);
-			Console.WriteLine ("Connecting to: " + mainContext.ServerUrl);
+			LogService.WriteLine ("Connecting to: " + mainContext.ServerUrl);
 			
 			if (running)
 				return;
@@ -115,7 +115,7 @@ namespace CydinBuildService
 
 		void HandleEvent (object sender, ServerEventArgs e)
 		{
-			Console.WriteLine ("Got event: " + e.AppId + " " + e.ProjectId + " " + e.EventId + " " + e.EventArgs);
+			LogService.WriteLine ("Got event: " + e.AppId + " " + e.ProjectId + " " + e.EventId + " " + e.EventArgs);
 			lock (eventQueue) {
 				eventQueue.Enqueue (e);
 			}
@@ -139,15 +139,15 @@ namespace CydinBuildService
 				}
 				else {
 					if (ctx.FirstNotAuthorised) {
-						Console.WriteLine ("ERROR: Connection to server not authorized.");
-						Console.WriteLine ("To enable connections from this service, go to the administration page");
-						Console.WriteLine ("in the server and click on the Change Service option.");
+						LogService.WriteLine ("ERROR: Connection to server not authorized.");
+						LogService.WriteLine ("To enable connections from this service, go to the administration page");
+						LogService.WriteLine ("in the server and click on the Change Service option.");
 						ctx.FirstNotAuthorised = false;
 					} else
-						Console.WriteLine ("Connection not authorized. Trying again.");
+						LogService.WriteLine ("Connection not authorized. Trying again.");
 				}
 			} catch (Exception ex) {
-				Console.WriteLine ("Connection failed: " + ex.Message);
+				LogService.WriteLine ("Connection failed: " + ex.Message);
 			}
 			ctx.Connected = false;
 			return false;
@@ -191,7 +191,7 @@ namespace CydinBuildService
 				ctx.Log (ex);
 				return true;
 			} catch (Exception e) {
-				Console.WriteLine (e);
+				LogService.WriteLine (e);
 				ctx.Connected = false;
 				return false;
 			}
@@ -781,7 +781,7 @@ namespace CydinBuildService
 			set {
 				status = value;
 				Server.BeginSetBuildServiceStatus (value, null, null);
-				Console.WriteLine (status);
+				LogService.WriteLine (status);
 			}
 		}
 		
@@ -792,14 +792,14 @@ namespace CydinBuildService
 		public void Log (Exception ex)
 		{
 			string txt = "Error [" + DateTime.Now.ToLongTimeString () + "] " + ex.ToString ();
-			Console.WriteLine (txt);
+			LogService.WriteLine (txt);
 			Server.Log (LogSeverity.Error, ex.ToString ());
 		}
 		
 		public void Log (LogSeverity severity, string message)
 		{
 			string txt = severity + " [" + DateTime.Now.ToLongTimeString () + "] " + message;
-			Console.WriteLine (txt);
+			LogService.WriteLine (txt);
 			Server.Log (severity, message);
 		}
 		

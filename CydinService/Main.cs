@@ -9,11 +9,11 @@ namespace CydinService
 	{
 		public static void Main (string[] args)
 		{
-			Console.WriteLine ("Starting Cydin service");
+			LogService.WriteLine ("Starting Cydin service");
 			SetProcessName ("cydind");
 			BuildService buildBot = new BuildService ();
 			buildBot.Start (null);
-			Console.WriteLine ("Running");
+			LogService.WriteLine ("Running");
 		}
 		
 		public static void SetProcessName (string name)
