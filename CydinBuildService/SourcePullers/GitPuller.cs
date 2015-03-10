@@ -139,7 +139,7 @@ namespace CydinBuildService
 		{
 			string gitDir = GetGitPath (ctx, sourceId);
 			if (!Directory.Exists (gitDir))
-				RunCommand (".", "clone --depth=1 " + url + " " + gitDir, output);
+				RunCommand (".", "clone --depth=1 --no-single-branch " + url + " " + gitDir, output);
 			else {
 				try {
 					RunCommand (gitDir, "fetch origin", output);
@@ -147,7 +147,7 @@ namespace CydinBuildService
 					Console.WriteLine ("Error: " + ex.Message);
 					// If something goes wrong while updating, reclone
 					Directory.Delete (gitDir, true);
-					RunCommand (null, "clone --depth=1 " + url + " " + gitDir, output);
+					RunCommand (null, "clone --depth=1 --no-single-branch " + url + " " + gitDir, output);
 				}
 			}
 		}
