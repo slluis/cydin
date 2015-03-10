@@ -34,7 +34,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Cydin\Cydin.csproj
 		Policies = $0
 		$0.VersionControlPolicy = $1
 		$1.inheritsSet = Mono
@@ -49,7 +48,6 @@ Global
 		$3.inheritsScope = text/plain
 		$3.scope = text/x-csharp
 		$0.CSharpFormattingPolicy = $4
-		$4.ElseIfNewLinePlacement = SameLine
 		$4.AfterDelegateDeclarationParameterComma = True
 		$4.inheritsSet = Mono
 		$4.inheritsScope = text/x-csharp
