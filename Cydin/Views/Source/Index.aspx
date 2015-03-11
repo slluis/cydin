@@ -8,7 +8,7 @@
 
     <h2>Version Control Sources</h2>
 
-    <table>
+    <table class="listview">
         <tr>
             <th>
                 Url
@@ -35,8 +35,8 @@
                 <%= Html.Encode(item.AutoPublish) %>
             </td>
             <td>
-                <%= Html.ActionLink("Edit", "Edit", new { id=item.Id }, new { @class="command" }) %> 
-                <%= Html.ActionLink ("Delete", "Delete", new { id = item.Id, projectId = ViewData["ProjectId"] }, new { @class="command" })%>
+                <%= Html.ActionLink("Edit", "Edit", new { id=item.Id }, new { @class="button" }) %> 
+                <%= Html.ActionLink ("Delete", "Delete", new { id = item.Id, projectId = ViewData["ProjectId"] }, new { @class="button" })%>
             </td>
         </tr>
     
@@ -45,7 +45,7 @@
     </table>
 
     <p>
-        <%= Html.ActionLink ("Create New", "Create", new { projectId = ViewData["ProjectId"] }, new { @class="command" })%>
+        <%= Html.ActionLink ("Create New", "Create", new { projectId = ViewData["ProjectId"] }, new { @class="button" })%>
     </p>
     <p>
         <%= Html.ActionLink ("Back to Project", "Index", "Project", new { id = ViewData["ProjectId"] }, null)%>

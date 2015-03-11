@@ -35,7 +35,7 @@
     <% if (m.GetUserProjects ().Any ()) {
            Response.Write ("<ul>");
            foreach (Project p in m.GetUserProjects ()) { %>
-            <li><%=Html.ActionLink (p.Name, "Index", "Project", new { id = p.Id }, null)%></li>
+           <li><%=Html.ActionLink (p.Name ?? "?", "Index", "Project", new { id = p.Id }, null)%></li>
         <% }
            Response.Write ("</ul>");
        }
@@ -43,7 +43,7 @@
        <p>There are no projects.</p>
        <% } %>
 
-    <%= Html.ActionLink ("Create a new Project", "Create", "Project", null, new { @class="command"})%>
+    <%= Html.ActionLink ("Create a new Project", "Create", "Project", null, new { @class="button"})%>
     </div>
     <div id="user-notifications" class="side-panel">
     <h1>My Notifications</h1>

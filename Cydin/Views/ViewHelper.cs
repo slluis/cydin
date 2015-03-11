@@ -72,7 +72,7 @@ namespace Cydin.Views
 			StringBuilder sb = new StringBuilder ();
 			sb.Append ("<div id='notification-summary' postUrl='" + postUrl + "'><p>");
 			sb.Append ("<span id='notification-summary-list'></span>");
-			sb.Append ("<br><br><a href='#' id='notification-change-button' class='command'>Change Subscriptions</a>");
+			sb.Append ("<br><br><a href='#' id='notification-change-button' class='button'>Change Subscriptions</a>");
 			sb.Append ("</div></p>");
 			
 		    sb.Append ("<div id='notification-selector' style='display:none'>");
@@ -89,7 +89,7 @@ namespace Cydin.Views
 		    }
 
 		    sb.Append ("</p><p>");
-		    sb.Append ("<a href='#' id='notification-done-button' class='command'>Done</a>");
+			sb.Append ("<a href='#' id='notification-done-button' class='button'>Done</a>");
 		    sb.Append ("</p></div>");
 			return sb.ToString ();
 		}

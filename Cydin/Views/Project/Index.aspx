@@ -134,7 +134,7 @@
     %>
     
     <% if (isProjectAdmin) {
-    	Response.Write (Html.ActionLink ("Edit Name and Description", "Edit", "Project", new { id = Model.Id }, new { @class = "command" }));
+    	Response.Write (Html.ActionLink ("Edit Name and Description", "Edit", "Project", new { id = Model.Id }, new { @class = "button" }));
     } %>
     <h2>Releases</h2>
     <% if (releases.Any ()) { %>
@@ -186,7 +186,7 @@
     </td>
 
     <% if (isProjectAdmin) { %>
-	<td valign="top" style="padding-top:0" width="1%"><%=release.Status%><br/><br/><a href="#" class="delete-release-button command" relid="<%=release.Id%>">Delete</a></td>
+	<td valign="top" style="padding-top:0" width="1%"><%=release.Status%><br/><br/><a href="#" class="delete-release-button button" relid="<%=release.Id%>">Delete</a></td>
     <% } %>
 
     </tr>
@@ -252,12 +252,12 @@
     </td>
     <td width="0px" align="right">
         <% if ((source.Status == SourceTagStatus.BuildError || source.Status == SourceTagStatus.FetchError || m.IsSiteAdmin) && !source.IsUpload)
-               Response.Write (Html.ActionLink ("Rebuild", "UpdateSource", new { sourceTagId = source.Id }, new { @class="command" }) + "<br>"); %>
+               Response.Write (Html.ActionLink ("Rebuild", "UpdateSource", new { sourceTagId = source.Id }, new { @class="button" }) + "<br>"); %>
         <% if (source.Status == SourceTagStatus.Ready)
-               Response.Write (Html.ActionLink ("Publish", "PublishRelease", new { sourceId = source.Id }, new { @class="command" }) + "<br>");
+               Response.Write (Html.ActionLink ("Publish", "PublishRelease", new { sourceId = source.Id }, new { @class="button" }) + "<br>");
         %>
         <% if (source.IsUpload)
-               Response.Write (Html.ActionLink ("Delete", "DeleteUpload", new { sourceId = source.Id }, new { @class="command" }));
+               Response.Write (Html.ActionLink ("Delete", "DeleteUpload", new { sourceId = source.Id }, new { @class="button" }));
         %>
     </td>
     </tr>
@@ -281,10 +281,10 @@
 	
 	<p>
 	<% if (Model.HasFlag (ProjectFlag.AllowPackageUpload)) { %>
-    <%=Html.ActionLink ("Upload Package", "UploadRelease", new { projectId = Model.Id }, new { @class="command" })%>
+    <%=Html.ActionLink ("Upload Package", "UploadRelease", new { projectId = Model.Id }, new { @class="button" })%>
 	<% } %>
 
-    <%=Html.ActionLink ("Edit Sources", "Index", "Source", new { projectId = Model.Id }, new { @class="command" })%>
+    <%=Html.ActionLink ("Edit Sources", "Index", "Source", new { projectId = Model.Id }, new { @class="button" })%>
     <% } /* if(isProjectAdmin) */ %>
     </p>
     </td>
@@ -303,7 +303,7 @@
 		</tr>
 	<% } %>
 	</table>
-	<a href="#" id="owners-add-button" class="command">Add</a>
+	<a href="#" id="owners-add-button" class="button">Add</a>
     </div>
     <% } %>
     <% if (m.User != null) { %>
@@ -316,13 +316,13 @@
     <% if (isProjectAdmin) { %>
     <div class="side-panel">
     <h1>Administration</h1>
-    <p><%=Html.ActionLink ("Delete Project", "ConfirmDelete", "Project", new { id = Model.Id }, new {@class="command"})%></p>
+    <p><%=Html.ActionLink ("Delete Project", "ConfirmDelete", "Project", new { id = Model.Id }, new {@class="button"})%></p>
     <% if (m.IsAdmin)
          using (Html.BeginForm ("UpdateFlags", "Project")) {%>
 	 	<%=Html.Hidden ("projectId", Model.Id)%>
     <p><%=Html.CheckBox ("allowDirectPublish", Model.HasFlag (ProjectFlag.AllowDirectPublish))%> Allow direct publish<br/>
     <%=Html.CheckBox ("allowPackageUpload", Model.HasFlag (ProjectFlag.AllowPackageUpload))%> Allow package upload</p>
-     <input type="submit" value="Save"  class="command"/>
+     <input type="submit" value="Save"  class="button"/>
     <% } %>
     </div>
     <% } /* if(isProjectAdmin) */ %>

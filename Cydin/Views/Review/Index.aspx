@@ -10,7 +10,7 @@
 
     <h2>Release Review</h2>
 
-    <table>
+    <table class="listview">
     <tr>
     <th>Date</th><th>Project</th><th>Addin Version</th><th><%=CurrentUserModel.CurrentApplication.Name %> Version</th><th></th>
     </tr>

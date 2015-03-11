@@ -6,11 +6,11 @@ to use a different color start by replacing all instances of
 body
 {
     background-color: #ffffff;
-    font-size: .75em;
-    font-family: Verdana, Helvetica, Sans-Serif;
+    font-size: 14px;
+    font-family: 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif;
     margin: 0;
     padding: 0;
-    color: #696969;
+    color: #4e5758;
 }
 
 a:link
@@ -42,12 +42,50 @@ p, ul
     text-decoration: underline;
 }
 
+a.button
+{
+	border:solid 1px #bbb;
+	padding:4px 8px; 4px 8px;
+    text-decoration: none;
+    background:#eee;
+    color: #4e5758;
+    font-size:0.90em;
+    line-height:30px;
+}
+
+a.button:hover
+{
+	border:solid 1px grey;
+    text-decoration: none;
+    background:white;
+    color: #4e5758;
+}
+
+input.button
+{
+	border:solid 1px #bbb;
+	padding:4px 8px; 4px 8px;
+    text-decoration: none;
+    background:#eee;
+    color: #4e5758;
+    font-size:0.90em;
+    cursor:pointer;
+}
+
+input.button:hover
+{
+	border:solid 1px grey;
+    text-decoration: none;
+    background:white;
+    color: #4e5758;
+}
+
 /* HEADINGS   
 ----------------------------------------------------------*/
 h1, h2, h3, h4, h5, h6
 {
     font-size: 1.5em;
-    color: #000;
+	color: #666;
     font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -59,8 +97,7 @@ h1
 }
 h2
 {
-    padding: 0 0 10px 0;
-	color: #4E6D9F;
+    font-size: 2em;
 }
 h3
 {
@@ -89,20 +126,24 @@ first child of the left and right table columns */
 page width. Or, you can specify an exact pixel width. */
 .page
 {
-    margin: 10px auto;
+    margin: auto;
     width: 974px;
-    background-image: url("/Media/md-header.png");
-    background-repeat: no-repeat;
 }
 
 #header
 {
+	border:none;
     position: relative;
-    margin-bottom: 0px;
-    color: #000;
-    padding: 0;
+    margin: 0;
+    padding: 10px;
+    color: white;
+	background: #333;
+}
+
+#header-content
+{
+    margin: 0px auto;
     width: 974px;
-    height:70px;
 }
 
 #header h1
@@ -118,10 +159,8 @@ page width. Or, you can specify an exact pixel width. */
 
 #main
 {
-    padding: 25px 15px 15px 20px;
+    padding: 15px 0px 15px 0px;
     margin-bottom: 30px;
-    _height: 1px; /* only IE6 applies CSS properties starting with an underscore */
-    width: 950px;
 }
 
 #footer
@@ -136,47 +175,44 @@ page width. Or, you can specify an exact pixel width. */
 
 /* TAB MENU   
 ----------------------------------------------------------*/
-ul#menu
+#menucontainer
 {
-    padding: 0;
-    position: relative;
-    margin: 0;
-    text-align: right;
-    color: #fff;
+	text-align:center;
 }
 
-ul#menu li
+.menu-item
 {
-    display: inline;
+    margin:0px;
+    padding:4px 10px 4px 10px;
     list-style: none;
+	background: #333;
+	font-size:14px;
 }
 
-ul#menu li#greeting
+.menu-item:hover
 {
-    padding: 5px;
-    font-weight: bold;
+    background:black;
+}
+
+.menu-item a
+{
+    margin:0;
+    padding:0;
     text-decoration: none;
     color: #fff;
 }
 
-ul#menu li a
-{
-    padding: 5px;
-    text-decoration: none;
-    color: #fff;
-}
-
-ul#menu li a:hover
+.menu-item a:hover
 {
     text-decoration: none;
 }
 
-ul#menu li a:active
+.menu-item a:active
 {
     text-decoration: none;
 }
 
-ul#menu li.selected a
+.menu-item.selected a
 {
 }
 
@@ -235,6 +271,10 @@ table th
   border: solid 1px lightgrey;   
 }
 
+.listview td {
+  border: solid 1px lightgrey;   
+}
+
 /* MISC  
 ----------------------------------------------------------*/
 .clear
@@ -247,31 +287,16 @@ table th
     color:Red;
 }
 
-#menucontainer
+#title
 {
-	margin-top:14px;
-	padding-top:2px;
-	padding-left:5px;
-	padding-right:5px;
-	background-image: url("/Media/md-menu-bg.png");
-	float:right;
-}
-
-div#title
-{
-    display:none;
-    float:left;
-    text-align:left;
+    font-size:20px;
 }
 
 #logindisplay
 {
-    font-size:1.1em;
-    display:block;
-    text-align:right;
-    margin:10px;
-    padding-top:4px;
+	font-size:12px;
     color:white;
+    margin-left:20px;
 }
 
 #logindisplay a:link
@@ -293,13 +318,16 @@ div#title
 
 .side-panel
 {
-	padding-bottom: 20px;
+	margin:0 0 20px 30px;
+	padding:15px;
+	background: #efefef;
 }
 
 .side-panel h1
 {
-    font-size: 1.2em;
-	color: #4E6D9F;
+	margin:0 0 5px 0;
+    font-size: 1em;
+	color: #666;
 }
 
 .tag-source-table, .tag-source-table tr, .tag-source-table td
@@ -334,6 +362,7 @@ div#title
 {
 	color:black;
 	padding: 5px;
+	font-weight: bold;
 	border-top: solid 1px lightgrey;
 	border-right: solid 1px lightgrey;
 	background-color: #ebde6b;
@@ -402,3 +431,4 @@ div#title
 {
     width: 6em;
 }
+

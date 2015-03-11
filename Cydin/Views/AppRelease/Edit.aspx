@@ -70,8 +70,8 @@
 		<br/>
 		<hr/>
             <p>
-                <input type="submit" value="Save" class="command"/>
-		        <%= Html.ActionLink("Cancel", "Index", "Admin", null, new { @class="command" }) %>
+                <input type="submit" value="Save" class="button"/>
+		        <%= Html.ActionLink("Cancel", "Index", "Admin", null, new { @class="button" }) %>
             </p>
 
     <% } %>

@@ -143,12 +143,12 @@ function updateSelection ()
             </div>
             
             <p>
-                <input type="submit" class="command" value="Save" />
+                <input type="submit" class="button" value="Save" />
                 <% if (initialCreation) { %>
-                <input type="button" class="command" value="Skip" onclick="window.location.href='/Project/Index/<%=Model.ProjectId %>'"/>
+                <input type="button" class="button" value="Skip" onclick="window.location.href='/Project/Index/<%=Model.ProjectId %>'"/>
                 <%}
                    else { %>
-                <input type="button" class="command" value="Cancel" onclick="window.location.href='/Source?projectId=<%=Model.ProjectId %>'"/>
+                <input type="button" class="button" value="Cancel" onclick="window.location.href='/Source?projectId=<%=Model.ProjectId %>'"/>
                 <%} %>
             </p>
 

@@ -1,15 +1,14 @@
 <%@ Master Language="C#" Inherits="System.Web.Mvc.ViewMasterPage" %>
 <%@ Import Namespace="Cydin.Models" %>
 <%@ Import Namespace="Cydin.Properties" %>
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <title><asp:ContentPlaceHolder ID="TitleContent" runat="server" /></title>
-    <link href="../../Content/Site.css" rel="stylesheet" type="text/css" />
     <link href="../../Content/jquery-ui-1.8.2.custom.css" rel="stylesheet" type="text/css" />
 	<script type="text/javascript" src="/Scripts/jquery-1.4.1.js"></script> 
 	<script type="text/javascript" src="/Scripts/jquery-ui-1.8.2.custom.min.js"></script> 
+    <link href="../../Content/Site.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript">
 
   var _gaq = _gaq || [];
@@ -40,37 +39,34 @@
 	}
 	
 </script></head>
-
 <body>
     <% var m = UserModel.GetCurrent (); %>
-    <div class="page">
-
-        <div id="header">
-            <div id="title">
-                <h1><%=m.CurrentApplication != null ? m.CurrentApplication.Name + " " : ""%>Community Add-in Repository</h1>
-            </div>
-              
-            <div id="logindisplay">
-                <% Html.RenderPartial("LogOnUserControl"); %>
-            </div> 
-            
-            <div id="menucontainer">
-            
-                <ul id="menu">
-                    <li><%= Html.ActionLink("Home", "Index", "Home")%></li>
-                    <% if (m.IsAdmin) { %>
-                        <li> | <%= Html.ActionLink("Review", "Index", "Review")%></li>
-                        <li> | <%= Html.ActionLink("Administration", "Index", "Admin")%></li>
-                    <% } %>
-                    <% if (m.IsSiteAdmin) { %>
-                        <li> | <%= Html.ActionLink("Site Admin", "Index", "SiteAdmin")%></li>
-                    <% } %>
-                    <li> | <%= Html.ActionLink("About", "About", "Home")%></li>
-                </ul>
-            
-            </div>
+    <div id="header">
+    	<div id="header-content">
+	    	<table><tr>
+    		<td nowrap>
+	        <span id="title">
+	            <%=m.CurrentApplication != null ? m.CurrentApplication.Name + " " : ""%>Add-in Repository
+	        </span>
+	    	</td><td width="100%" style="text-align:right">
+	        <span id="menucontainer">
+                <span class="menu-item"><%= Html.ActionLink("Home", "Index", "Home")%></span>
+                <% if (m.IsAdmin) { %>
+                    <span class="menu-item"><%= Html.ActionLink("Review", "Index", "Review")%></span>
+                    <span class="menu-item"><%= Html.ActionLink("Administration", "Index", "Admin")%></span>
+                <% } %>
+                <% if (m.IsSiteAdmin) { %>
+                    <span class="menu-item"><%= Html.ActionLink("Site Admin", "Index", "SiteAdmin")%></span>
+                <% } %>
+                <span class="menu-item"><%= Html.ActionLink("About", "About", "Home")%></span>
+        	</span>
+	    	</td><td nowrap>      
+	        <% Html.RenderPartial("LogOnUserControl"); %>
+	        </td></tr></table>
         </div>
+    </div>
 
+    <div class="page">
         <div id="main">
            <asp:ContentPlaceHolder ID="HeaderContent" runat="server" />
            <asp:ContentPlaceHolder ID="MainContent" runat="server" />

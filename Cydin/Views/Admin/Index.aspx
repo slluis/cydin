@@ -217,7 +217,7 @@
 	</div>
 
 	<div id="tabs-3">
-	<p><%=Html.ActionLink ("Add New Release", "Create", "AppRelease", null, new { @class="command" }) %></p>
+	<p><%=Html.ActionLink ("Add New Release", "Create", "AppRelease", null, new { @class="button" }) %></p>
     <table>
     <tr><th>Release</th><th>Add-in Version</th><th>Compatible With</th><th>Sources File</th><th></th></tr>
     <% 
@@ -228,7 +228,7 @@
     <td> <%= r.AddinRootVersion%> </td>
     <td> <%= r.CompatibleAppReleaseId.HasValue ? m.GetAppRelease (r.CompatibleAppReleaseId.Value).AppVersion : "" %> </td>
     <td> <%= System.IO.File.Exists (r.ZipPath) ? "Yes (" + (new System.IO.FileInfo(r.ZipPath).Length / (1024*1024)) + "mb)" : ""%> </td>
-    <td> <a href="#" class="command delete-release-button" relid="<%=r.Id%>">Delete</a> <%=Html.ActionLink ("Edit", "Edit", "AppRelease", new { id = r.Id }, new { @class="command" }) %> </td>
+    <td> <a href="#" class="button delete-release-button" relid="<%=r.Id%>">Delete</a> <%=Html.ActionLink ("Edit", "Edit", "AppRelease", new { id = r.Id }, new { @class="button" }) %> </td>
     </tr>
     <% } %>
     </table>
@@ -248,7 +248,7 @@
 		</tr>
 	<% } %>
 	</table>
-	<p><a href="#" id="admin-add-button" class="command">Add Administrator</a></p>
+	<p><a href="#" id="admin-add-button" class="button">Add Administrator</a></p>
 	</div>
     
 	<div id="tabs-5">
