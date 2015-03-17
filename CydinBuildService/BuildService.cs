@@ -539,9 +539,14 @@ namespace CydinBuildService
 					
 					Directory.Move (sourcePath, workArea);
 					
+					StringBuilder output = new StringBuilder ();
+
 					try {
 		
 						string solFile = Path.Combine (workArea, NormalizePath (psource.BuildFile));
+
+						// Restore packages
+						RunCommand (true, "nuget", "restore \"" + solFile + "\"", output, output, Timeout.Infinite);
 		
 						string refPath = rel.GetAssembliesPath (ctx);
 
@@ -555,23 +560,15 @@ namespace CydinBuildService
 						
 						ops = ops + " \"" + solFile + "\"";
 
-						StringBuilder output = new StringBuilder ();
-						try {
-							// Restore packages
-							RunCommand (true, "nuget", "restore \"" + solFile + "\"", output, output, Timeout.Infinite);
+						// Clean the project
+						RunCommand (true, ctx.LocalSettings.MSBuildCommand, "/t:Clean " + ops, output, output, Timeout.Infinite);
 
-							// Clean the project
-							RunCommand (true, ctx.LocalSettings.MSBuildCommand, "/t:Clean " + ops, output, output, Timeout.Infinite);
-
-							// Build
-							RunCommand (true, ctx.LocalSettings.MSBuildCommand, ops, output, output, Timeout.Infinite);
-						}
-						finally {
-							output = output.Replace (workArea, "/build");
-							File.AppendAllText (logFile, "<pre>" + HttpUtility.HtmlEncode (output.ToString ()) + "</pre>");
-						}
+						// Build
+						RunCommand (true, ctx.LocalSettings.MSBuildCommand, ops, output, output, Timeout.Infinite);
 					}
 					finally {
+						output = output.Replace (workArea, "/build");
+						File.AppendAllText (logFile, "<pre>" + HttpUtility.HtmlEncode (output.ToString ()) + "</pre>");
 						Directory.Move (workArea, sourcePath);
 					}
 				}
