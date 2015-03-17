@@ -91,9 +91,9 @@ h1, h2, h3, h4, h5, h6
 
 h1
 {
-    font-size: 2em;
-    padding-bottom: 0;
-    margin-bottom: 0;
+    font-size: 3em;
+    padding: 0;
+    margin: 0;
 }
 h2
 {
@@ -321,6 +321,9 @@ table th
 	margin:0 0 20px 30px;
 	padding:15px;
 	background: #efefef;
+	border: solid 1px lightgrey;
+  	-webkit-box-shadow: 0 4px 10px rgba(0,0,0,.1);
+  	box-shadow: 0 4px 10px rgba(0,0,0,.1);
 }
 
 .side-panel h1
@@ -334,11 +337,12 @@ table th
 {
 	padding:0;
 	margin:0;
+	line-height:1.7em;
 }
 
 .tag-source-table-body
 {
-	border: solid 1px lightgrey
+	border: solid 1px lightgrey;
 }
 .tag-source-table-body-Ready
 {
@@ -376,6 +380,16 @@ table th
 .tag-source-table-status-Ready
 {
 	background-color: #eeeeee;
+}
+
+tr.release-row {
+	border: solid 1px lightgrey
+}
+
+tr.release-row td {
+	padding:5px;
+	background-color: #f5f5f5;
+	line-height:1.7em;
 }
 
 /* Styles for validation helpers

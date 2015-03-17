@@ -117,7 +117,7 @@
 	<table>
 	<tr>
 	<td valign="top" width="75%">
-	<h2><%=Model.Name %></h2>
+	<h1><%=Model.Name %></h1>
     <%
     MarkdownSharp.Markdown md = new MarkdownSharp.Markdown ();
     md.AutoHyperlink = true;
@@ -138,7 +138,6 @@
     } %>
     <h2>Releases</h2>
     <% if (releases.Any ()) { %>
-    <table width="100%">
     <%
     foreach (var appRel in m.GetAppReleases ().OrderBy (r => r.AppVersion).Reverse ()) {
     	var appReleases = releases.Where (r => r.TargetAppVersion == appRel.AppVersion).ToList ();
@@ -148,10 +147,10 @@
     	appReleases.Sort ((s1,s2) => Mono.Addins.Addin.CompareVersions (s2.Version, s1.Version));
     	appReleases.Reverse ();
     %>
-    <tr><td valign="top">
-    <b><%=m.CurrentApplication.Name%> <%=appRel.AppVersion%></b>
-    </td>
-    <td valign="top">
+    <h3><%=m.CurrentApplication.Name%> <%=appRel.AppVersion%></h3>
+    <table width="100%">
+    <tr>
+    <td valign="top" style="padding:0">
     <table width="100%">
     <tbody>
     <%
@@ -168,13 +167,13 @@
     <tbody class="release-row-<%=appRel.Id%>" style="display:none">
     <% } %>
     
-    <tr>
-    <td valign="top" style="padding-top:0" width="50%">
-    <b><%=release.Version%> (<%=release.DevStatus%>)</b><br/>
+    <tr class="release-row">
+    <td valign="top" width="50%">
+    <b style="font-size:large"><%=release.Version%> (<%=release.DevStatus%>)</b><br/>
     <%=release.AddinId%><br/>
     <%=release.LastChangeTime.ToShortDateString ()%>
     </td>
-    <td valign="top" style="padding-top:0" width="50%">
+    <td valign="top" width="50%">
 <!--    	<a href="<%=release.GetInstallerVirtualPath ()%>">Install</a> -->
 		<img src="/Media/package.png"/>
         <% foreach (var plat in release.PlatformsList) { %>
@@ -186,7 +185,7 @@
     </td>
 
     <% if (isProjectAdmin) { %>
-	<td valign="top" style="padding-top:0" width="1%"><%=release.Status%><br/><br/><a href="#" class="delete-release-button button" relid="<%=release.Id%>">Delete</a></td>
+	<td valign="top" width="1%"><%=release.Status%><br/><br/><a href="#" class="delete-release-button button" relid="<%=release.Id%>">Delete</a></td>
     <% } %>
 
     </tr>
@@ -199,8 +198,8 @@
     </tbody>
     </table>
     </td></tr>
-    <% } %>
     </table>
+    <% } %>
     <% } else {/* if (Model.Releases.Any ())*/ %>
        <p>There isn't yet any release.</p>
     <% } %>
@@ -219,7 +218,7 @@
     			continue;
     { %>
     <h3><%=appRel != "" ? m.CurrentApplication.Name + " " + appRel : (oneShown ? "Unknown Target Version" : "")%></h3>
-    <table class="tag-source-table">
+    <table class="tag-source-table" width="100%">
     <%
     oneShown = true;
     foreach (var source in appSources) { 
