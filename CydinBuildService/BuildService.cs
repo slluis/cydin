@@ -550,8 +550,15 @@ namespace CydinBuildService
 		
 						string refPath = rel.GetAssembliesPath (ctx);
 
-						if (ContaintsMdTargetsFile (workArea) && !string.IsNullOrEmpty (ctx.LocalSettings.LocalAppInstallPath))
-							refPath = Path.Combine (refPath, "__install", ctx.LocalSettings.LocalAppInstallPath);
+						if (ContaintsMdTargetsFile (workArea) && !string.IsNullOrEmpty (ctx.LocalSettings.LocalAppInstallPath)) {
+							foreach (var p in ctx.LocalSettings.LocalAppInstallPath.Split (new [] {';'}, StringSplitOptions.RemoveEmptyEntries)) {
+								var ip = Path.Combine (refPath, "__install", p);
+								if (Directory.Exists (ip)) {
+									refPath = ip;
+									break;
+								}
+							}
+						}
 
 						string ops = " \"/p:ReferencePath=" + refPath + "\"";
 						
