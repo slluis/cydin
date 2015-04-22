@@ -1,4 +1,4 @@
-<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage" %>
+<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage<User>" %>
 <%@ Import Namespace="Cydin.Models" %>
 <%@ Import Namespace="Cydin.Properties" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="TitleContent" runat="server">
@@ -7,8 +7,7 @@
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
     <div class="center">
-    <b>We can't find an account associated with the OpenID:</b><br />
-    <i><%= (Model as User).OpenId%></i>
+    <b>We can't find an account associated with this user.</b><br />
     <br /><br />
     
     <% if (!string.IsNullOrEmpty (Settings.Default.PreviousWebSiteHost)) { %>
@@ -33,7 +32,7 @@
         </p>
         <p>
             <label for="Email">Email:</label><br />
-            <%= Html.TextBox("Email", user.Email, new { @class = "form-text" }) %>
+            <%= Html.TextBox("Email", user.Email, string.IsNullOrEmpty (user.Email) ? (object) new { @class = "form-text" } : (object) new { @class = "form-text", @readonly="readonly" }) %>
             <%= Html.ValidationMessage("Email", "*") %>
         </p>
         <p>

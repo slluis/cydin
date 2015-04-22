@@ -13,6 +13,8 @@ using Mono.Addins;
 using Mono.Addins.Description;
 using Mono.Addins.Setup;
 using System.Web.Mvc;
+using OAuth2;
+
 #if CYDIN_ON_SQLITE
 using MySqlConnection = Mono.Data.Sqlite.SqliteConnection;
 #else
@@ -29,6 +31,8 @@ namespace Cydin.Models
 		Application application;
 		bool isAdmin;
 		StatsModel stats;
+
+		static AuthorizationRoot oauth2AuthorizationRoot = new AuthorizationRoot ();
 
 		public static UserModel GetCurrent ()
 		{
@@ -109,7 +113,11 @@ namespace Cydin.Models
 			}
 			return null;
 		}
-		
+
+		public static AuthorizationRoot OAuth2AuthorizationRoot {
+			get { return oauth2AuthorizationRoot; }
+		}		
+
 		public void Dispose ()
 		{
 			db.Dispose ();

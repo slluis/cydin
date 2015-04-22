@@ -1,4 +1,6 @@
 using Cydin.Properties;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Cydin.Controllers
 {
@@ -114,37 +116,7 @@ namespace Cydin.Controllers
 				// Stage 3: OpenID Provider sending assertion response
 				switch (response.Status) {
 				case AuthenticationStatus.Authenticated:
-					
-					User user = CurrentServiceModel.GetUserFromOpenId (response.ClaimedIdentifier);
-					if (updating) {
-						if (user == null) {
-							ViewData["Message"] = "User not registered";
-							return View (loginView);
-						}
-						string newId = GetTicketId (ticket);
-						CurrentServiceModel.UpdateOpenId (response.ClaimedIdentifier, newId);
-						FormsAuthentication.SignOut ();
-					}
-					
-					// This is a new user, send them to a registration page
-					if (user == null) {
-						ViewData["openid"] = response.ClaimedIdentifier;
-						if (Settings.Default.SupportsMultiApps)
-							return Redirect (string.Format ("~/home/User/register?openid={0}", Url.Encode (response.ClaimedIdentifier)));
-						else
-							return Redirect (string.Format ("~/User/register?openid={0}", Url.Encode (response.ClaimedIdentifier)));
-					}
-					
-					Session["FriendlyIdentifier"] = response.FriendlyIdentifierForDisplay;
-					FormsAuthentication.SetAuthCookie (user.Login, false);
-
-					if (!string.IsNullOrEmpty (returnUrl)) 
-						return Redirect (returnUrl);
-					else if (updating)
-						return Redirect (ControllerHelper.GetActionUrl ("home", "Index", "Home"));
-					else
-						return RedirectToAction ("Index", "Home");
-					
+					return AuthorizeUser (response.ClaimedIdentifier, ticket, returnUrl, null);
 				case AuthenticationStatus.Canceled:
 					ViewData["Message"] = "Canceled at provider";
 					return View (loginView);
@@ -156,10 +128,87 @@ namespace Cydin.Controllers
 			return new EmptyResult ();
 		}
 
-		public ActionResult Register ()
+		public ActionResult GoogleAuthenticate (string returnUrl, string ticket)
+		{
+			var state = GetAuthState ();
+			Session ["AuthReturnUrl"] = returnUrl;
+			Session ["AuthTicket"] = ticket;
+			var uri = UserModel.OAuth2AuthorizationRoot.Clients.First ().GetLoginLinkUri (state);
+			return Redirect (uri);
+		}
+
+		string GetAuthState ()
+		{
+			MD5 md5 = MD5.Create ();
+			byte[] hash = md5.ComputeHash (Encoding.UTF8.GetBytes (Session.SessionID));
+			StringBuilder sb = new StringBuilder ();
+			foreach (byte b in hash)
+				sb.Append (b.ToString ("x"));
+			return sb.ToString ();
+		}
+
+		public ActionResult OAuth2Authenticate ()
+		{
+			var ac = UserModel.OAuth2AuthorizationRoot.Clients.First ();
+			var returnUrl = (string) Session ["AuthReturnUrl"];
+			var ticket = (string) Session ["AuthTicket"];
+			var state = Request.QueryString ["state"];
+			var info = ac.GetUserInfo(Request.QueryString);
+			if (state == GetAuthState ())
+				return AuthorizeUser ("google-oauth2:" + info.Id, ticket, returnUrl, info.Email);
+			ViewData["Message"] = "User could not be authenticated";
+			return View ("Login");
+		}
+
+		ActionResult AuthorizeUser (string claimedUserId, string ticket, string returnUrl, string userEmail = null, string userName = null)
+		{
+			bool updating = !string.IsNullOrEmpty (ticket);
+
+			User user = CurrentServiceModel.GetUserFromOpenId (claimedUserId);
+			if (updating) {
+				if (user == null) {
+					ViewData["Message"] = "User not registered";
+					return View ("Login");
+				}
+				string newId = GetTicketId (ticket);
+				CurrentServiceModel.UpdateOpenId (claimedUserId, newId);
+				FormsAuthentication.SignOut ();
+			}
+
+			// Try to migrate users using old Google OpenID to OAuth2
+			if (user == null && !string.IsNullOrEmpty (userEmail)) {
+				var currentUser = CurrentServiceModel.GetUserByEmail (userEmail);
+				if (currentUser != null && currentUser.OpenId.StartsWith ("https://www.google.com/accounts/o8/id")) {
+					CurrentServiceModel.UpdateOpenId (currentUser.OpenId, claimedUserId);
+					user = currentUser;
+				}
+			}
+
+			// This is a new user, send them to a registration page
+			if (user == null) {
+				ViewData["openid"] = claimedUserId;
+				if (Settings.Default.SupportsMultiApps)
+					return Redirect (string.Format ("~/home/User/register?openid={0}&name={1}&email={2}", Url.Encode (claimedUserId), Url.Encode (userName), Url.Encode (userEmail)));
+				else
+					return Redirect (string.Format ("~/User/register?openid={0}&name={1}&email={2}", Url.Encode (claimedUserId), Url.Encode (userName), Url.Encode (userEmail)));
+			}
+
+			FormsAuthentication.SetAuthCookie (user.Login, false);
+
+			if (!string.IsNullOrEmpty (returnUrl)) 
+				return Redirect (returnUrl);
+			else if (updating)
+				return Redirect (ControllerHelper.GetActionUrl ("home", "Index", "Home"));
+			else
+				return RedirectToAction ("Index", "Home");
+		}
+
+		public ActionResult Register (string openid, string name, string email)
 		{
 			User user = new User ();
-			user.OpenId = Request.QueryString["openid"];
+			user.OpenId = openid;
+			user.Name = name;
+			user.Email = email;
 			ViewData["ticket"] = GetIdTicket (user.OpenId);
 			return View ("Registration", user);
 		}

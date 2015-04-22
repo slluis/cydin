@@ -23,7 +23,7 @@
     	<table cellspacing="5px" style="border-collapse: separate">
     	<tr>
     	<td style="border:solid lightgrey 1px;padding:15px">
-        <a id="OIDgoogle" style="cursor:pointer" onclick="document.getElementById('openid_identifier').value = 'https://www.google.com/accounts/o8/id';document.getElementById('openid_submit').click()" style="cursor:hand"><img border=""0 src="/Media/signin-google.png" alt="Google" /></a>
+        <a id="OIDgoogle" style="cursor:pointer" href="<%=GetActionUrl("GoogleAuthenticate","User")%>?ReturnUrl=<%=HttpUtility.UrlEncode(ViewData["ReturnUrl"] as string) + "&ticket=" + HttpUtility.UrlEncode (ViewData["ticket"] as string)%>" style="cursor:hand"><img border="0" src="/Media/signin-google.png" alt="Google" /></a>
     	</td>
     	<td style="border:solid lightgrey 1px;padding:15px">
         <a id="OIDyahoo" style="cursor:pointer"  onclick="document.getElementById('openid_identifier').value = 'http://yahoo.com/';document.getElementById('openid_submit').click()"><img border="0" src="/Media/signin-yahoo.png" alt="Yahoo!" /></a>
