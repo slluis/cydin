@@ -24,7 +24,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
+#if CYDIN_ON_SQLITE
+using MySqlConnection = Mono.Data.Sqlite.SqliteConnection;
+#else
 using MySql.Data.MySqlClient;
+#endif
 using System.Data.Common;
 using System.Collections.Generic;
 using System.Text;
