@@ -73,6 +73,11 @@ namespace Cydin.Models
 				return Path.Combine (FileFolder, "All.mpack");
 		}
 
+		public string GetPublishedPath (string platform)
+		{
+			return BuildService.AddinsPath + GetPublishedVirtualPath (platform);
+		}
+
 		public string GetVirtualPath (string platform)
 		{
 			return "/Project/ReleasePackage/" + Id + "?platform=" + platform;

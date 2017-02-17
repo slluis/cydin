@@ -247,11 +247,14 @@ namespace Cydin.Builder
 							if (rel.Status == ReleaseStatus.PendingPublish || updateAll) {
 								if (!Directory.Exists (repoPath))
 									Directory.CreateDirectory (repoPath);
-								if (!File.Exists (rel.GetFilePath (plat))) {
-									Log (LogSeverity.Error, "Could not publish release " + rel.Version + " of add-in " + rel.AddinId + ". File " + rel.GetFilePath (plat) + " not found");
+								var relPath = rel.SourceTagId != null ? rel.GetFilePath (plat) : rel.GetPublishedPath (plat);
+
+								if (!File.Exists (relPath)) {
+									Log (LogSeverity.Error, "Could not publish release " + rel.Version + " of add-in " + rel.AddinId + ". File " + relPath + " not found");
 									continue;
 								}
-								File.Copy (rel.GetFilePath (plat), path, true);
+								if (Path.GetFullPath (relPath) != path)
+									File.Copy (relPath, path, true);
 								GenerateInstallerFile (m, path, rel, plat);
 								reposToBuild.Add (repoPath);
 								if (!releases.Contains (rel) && rel.Status == ReleaseStatus.PendingPublish)
@@ -522,7 +525,7 @@ namespace Cydin.Builder
 				msg.Subject = subject;
 				msg.SubjectEncoding = System.Text.Encoding.UTF8;
 				msg.IsBodyHtml = true;
-				c.SendAsync (msg, null);
+				c.Send (msg);
 				//Console.WriteLine ("pp SENDING MAIL TO: " + to + " - " + subject);
 			}
 		}
